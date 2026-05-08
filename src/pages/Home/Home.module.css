@@ -1,0 +1,137 @@
+:root {
+    --purple-main: #6347f3;
+    --text-dark: #2d3436;
+    --text-light: #636e72;
+    --bg-light: #fdfdfd;
+    --card-bg: #f4f5fc;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: white;
+    color: var(--text-dark);
+}
+
+.hero {
+    background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
+    padding: 80px 10%;
+}
+
+.heroInner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.heroBook img {
+    width: 220px;
+    filter: drop-shadow(15px 15px 30px rgba(0, 0, 0, 0.3));
+}
+
+.heroInfo {
+    /* Info do herói */
+}
+
+.tag {
+    /* Tag da obra */
+}
+
+.heroIllustration img {
+    width: 400px;
+    border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+    object-fit: cover;
+}
+
+.btnMain {
+    background: var(--purple-main);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.sectionPresentation {
+    /* Apresentação do projeto */
+}
+
+.sectionTitle {
+    /* Título da seção */
+}
+
+.sectionSubtitle {
+    /* Subtítulo da seção */
+}
+
+.cardsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    padding: 50px 10%;
+}
+
+.card {
+    background-color: var(--card-bg);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: left;
+}
+
+.icon {
+    /* Ícone do card */
+}
+
+.card a {
+    color: var(--purple-main);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.quoteContainer {
+    text-align: center;
+    padding: 100px 20%;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--text-light);
+}
+
+.librarySection {
+    /* Seção da biblioteca */
+}
+
+.libraryHeader {
+    /* Cabeçalho da biblioteca */
+}
+
+.booksGrid {
+    /* Grid dos livros */
+}
+
+.bookItem {
+    /* Item do livro */
+}
+
+.blueFooter {
+    background-color: var(--purple-main);
+    color: white;
+    text-align: center;
+    padding: 60px;
+}
+
+.subscribeBox input {
+    padding: 12px;
+    border-radius: 8px 0 0 8px;
+    border: none;
+    width: 300px;
+}
+
+.subscribeBox button {
+    padding: 12px 20px;
+    border-radius: 0 8px 8px 0;
+    border: none;
+    background: white;
+    color: var(--purple-main);
+    font-weight: bold;
+}
