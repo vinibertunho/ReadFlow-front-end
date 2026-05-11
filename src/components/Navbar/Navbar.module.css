@@ -9,7 +9,8 @@
     font-weight: bold;
     color: var(--purple-main);
     text-decoration: none;
-    font-size: 18px;\n    cursor: pointer;
+    font-size: 18px;
+    cursor: pointer;
     transition: color 0.3s;
 }
 
