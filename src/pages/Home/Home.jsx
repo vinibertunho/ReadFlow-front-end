@@ -1,5 +1,5 @@
+import { Navigate } from 'react-router-dom';
 import styles from './Home.module.css';
-import Navbar from '../../components/Navbar/Navbar';
 
 function Home() {
     return (
@@ -72,5 +72,3 @@ pertencia por direito, a eles que não tinham nada e tinham tudo."</h6>
         </body>
     );
 }
-
-export default Home;
