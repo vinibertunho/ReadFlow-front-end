@@ -11,7 +11,7 @@ function Navbar() {
     return (
         <nav className={styles.navbar}>
             <Link to="/" className={styles.navBrand}>
-                ReadFlow
+                <h1>ReadFlow</h1>
             </Link>
             <ul className={styles.navLinks}>
                 <li>
@@ -25,7 +25,7 @@ function Navbar() {
                     </Link>
                 </li>
                 <li>
-                    <Link to="/livro/1" className={isActive('/livro/1')}>
+                    <Link to="/livro" className={isActive('/livro')}>
                         Explorar obra
                     </Link>
                 </li>
@@ -55,7 +55,9 @@ function Navbar() {
                     </Link>
                 </li>
             </ul>
-            <div className={styles.navLang}>PT/EN 🌐</div>
+            <div className={styles.language}>
+               <button> PT/EN 🌐 </button>
+            </div>
         </nav>
     );
 }

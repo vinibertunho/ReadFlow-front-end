@@ -1,12 +1,15 @@
-
-import Biblioteca from './pages/Biblioteca de livros/Biblioteca';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home/Home';
 
 
 function App() {
     return (
-    <>
-        <Biblioteca />
-    </>
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<Home />} />
+                
+            </Routes>
+        </BrowserRouter>
     );
 }
 
