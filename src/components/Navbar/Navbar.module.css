@@ -4,12 +4,13 @@
     align-items: center;
     border-bottom: 1px solid #eee;
     padding: 15px 0;
-}\n
+}
 .navBrand {
     font-weight: bold;
     color: var(--purple-main);
     text-decoration: none;
-    font-size: 18px;\n    cursor: pointer;
+    font-size: 18px;
+    cursor: pointer;
     transition: color 0.3s;
 }
 
