@@ -1,11 +1,11 @@
-import { Navigate } from 'react-router-dom';
+import Navbar from '../../components/Navbar/Navbar';
 import styles from './Home.module.css';
 
 function Home() {
     return (
-        <body>
+        <>
+            <Navbar />
             <main>
-                <Navbar />
                 <section className={styles.header}>
                     <div className={styles.criancasCorrendo}>
                         
@@ -69,6 +69,8 @@ pertencia por direito, a eles que não tinham nada e tinham tudo."</h6>
                     </div>
                 </section>
             </main>
-        </body>
+        </>
     );
 }
+
+export default Home;

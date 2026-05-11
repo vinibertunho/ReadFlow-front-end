@@ -25,61 +25,63 @@ function Equipe() {
     }
 
     return (
-        <div className={styles.container}>
-            <section className={styles.hero}>
-                <div className={styles.overlay}>
-                    <span className={styles.bagge}>...</span>
+        <>
+            <Navbar />
+            <div className={styles.container}>
+                <section className={styles.hero}>
+                    <div className={styles.overlay}>
+                        <span className={styles.bagge}>...</span>
 
-                    <h1>Equipe</h1>
-                    <p>Composta por alunos do SESI-SENAI</p>
-                </div>
-            </section>
+                        <h1>Equipe</h1>
+                        <p>Composta por alunos do SESI-SENAI</p>
+                    </div>
+                </section>
 
-            <section className={styles.missao}>
-                <div className={styles.texto}>
-                    <h2>Nossa Missao</h2>
+                <section className={styles.missao}>
+                    <div className={styles.texto}>
+                        <h2>Nossa Missao</h2>
 
-                    <p>YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY</p>
+                        <p>YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY</p>
 
-                    <p>YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY</p>
-                </div>
+                        <p>YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY</p>
+                    </div>
 
-                <div className={styles.objetivos}>
-                    <h3>Objetivos</h3>
-                    <ul>
-                        <li>YYYYYYYYYYYYYYYYY</li>
-                        <li>YYYYYYYYYYYYYYYYY</li>
-                        <li>YYYYYYYYYYYYYYYYY</li>
-                        <li>YYYYYYYYYYYYYYYYY</li>
-                    </ul>
-                </div>
-            </section>
+                    <div className={styles.objetivos}>
+                        <h3>Objetivos</h3>
+                        <ul>
+                            <li>YYYYYYYYYYYYYYYYY</li>
+                            <li>YYYYYYYYYYYYYYYYY</li>
+                            <li>YYYYYYYYYYYYYYYYY</li>
+                            <li>YYYYYYYYYYYYYYYYY</li>
+                        </ul>
+                    </div>
+                </section>
 
-            <section className={styles.equipe}>
-                <h2>Membros da Equipe</h2>
+                <section className={styles.equipe}>
+                    <h2>Membros da Equipe</h2>
 
-                <div className={styles.grid}>
-                    {membros.map((item, index) => (
-                        <div key={index} className={styles.card}>
-                            <img src={item.picture.large} alt={item.name.first} />
+                    <div className={styles.grid}>
+                        {membros.map((item, index) => (
+                            <div key={index} className={styles.card}>
+                                <img src={item.picture.large} alt={item.name.first} />
 
-                            <div className={styles.info}>
-                                <h3>
-                                    {item.name.first} {item.name.last}
-                                </h3>
+                                <div className={styles.info}>
+                                    <h3>
+                                        {item.name.first} {item.name.last}
+                                    </h3>
 
-                                <span>Desenvolvedor(a)</span>
+                                    <span>Desenvolvedor(a)</span>
 
-                                <p>YYYYYYYYYYYY</p>
+                                    <p>YYYYYYYYYYYY</p>
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
-        </div>
+                        ))}
+                    </div>
+                </section>
+            </div>
+            <Footer />
+        </>
     );
 }
 
 export default Equipe;
-export default Navbar;
-export default Footer;
