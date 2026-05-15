@@ -1,55 +1,85 @@
-import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import styles from './BookCard.module.css';
 
 function BookCard({ dados }) {
     const {
+        id,
         titulo,
+        title,
         autor,
+        author,
         capa_url,
+        capaUrl,
+        capa,
         genero_pt,
+        generoPt,
         genero_en,
+        generoEn,
         descricao_pt,
+        descricaoPt,
         descricao_en,
+        descricaoEn,
     } = dados || {};
 
-    const placeholder = 'https://via.placeholder.com/400x600?text=Sem+Capa';
-    const [imgSrc, setImgSrc] = useState(capa_url || placeholder);
+    const tituloLivro = titulo || title || 'Título não disponível';
+    const autorLivro = autor || author || 'Desconhecido';
+    const capaLivro = capa_url || capaUrl || capa || '';
+    const generoPT = genero_pt || generoPt;
+    const generoEN = genero_en || generoEn;
+    const descricaoPT = descricao_pt || descricaoPt || 'Sem descrição disponível.';
+    const descricaoEN = descricao_en || descricaoEn || 'No description available.';
+    const livroHref = id ? `/livro/${id}` : '/livro';
+
+    function normalizeCover(url) {
+        if (!url) return '';
+        try {
+            let s = String(url).trim();
+            if (!/^https?:\/\//i.test(s)) s = 'https://' + s.replace(/^\/+/, '');
+            // ibb.co short links -> try converting to i.ibb.co and change common bad extensions
+            if (s.includes('ibb.co')) {
+                s = s.replace('https://ibb.co/', 'https://i.ibb.co/').replace('http://ibb.co/', 'https://i.ibb.co/');
+                s = s.replace(/\.peg$/i, '.png');
+                if (!/\.(png|jpg|jpeg|gif)$/i.test(s)) s = s + '.png';
+            }
+            return s;
+        } catch {
+            return String(url);
+        }
+    }
 
     return (
-        <article className={styles.card}>
-            <img
-                className={styles.foto}
-                src={imgSrc}
-                alt={titulo || 'Capa'}
-                onError={() => setImgSrc(placeholder)}
-            />
+        <Link to={livroHref} className={styles.card}>
+            <div className={styles.capaWrapper}>
+                <img
+                    className={styles.foto}
+                    src={normalizeCover(capaLivro) || 'https://via.placeholder.com/600x800?text=Capa+indispon%C3%ADvel'}
+                    alt={`Capa de ${tituloLivro}`}
+                    onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/600x800?text=Capa+indispon%C3%ADvel'; }}
+                />
+            </div>
 
             <div className={styles.info}>
                 <div className={styles.tags}>
-                    {genero_pt ? (
-                        <span className={styles.genero}>{genero_pt}</span>
-                    ) : null}
-                    {genero_en ? (
-                        <span className={styles.genero}>{genero_en}</span>
-                    ) : null}
+                    {generoPT ? <span className={styles.genero}>{generoPT}</span> : null}
+                    {generoEN ? <span className={styles.genero}>{generoEN}</span> : null}
                 </div>
 
-                <h2>{titulo || 'Título não disponível'}</h2>
-                <p className={styles.autor}>Por: {autor || 'Desconhecido'}</p>
+                <h2>{tituloLivro}</h2>
+                <p className={styles.autor}>Por: {autorLivro}</p>
 
                 <div className={styles.divisor} />
 
                 <div style={{ marginBottom: '10px' }}>
                     <span className={styles.idiomaRotulo}>PORTUGUÊS</span>
-                    <p className={styles.descricao}>{descricao_pt || 'Sem descrição disponível.'}</p>
+                    <p className={styles.descricao}>{descricaoPT}</p>
                 </div>
 
                 <div>
                     <span className={styles.idiomaRotulo}>ENGLISH</span>
-                    <p className={styles.descricao}>{descricao_en || 'No description available.'}</p>
+                    <p className={styles.descricao}>{descricaoEN}</p>
                 </div>
             </div>
-        </article>
+        </Link>
     );
 }
 
