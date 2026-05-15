@@ -1,21 +1,26 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home/Home';
-import Biblioteca from './pages/Biblioteca de livros/Biblioteca';
-import Livro from './pages/Livro/Livro';
-
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home/Home";
+import Livro from "./pages/Livro/Livro";
+import Biblioteca from "./pages/Biblioteca de livros/Biblioteca";
+import Equipe from "./pages/Equipe/Equipe";
+import Vestibular from "./pages/Vestibular/Vestibular";
+import Videoaulas from "./pages/Videoaulas/Videoaulas";
+import Simulados from "./pages/Simulados e quiz/Simulados";
 
 function App() {
-    return (
-        <BrowserRouter>
-            <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/biblioteca" element={<Biblioteca />} />
-                <Route path="/livro" element={<Livro />} />
-                <Route path="/livro/:id" element={<Livro />} />
-            </Routes>
-        </BrowserRouter>
-    );
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/biblioteca" element={<Biblioteca />} />
+        <Route path="/livro/:id" element={<Livro />} />
+        <Route path="/equipe" element={<Equipe />} />
+        <Route path="/vestibular" element={<Vestibular />} />
+        <Route path="/videoaulas" element={<Videoaulas />} />
+        <Route path="/simulados" element={<Simulados />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
-
 
 export default App;

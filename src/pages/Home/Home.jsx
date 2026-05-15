@@ -1,20 +1,14 @@
-
 import Navbar from '../../components/Navbar/Navbar';
 import styles from './Home.module.css';
 
 function Home() {
     return (
-        <main>
+        <>
             <Navbar />
-            <section className={styles.header}>
-                <div className={styles.criancasCorrendo}>
-                </div>
-                <div className={styles.conteudoHeader}>
-                    <div className={styles.textoHeader}>
-                        <h4>Obra de Jorge Amado</h4>
-                        <h1>Capitães da Areia</h1>
-                        <p>resumo do livro aqui rs</p>
-                        <button>Explorar mais</button>
+            <main>
+                <section className={styles.header}>
+                    <div className={styles.criancasCorrendo}>
+                        
                     </div>
                 </div>
             </section>
@@ -49,28 +43,10 @@ function Home() {
                         <p>Assista às videoaulas...</p>
                         <p>Ver Galeria → </p>
                     </div>
-                    <div className={styles.curiosidades}>
-                        <h4>Curiosidades e Dicas</h4>
-                        <p>Descubra curiosidades sobre o autor e a obra...</p>
-                        <p>Explorar → </p>
-                    </div>
-                </div>
-            </section>
-            <section className={styles.biblioteca}>
-                <div className={styles.fraseBonitaAesthetic}>
-                    <h6>"Eram os donos do trapiche e da cidade, pois a cidade de Salvador lhes
-pertencia por direito, a eles que não tinham nada e tinham tudo."</h6>
-                    <p> — Jorge Amado, 1937 </p>
-                </div>
-                <div className={styles.bibliotecaRealOficial}>
-                    <h3>Biblioteca de Livros</h3>
-                    <p>Explore as obras analisadas por outras equipes do projeto.</p>
-                </div>
-            </section>
-        </main>
+                </section>
+            </main>
+        </>
     );
 }
 
 export default Home;
-
-
