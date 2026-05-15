@@ -14,6 +14,7 @@ function Biblioteca() {
 
   useEffect(() => {
     const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // abort after 10s
 
     const normalizeBook = (livro) => ({
       ...livro,
@@ -58,17 +59,21 @@ function Biblioteca() {
         if (error.name !== 'AbortError') {
           setLivros([]);
           console.error('Erro ao buscar livros:', error);
+        } else {
+          console.warn('Request aborted (timeout or unmount)');
         }
       } finally {
-        if (!controller.signal.aborted) {
-          setCarregando(false);
-        }
+        clearTimeout(timeoutId);
+        setCarregando(false);
       }
     }
 
     fetchLivros();
 
-    return () => controller.abort();
+    return () => {
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
   }, []);
 
   const genres = useMemo(() => {

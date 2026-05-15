@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './BookCard.module.css';
 
@@ -9,7 +9,7 @@ function resolveCoverUrl(url) {
     if (!url || typeof url !== 'string') return '';
     const value = url.trim();
     if (!value) return '';
-    // ibb.co geralmente aponta para uma pagina, nao para a imagem direta.
+
     if (value.includes('ibb.co/') && !value.includes('i.ibb.co/')) return '';
     return value;
 }
@@ -19,7 +19,6 @@ function BookCard({ dados }) {
     const {
         id,
         titulo,
-        title,
         autor,
         anoPublicacao,
         ano_publicacao,
@@ -30,7 +29,6 @@ function BookCard({ dados }) {
         capas,
         foto,
         genero_pt,
-        generoPt,
         genero_en,
     } = dados || {};
 
@@ -38,10 +36,8 @@ function BookCard({ dados }) {
     const capaImagem = resolveCoverUrl(capa_url || imagem_url || imagem || capas || foto || '');
     const [imgSrc, setImgSrc] = useState(capaImagem || FALLBACK_COVER);
 
-    const rating = useMemo(() => {
-        const r = dados?.avaliacao || dados?.media_avaliacao || dados?.avaliacao_media || 4.6;
-        return typeof r === 'number' ? r : parseFloat(r) || 4.6;
-    }, [dados]);
+    const r = dados?.avaliacao || dados?.media_avaliacao || dados?.avaliacao_media || 4.6;
+    const rating = typeof r === 'number' ? r : parseFloat(r) || 4.6;
 
     const handleClick = () => {
         if (id) {
