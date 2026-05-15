@@ -89,7 +89,7 @@ function BookCard({ dados }) {
                 </div>
 
             </div>
-        </Link>
+        </article>
     );
 }
 

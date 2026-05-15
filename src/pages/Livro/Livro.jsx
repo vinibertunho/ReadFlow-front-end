@@ -1,8 +1,8 @@
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import styles from './Livro.module.css';
 
-const API_URL = "https://readflow-m8o6.onrender.com/api/livros";
+const API_URL = 'https://readflow-m8o6.onrender.com/api/livros';
 const FALLBACK_COVER =
     'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600"><rect width="400" height="600" fill="%23eef2ff"/><rect x="24" y="24" width="352" height="552" rx="16" fill="%23dbeafe"/><text x="200" y="300" text-anchor="middle" fill="%23334155" font-size="28" font-family="Arial">Sem capa</text></svg>';
 
@@ -14,6 +14,29 @@ function resolveCoverUrl(url) {
     return value;
 }
 
+function firstText(...values) {
+    return values.find((value) => typeof value === 'string' && value.trim())?.trim() || '';
+}
+
+function normalizeParagraphs(value) {
+    if (!value) return [];
+    if (Array.isArray(value)) {
+        return value
+            .flatMap((item) => String(item).split(/\n+/))
+            .map((item) => item.trim())
+            .filter(Boolean);
+    }
+
+    if (typeof value === 'string') {
+        return value
+            .split(/\n+|\s*;\s*/)
+            .map((item) => item.trim())
+            .filter(Boolean);
+    }
+
+    return [];
+}
+
 function Livro() {
     const { id } = useParams();
     const location = useLocation();
@@ -23,7 +46,6 @@ function Livro() {
     const [erro, setErro] = useState(null);
 
     useEffect(() => {
-        // Se não temos os dados do livro, buscar da API
         if (!livro && id) {
             async function fetchLivro() {
                 try {
@@ -45,20 +67,7 @@ function Livro() {
         }
     }, [id, livro]);
 
-    if (carregando) {
-        return <div className={styles.corpo}><p style={{ textAlign: 'center', marginTop: '50px' }}>Carregando...</p></div>;
-    }
-
-    if (erro || !livro) {
-        return (
-            <div className={styles.corpo}>
-                <div className={styles.container}>
-                    <p>{erro || 'Livro não encontrado'}</p>
-                    <button onClick={() => navigate(-1)} className={styles.botaoRoxo}>Voltar</button>
-                </div>
-            </div>
-        );
-    }
+    const data = livro || {};
 
     const {
         titulo,
@@ -92,166 +101,193 @@ function Livro() {
         avaliacao,
         media_avaliacao,
         avaliacao_media,
-    } = livro;
+        personagens,
+        personagens_pt,
+        personagens_en,
+        usuarioId,
+        criadoEm,
+        atualizadoEm,
+    } = data;
 
-    // Tenta puxar a capa de varios campos possiveis
     const capaImagem = resolveCoverUrl(capa_url || imagem_url || imagem || capas || foto || '');
     const ano = ano_publicacao || anoPublicacao;
-    const rating = avaliacao || media_avaliacao || avaliacao_media || 4.6;
-    const sinopseFinal = sinopse || descricao_pt || 'Sinopse não disponível.';
+    const rating = Number(avaliacao || media_avaliacao || avaliacao_media || 4.6);
+    const resumo = firstText(sinopse, descricao_pt, descricao_en);
+    const contexto = firstText(contexto_pt, contexto_en);
+    const detalhesAutor = firstText(detalhes_autor_pt, detalhes_autor_en);
+    const estilo = firstText(estilo_escrita_pt, estilo_escrita_en);
+    const verossimilhanca = firstText(verossimilhanca_pt, verossimilhanca_en);
+    const caracteristicas = firstText(caracteristicas_literarias_pt, caracteristicas_literarias_en);
+    const conclusao = firstText(conclusao_pt, conclusao_en);
+    const listaPersonagens = useMemo(
+        () => normalizeParagraphs(personagens || personagens_pt || personagens_en),
+        [personagens, personagens_pt, personagens_en]
+    );
+
+    if (carregando) {
+        return (
+            <div className={styles.page}>
+                <div className={styles.container}>
+                    <p className={styles.status}>Carregando livro...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (erro || !livro) {
+        return (
+            <div className={styles.page}>
+                <div className={styles.container}>
+                    <p className={styles.error}>{erro || 'Livro não encontrado'}</p>
+                    <button onClick={() => navigate(-1)} className={styles.botaoRoxo}>Voltar</button>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className={styles.corpo}>
+        <div className={styles.page}>
             <div className={styles.container}>
                 <button onClick={() => navigate(-1)} className={styles.voltarBtn}>
                     ← Voltar ao catálogo
                 </button>
 
-                <div className={styles.secaoTopo}>
-                    <img 
-                        src={capaImagem || FALLBACK_COVER} 
-                        alt={titulo}
-                        className={styles.fotoLivro}
-                        onError={(e) => {
-                            e.currentTarget.onerror = null;
-                            e.currentTarget.src = FALLBACK_COVER;
-                        }}
-                    />
+                <section className={styles.hero}>
+                    <div className={styles.coverCard}>
+                        {capaImagem ? (
+                            <img
+                                src={capaImagem}
+                                alt={titulo || 'Capa do livro'}
+                                className={styles.coverImage}
+                                onError={(event) => {
+                                    event.currentTarget.onerror = null;
+                                    event.currentTarget.src = FALLBACK_COVER;
+                                }}
+                            />
+                        ) : (
+                            <div className={styles.coverFallback}>Sem capa</div>
+                        )}
+                    </div>
 
-                    <div className={styles.infoLivro}>
+                    <div className={styles.heroContent}>
                         {(genero_pt || genero_en) && <span className={styles.tag}>{genero_pt || genero_en}</span>}
-                        <h1 className={styles.titulo}>{titulo || 'Título não disponível'}</h1>
-                        <p className={styles.autor}>por {autor || 'Desconhecido'}</p>
+                        <h1 className={styles.title}>{titulo || 'Título não disponível'}</h1>
+                        <p className={styles.author}>por {autor || 'Desconhecido'}</p>
 
-                        <div className={styles.rating}>
-                            {[1, 2, 3, 4, 5].map((i) => (
-                                <svg
-                                    key={i}
-                                    viewBox="0 0 24 24"
-                                    width="20"
-                                    height="20"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    style={{ marginRight: '4px' }}
-                                >
-                                    <path
-                                        d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.788 1.402 8.17L12 18.896l-7.336 3.872 1.402-8.17L.132 9.21l8.2-1.192z"
-                                        fill={i <= Math.round(rating) ? '#fbbf24' : '#e5e7eb'}
-                                    />
-                                </svg>
-                            ))}
-                            <span style={{ marginLeft: '8px', fontWeight: '600' }}>{rating.toFixed(1)}</span>
+                        <div className={styles.ratingRow}>
+                            <div className={styles.ratingStars} aria-hidden>
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                    <svg key={i} viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.788 1.402 8.17L12 18.896l-7.336 3.872 1.402-8.17L.132 9.21l8.2-1.192z"
+                                            fill={i <= Math.round(rating) ? '#fbbf24' : '#e5e7eb'}
+                                        />
+                                    </svg>
+                                ))}
+                            </div>
+                            <span className={styles.ratingNumber}>{Number.isFinite(rating) ? rating.toFixed(1) : '4.6'}</span>
                         </div>
 
                         <div className={styles.metaInfo}>
                             {ano && <span>📅 {ano}</span>}
                             {paginas && <span>📄 {paginas} páginas</span>}
                             {genero_en && <span>🌍 {genero_en}</span>}
+                            {usuarioId && <span>🧩 ID do autor: {usuarioId}</span>}
+                        </div>
+
+                        <div className={styles.actions}>
+                            {video_url && (
+                                <a className={styles.primaryButton} href={video_url} target="_blank" rel="noreferrer">
+                                    Assistir vídeo
+                                </a>
+                            )}
+                            <button className={styles.secondaryButton} onClick={() => navigate('/biblioteca')}>
+                                Ver catálogo
+                            </button>
                         </div>
                     </div>
-                </div>
+                </section>
 
-                <div className={styles.blocoBranco}>
-                    <h2 style={{ fontSize: '24px', marginBottom: '16px', color: '#1f2937' }}>Sinopse</h2>
-                    <p className={styles.sinopse}>{sinopseFinal}</p>
-                </div>
+                <main className={styles.main}>
+                    {resumo && (
+                        <section className={styles.introCard}>
+                            <h2 className={styles.sectionTitle}>Resumo da obra</h2>
+                            <p className={styles.fieldValue}>{resumo}</p>
+                        </section>
+                    )}
 
-                {contexto_pt && (
-                    <div className={styles.blocoBranco}>
-                        <h2 style={{ fontSize: '24px', marginBottom: '16px', color: '#1f2937' }}>Contexto</h2>
-                        <p className={styles.sinopse}>{contexto_pt}</p>
-                    </div>
-                )}
+                    <section className={styles.grid}>
+                        {contexto && (
+                            <article className={styles.field}>
+                                <p className={styles.fieldLabel}>Contexto</p>
+                                <p className={styles.fieldValue}>{contexto}</p>
+                            </article>
+                        )}
+                        {detalhesAutor && (
+                            <article className={styles.field}>
+                                <p className={styles.fieldLabel}>Sobre o autor</p>
+                                <p className={styles.fieldValue}>{detalhesAutor}</p>
+                            </article>
+                        )}
+                        {estilo && (
+                            <article className={styles.field}>
+                                <p className={styles.fieldLabel}>Estilo de escrita</p>
+                                <p className={styles.fieldValue}>{estilo}</p>
+                            </article>
+                        )}
+                        {verossimilhanca && (
+                            <article className={styles.field}>
+                                <p className={styles.fieldLabel}>Verossimilhança</p>
+                                <p className={styles.fieldValue}>{verossimilhanca}</p>
+                            </article>
+                        )}
+                        {caracteristicas && (
+                            <article className={styles.field}>
+                                <p className={styles.fieldLabel}>Características literárias</p>
+                                <p className={styles.fieldValue}>{caracteristicas}</p>
+                            </article>
+                        )}
+                        {conclusao && (
+                            <article className={styles.field}>
+                                <p className={styles.fieldLabel}>Conclusão</p>
+                                <p className={styles.fieldValue}>{conclusao}</p>
+                            </article>
+                        )}
+                    </section>
 
-                {detalhes_autor_pt && (
-                    <div className={styles.blocoBranco}>
-                        <h2 style={{ fontSize: '24px', marginBottom: '16px', color: '#1f2937' }}>Detalhes do Autor</h2>
-                        <p className={styles.sinopse}>{detalhes_autor_pt}</p>
-                    </div>
-                )}
+                    {(listaPersonagens.length || video_url) && (
+                        <section className={styles.listSection}>
+                            {listaPersonagens.length > 0 && (
+                                <div className={styles.introCard}>
+                                    <h2 className={styles.sectionTitle}>Personagens</h2>
+                                    <ul className={styles.list}>
+                                        {listaPersonagens.map((personagem) => (
+                                            <li key={personagem}>{personagem}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
 
-                {estilo_escrita_pt && (
-                    <div className={styles.blocoBranco}>
-                        <h2 style={{ fontSize: '24px', marginBottom: '16px', color: '#1f2937' }}>Estilo de Escrita</h2>
-                        <p className={styles.sinopse}>{estilo_escrita_pt}</p>
-                    </div>
-                )}
+                            {video_url && (
+                                <div className={styles.introCard}>
+                                    <h2 className={styles.sectionTitle}>Vídeo</h2>
+                                    <a href={video_url} target="_blank" rel="noreferrer">Assistir vídeo</a>
+                                </div>
+                            )}
 
-                {verossimilhanca_pt && (
-                    <div className={styles.blocoBranco}>
-                        <h2 style={{ fontSize: '24px', marginBottom: '16px', color: '#1f2937' }}>Verossimilhança</h2>
-                        <p className={styles.sinopse}>{verossimilhanca_pt}</p>
-                    </div>
-                )}
-
-                {caracteristicas_literarias_pt && (
-                    <div className={styles.blocoBranco}>
-                        <h2 style={{ fontSize: '24px', marginBottom: '16px', color: '#1f2937' }}>Características Literárias</h2>
-                        <p className={styles.sinopse}>{caracteristicas_literarias_pt}</p>
-                    </div>
-                )}
-
-                {conclusao_pt && (
-                    <div className={styles.blocoBranco}>
-                        <h2 style={{ fontSize: '24px', marginBottom: '16px', color: '#1f2937' }}>Conclusão</h2>
-                        <p className={styles.sinopse}>{conclusao_pt}</p>
-                    </div>
-                )}
-
-                {descricao_en && (
-                    <div className={styles.blocoBranco}>
-                        <h2 style={{ fontSize: '24px', marginBottom: '16px', color: '#1f2937' }}>Description (EN)</h2>
-                        <p className={styles.sinopse}>{descricao_en}</p>
-                    </div>
-                )}
-
-                {contexto_en && (
-                    <div className={styles.blocoBranco}>
-                        <h2 style={{ fontSize: '24px', marginBottom: '16px', color: '#1f2937' }}>Context (EN)</h2>
-                        <p className={styles.sinopse}>{contexto_en}</p>
-                    </div>
-                )}
-
-                {detalhes_autor_en && (
-                    <div className={styles.blocoBranco}>
-                        <h2 style={{ fontSize: '24px', marginBottom: '16px', color: '#1f2937' }}>Author Details (EN)</h2>
-                        <p className={styles.sinopse}>{detalhes_autor_en}</p>
-                    </div>
-                )}
-
-                {estilo_escrita_en && (
-                    <div className={styles.blocoBranco}>
-                        <h2 style={{ fontSize: '24px', marginBottom: '16px', color: '#1f2937' }}>Writing Style (EN)</h2>
-                        <p className={styles.sinopse}>{estilo_escrita_en}</p>
-                    </div>
-                )}
-
-                {verossimilhanca_en && (
-                    <div className={styles.blocoBranco}>
-                        <h2 style={{ fontSize: '24px', marginBottom: '16px', color: '#1f2937' }}>Verisimilitude (EN)</h2>
-                        <p className={styles.sinopse}>{verossimilhanca_en}</p>
-                    </div>
-                )}
-
-                {caracteristicas_literarias_en && (
-                    <div className={styles.blocoBranco}>
-                        <h2 style={{ fontSize: '24px', marginBottom: '16px', color: '#1f2937' }}>Literary Features (EN)</h2>
-                        <p className={styles.sinopse}>{caracteristicas_literarias_en}</p>
-                    </div>
-                )}
-
-                {conclusao_en && (
-                    <div className={styles.blocoBranco}>
-                        <h2 style={{ fontSize: '24px', marginBottom: '16px', color: '#1f2937' }}>Conclusion (EN)</h2>
-                        <p className={styles.sinopse}>{conclusao_en}</p>
-                    </div>
-                )}
-
-                {video_url && (
-                    <div className={styles.blocoBranco}>
-                        <h2 style={{ fontSize: '24px', marginBottom: '16px', color: '#1f2937' }}>Video</h2>
-                        <a href={video_url} target="_blank" rel="noreferrer">Assistir video</a>
-                    </div>
-                )}
+                            <div className={styles.introCard}>
+                                <h2 className={styles.sectionTitle}>Dados da API</h2>
+                                <ul className={styles.list}>
+                                    <li><strong>Título:</strong> {titulo || '-'}</li>
+                                    <li><strong>Autor:</strong> {autor || '-'}</li>
+                                    <li><strong>Ano:</strong> {ano || '-'}</li>
+                                    <li><strong>Criado em:</strong> {criadoEm ? new Date(criadoEm).toLocaleDateString('pt-BR') : '-'}</li>
+                                    <li><strong>Atualizado em:</strong> {atualizadoEm ? new Date(atualizadoEm).toLocaleDateString('pt-BR') : '-'}</li>
+                                </ul>
+                            </div>
+                        </section>
+                    )}
+                </main>
             </div>
         </div>
     );
