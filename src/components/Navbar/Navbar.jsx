@@ -22,7 +22,8 @@ function Navbar() {
       : styles.navLink;
   };
 
-  return (
+    return (
+<main className={styles.container}>
     <nav className={styles.navbar}>
       <Link to="/" className={styles.navBrand}>
         <h1>ReadFlow</h1>
@@ -42,6 +43,7 @@ function Navbar() {
         <button className={styles.langBtn}> PT/EN 🌐 </button>
       </div>
     </nav>
+</main>
   );
 }
 
