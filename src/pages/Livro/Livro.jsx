@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import styles from './Livro.module.css';
 
@@ -45,6 +46,15 @@ function Livro() {
     const [carregando, setCarregando] = useState(!livro);
     const [erro, setErro] = useState(null);
 
+    const [listaPersonagens, setListaPersonagens] = useState(() =>
+        normalizeParagraphs(
+            location.state?.livro?.personagens ||
+                location.state?.livro?.personagens_pt ||
+                location.state?.livro?.personagens_en ||
+                ''
+        )
+    );
+
     useEffect(() => {
         if (!livro && id) {
             async function fetchLivro() {
@@ -56,6 +66,9 @@ function Livro() {
                     }
                     const data = await response.json();
                     setLivro(data);
+                    setListaPersonagens(
+                        normalizeParagraphs(data?.personagens || data?.personagens_pt || data?.personagens_en || '')
+                    );
                 } catch (error) {
                     setErro(error.message);
                     console.error('Erro ao buscar livro:', error);
@@ -63,6 +76,7 @@ function Livro() {
                     setCarregando(false);
                 }
             }
+
             fetchLivro();
         }
     }, [id, livro]);
@@ -101,10 +115,6 @@ function Livro() {
         avaliacao,
         media_avaliacao,
         avaliacao_media,
-        personagens,
-        personagens_pt,
-        personagens_en,
-        usuarioId,
         criadoEm,
         atualizadoEm,
     } = data;
@@ -119,10 +129,28 @@ function Livro() {
     const verossimilhanca = firstText(verossimilhanca_pt, verossimilhanca_en);
     const caracteristicas = firstText(caracteristicas_literarias_pt, caracteristicas_literarias_en);
     const conclusao = firstText(conclusao_pt, conclusao_en);
-    const listaPersonagens = useMemo(
-        () => normalizeParagraphs(personagens || personagens_pt || personagens_en),
-        [personagens, personagens_pt, personagens_en]
+
+    // Analysis fields for the 'Análise da obra' tab
+    const analiseTexto = firstText(detalhesAutor, conclusao, resumo, contexto);
+    const simbolismoLines = normalizeParagraphs(caracteristicas || '');
+    const engajamentoLines = normalizeParagraphs(detalhesAutor || estilo || '');
+    const temasLines = normalizeParagraphs(contexto || caracteristicas || '');
+
+    // Tabs: ensure 'Personagens' and 'Contexto histórico' tabs are present
+    const hasFicha = Boolean(
+        detalhesAutor || estilo || verossimilhanca || caracteristicas || conclusao || paginas || ano
     );
+
+    const tabs = [];
+    if (resumo) tabs.push({ id: 'resumo', label: 'Resumo' });
+    // always include personagens and contexto tabs (content may be empty)
+    tabs.push({ id: 'personagens', label: 'Personagens' });
+    tabs.push({ id: 'contexto', label: 'Contexto histórico' });
+    if (hasFicha) tabs.push({ id: 'ficha', label: 'Ficha técnica' });
+    if (video_url) tabs.push({ id: 'video', label: 'Vídeo' });
+    tabs.push({ id: 'dados', label: 'Análise da obra' });
+
+    const [activeTab, setActiveTab] = useState(tabs[0]?.id || 'dados');
 
     if (carregando) {
         return (
@@ -172,7 +200,7 @@ function Livro() {
                     <div className={styles.heroContent}>
                         {(genero_pt || genero_en) && <span className={styles.tag}>{genero_pt || genero_en}</span>}
                         <h1 className={styles.title}>{titulo || 'Título não disponível'}</h1>
-                        <p className={styles.author}>por {autor || 'Desconhecido'}</p>
+                        
 
                         <div className={styles.ratingRow}>
                             <div className={styles.ratingStars} aria-hidden>
@@ -192,7 +220,7 @@ function Livro() {
                             {ano && <span>📅 {ano}</span>}
                             {paginas && <span>📄 {paginas} páginas</span>}
                             {genero_en && <span>🌍 {genero_en}</span>}
-                            {usuarioId && <span>🧩 ID do autor: {usuarioId}</span>}
+                            {autor && <span>Autor: <strong>{autor}</strong></span>}
                         </div>
 
                         <div className={styles.actions}>
@@ -209,84 +237,160 @@ function Livro() {
                 </section>
 
                 <main className={styles.main}>
-                    {resumo && (
-                        <section className={styles.introCard}>
-                            <h2 className={styles.sectionTitle}>Resumo da obra</h2>
-                            <p className={styles.fieldValue}>{resumo}</p>
-                        </section>
-                    )}
+                    <div className={styles.tabsBar} role="tablist" aria-label="Seções do livro">
+                        {tabs.map((t) => (
+                            <button
+                                key={t.id}
+                                role="tab"
+                                aria-selected={activeTab === t.id}
+                                className={activeTab === t.id ? styles.tabActive : styles.tab}
+                                onClick={() => setActiveTab(t.id)}
+                            >
+                                {t.label}
+                            </button>
+                        ))}
+                    </div>
 
-                    <section className={styles.grid}>
-                        {contexto && (
-                            <article className={styles.field}>
-                                <p className={styles.fieldLabel}>Contexto</p>
-                                <p className={styles.fieldValue}>{contexto}</p>
-                            </article>
+                    <div className={styles.tabContent}>
+                        {activeTab === 'resumo' && resumo && (
+                            <section className={styles.introCard}>
+                                <h2 className={styles.sectionTitle}>Resumo da obra</h2>
+                                <p className={styles.fieldValue}>{resumo}</p>
+                            </section>
                         )}
-                        {detalhesAutor && (
-                            <article className={styles.field}>
-                                <p className={styles.fieldLabel}>Sobre o autor</p>
-                                <p className={styles.fieldValue}>{detalhesAutor}</p>
-                            </article>
-                        )}
-                        {estilo && (
-                            <article className={styles.field}>
-                                <p className={styles.fieldLabel}>Estilo de escrita</p>
-                                <p className={styles.fieldValue}>{estilo}</p>
-                            </article>
-                        )}
-                        {verossimilhanca && (
-                            <article className={styles.field}>
-                                <p className={styles.fieldLabel}>Verossimilhança</p>
-                                <p className={styles.fieldValue}>{verossimilhanca}</p>
-                            </article>
-                        )}
-                        {caracteristicas && (
-                            <article className={styles.field}>
-                                <p className={styles.fieldLabel}>Características literárias</p>
-                                <p className={styles.fieldValue}>{caracteristicas}</p>
-                            </article>
-                        )}
-                        {conclusao && (
-                            <article className={styles.field}>
-                                <p className={styles.fieldLabel}>Conclusão</p>
-                                <p className={styles.fieldValue}>{conclusao}</p>
-                            </article>
-                        )}
-                    </section>
 
-                    {(listaPersonagens.length || video_url) && (
-                        <section className={styles.listSection}>
-                            {listaPersonagens.length > 0 && (
-                                <div className={styles.introCard}>
-                                    <h2 className={styles.sectionTitle}>Personagens</h2>
+                        {activeTab === 'personagens' && (
+                            <section className={styles.introCard}>
+                                <h2 className={styles.sectionTitle}>Personagens</h2>
+                                {listaPersonagens.length > 0 ? (
                                     <ul className={styles.list}>
                                         {listaPersonagens.map((personagem) => (
                                             <li key={personagem}>{personagem}</li>
                                         ))}
                                     </ul>
-                                </div>
-                            )}
+                                ) : (
+                                    <div />
+                                )}
+                            </section>
+                        )}
 
-                            {video_url && (
+                        {activeTab === 'contexto' && (
+                            <section className={styles.introCard}>
+                                <h2 className={styles.sectionTitle}>Contexto histórico</h2>
+                                {contexto ? <p className={styles.fieldValue}>{contexto}</p> : <div />}
+                            </section>
+                        )}
+
+                        {activeTab === 'ficha' && hasFicha && (
+                            <section className={styles.grid}>
+                                {contexto && (
+                                    <article className={styles.field}>
+                                        <p className={styles.fieldLabel}>Contexto</p>
+                                        <p className={styles.fieldValue}>{contexto}</p>
+                                    </article>
+                                )}
+                                {detalhesAutor && (
+                                    <article className={styles.field}>
+                                        <p className={styles.fieldLabel}>Sobre o autor</p>
+                                        <p className={styles.fieldValue}>{detalhesAutor}</p>
+                                    </article>
+                                )}
+                                {estilo && (
+                                    <article className={styles.field}>
+                                        <p className={styles.fieldLabel}>Estilo de escrita</p>
+                                        <p className={styles.fieldValue}>{estilo}</p>
+                                    </article>
+                                )}
+                                {verossimilhanca && (
+                                    <article className={styles.field}>
+                                        <p className={styles.fieldLabel}>Verossimilhança</p>
+                                        <p className={styles.fieldValue}>{verossimilhanca}</p>
+                                    </article>
+                                )}
+                                {caracteristicas && (
+                                    <article className={styles.field}>
+                                        <p className={styles.fieldLabel}>Características literárias</p>
+                                        <p className={styles.fieldValue}>{caracteristicas}</p>
+                                    </article>
+                                )}
+                                {conclusao && (
+                                    <article className={styles.field}>
+                                        <p className={styles.fieldLabel}>Conclusão</p>
+                                        <p className={styles.fieldValue}>{conclusao}</p>
+                                    </article>
+                                )}
+                            </section>
+                        )}
+
+                        {activeTab === 'video' && video_url && (
+                            <section className={styles.introCard}>
+                                <h2 className={styles.sectionTitle}>Vídeo</h2>
+                                <a href={video_url} target="_blank" rel="noreferrer">Assistir vídeo</a>
+                            </section>
+                        )}
+
+                        {activeTab === 'dados' && (
+                            <section>
+                                {analiseTexto && (
+                                    <div className={styles.analysisIntro}>
+                                        <p className={styles.fieldValue}>{analiseTexto}</p>
+                                    </div>
+                                )}
+
+                                <div className={styles.analysisGrid}>
+                                    <div className={styles.analysisCard}>
+                                        <h3 className={styles.analysisCardTitle}>Simbolismo</h3>
+                                        <div className={styles.analysisCardContent}>
+                                            {simbolismoLines.length > 0 ? (
+                                                simbolismoLines.map((line, idx) => (
+                                                    <p key={idx} className={styles.fieldValue}>{line}</p>
+                                                ))
+                                            ) : (
+                                                <div />
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className={styles.analysisCard}>
+                                        <h3 className={styles.analysisCardTitle}>Engajamento</h3>
+                                        <div className={styles.analysisCardContent}>
+                                            {engajamentoLines.length > 0 ? (
+                                                engajamentoLines.map((line, idx) => (
+                                                    <p key={idx} className={styles.fieldValue}>{line}</p>
+                                                ))
+                                            ) : (
+                                                <div />
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className={styles.analysisCard}>
+                                        <h3 className={styles.analysisCardTitle}>Temas chave</h3>
+                                        <div className={styles.analysisCardContent}>
+                                            {temasLines.length > 0 ? (
+                                                temasLines.map((line, idx) => (
+                                                    <p key={idx} className={styles.fieldValue}>{line}</p>
+                                                ))
+                                            ) : (
+                                                <div />
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div className={styles.introCard}>
-                                    <h2 className={styles.sectionTitle}>Vídeo</h2>
-                                    <a href={video_url} target="_blank" rel="noreferrer">Assistir vídeo</a>
+                                    <h2 className={styles.sectionTitle}>Metadados</h2>
+                                    <ul className={styles.list}>
+                                        {titulo && <li><strong>Título:</strong> {titulo}</li>}
+                                        {autor && <li><strong>Autor:</strong> {autor}</li>}
+                                        {ano && <li><strong>Ano:</strong> {ano}</li>}
+                                        {criadoEm && <li><strong>Criado em:</strong> {new Date(criadoEm).toLocaleDateString('pt-BR')}</li>}
+                                        {atualizadoEm && <li><strong>Atualizado em:</strong> {new Date(atualizadoEm).toLocaleDateString('pt-BR')}</li>}
+                                    </ul>
                                 </div>
-                            )}
-
-                            <div className={styles.introCard}>
-                                <h2 className={styles.sectionTitle}>Dados da API</h2>
-                                <ul className={styles.list}>
-                                    <li><strong>Título:</strong> {titulo || '-'}</li>
-                                    <li><strong>Autor:</strong> {autor || '-'}</li>
-                                    <li><strong>Ano:</strong> {ano || '-'}</li>
-                                    <li><strong>Criado em:</strong> {criadoEm ? new Date(criadoEm).toLocaleDateString('pt-BR') : '-'}</li>
-                                    <li><strong>Atualizado em:</strong> {atualizadoEm ? new Date(atualizadoEm).toLocaleDateString('pt-BR') : '-'}</li>
-                                </ul>
-                            </div>
-                        </section>
-                    )}
+                            </section>
+                        )}
+                    </div>
                 </main>
             </div>
         </div>
