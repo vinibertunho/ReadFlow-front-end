@@ -19,6 +19,7 @@ function BookCard({ dados }) {
     const {
         id,
         titulo,
+        title,
         autor,
         anoPublicacao,
         ano_publicacao,
@@ -29,6 +30,7 @@ function BookCard({ dados }) {
         capas,
         foto,
         genero_pt,
+        generoPt,
         genero_en,
     } = dados || {};
 
@@ -87,7 +89,7 @@ function BookCard({ dados }) {
                 </div>
 
             </div>
-        </article>
+        </Link>
     );
 }
 
