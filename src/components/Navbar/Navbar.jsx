@@ -2,6 +2,9 @@ import { Link, useLocation } from 'react-router-dom';
 import styles from './Navbar.module.css';
 
 function Navbar() {
+    const toggleLanguage = () => {
+        console.log('Mudar idioma');
+    };
 
   const getLinkClass = (path) => {
     return location.pathname === path
