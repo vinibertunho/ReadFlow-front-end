@@ -2,7 +2,6 @@ import { Link, useLocation } from 'react-router-dom';
 import styles from './Navbar.module.css';
 
 function Navbar() {
-  const location = useLocation();
 
   const getLinkClass = (path) => {
     return location.pathname === path
@@ -29,4 +28,3 @@ function Navbar() {
 }
 
 export default Navbar;
-

@@ -6,7 +6,7 @@ import Equipe from "./pages/Equipe/Equipe";
 import Vestibular from "./pages/Vestibular/Vestibular";
 import Videoaulas from "./pages/Videoaulas/Videoaulas";
 import Simulados from "./pages/Simulados e quiz/Simulados";
-import Curiosidades from './pages/Curiosidades e dicas/Curiosidades';
+import Footer from "../src/components/Footer/Footer"
 
 function App() {
   return (
@@ -21,6 +21,7 @@ function App() {
         <Route path="/simulados" element={<Simulados />} />
         <Route path="/curiosidades" element={<Curiosidades />} />
       </Routes>
+      <Footer />
     </BrowserRouter>
   );
 }

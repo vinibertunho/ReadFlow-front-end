@@ -4,34 +4,55 @@ function Footer() {
     return (
         <footer className={styles.footer}>
             <div className={styles.container}>
-                {/* Identidade Visual */}
                 <div className={styles.brand}>
-                    <img src="/logo-readflow.svg" alt="Logo ReadFlow" className={styles.logo} />
+                    <a href="/">
+                        <img src="../../../public/image/logo-do-readflow.png" alt="Logo ReadFlow" className={styles.logo} />
+                    </a>
                     <p>Sua leitura em um novo fluxo.</p>
                 </div>
 
-                {/* Navegação Secundária */}
                 <div className={styles.nav}>
                     <h3>Navegação</h3>
                     <ul>
                         <li>
-                            <a href="/sobre">Quem Somos</a>
+                            <a href="../../pages/Home/Home.jsx">Home</a>
                         </li>
                         <li>
-                            <a href="/funcionalidades">Funcionalidades</a>
+                            <a href="../../pages/Biblioteca de livros/Biblioteca.jsx">Biblioteca</a>
                         </li>
                         <li>
-                            <a href="/precos">Planos</a>
+                            <a href="../../pages/Equipe/Equipe.jsx">Equipe</a>
+                        </li>
+                        <li>
+                            <a href="../../pages/Vestibular/Vestibular.css">Vestibular</a>
+                        </li>
+                        <li>
+                            <a href="../../pages/Simulados e quiz/Simulados.jsx">Quiz</a>
+                        </li>
+                        <li>
+                            <a href="../../pages/Videoaulas/Videoaulas.jsx">Videoaulas</a>
+                        </li>
+                        <li>
+                            <a href="../../pages/Curiosidades e dicas/Curiosidades.jsx">Curiosidades</a>
+                        </li>
+                        <hr className={styles.navDivider} />
+                        <li>
+                            <a href="../../pages/Equipe/Equipe.jsx">Quem Somos</a>
                         </li>
                     </ul>
                 </div>
 
-                {/* Contatos e Suporte */}
                 <div className={styles.contact}>
                     <h3>Contato</h3>
-                    <p>E-mail: suporte@readflow.com.br</p>
-                    <p>Telefone: (11) 9999-9999</p>
-                    <p>Endereço: Av. Paulista, 1000 - SP</p>
+                    <p>
+                        E-mail: <a href="mailto:suporte@readflow.com.br" className={styles.contactLink}>readflow@gmail.com</a>
+                    </p>
+                    <p>
+                        Telefone: <a href="tel:1199999999" className={styles.contactLink}>(11) 9999-9999</a>
+                    </p>
+                    <p>
+                        Endereço: <a href="https://maps.google.com/?q=Av.+Paulista,+1000+-+SP" target="_blank" rel="noopener noreferrer" className={styles.contactLink}>Av. Paulista, 1000 - SP</a>
+                    </p>
                     <a href="/suporte" className={styles.supportBtn}>
                         Falar com o SAC
                     </a>
@@ -40,7 +61,6 @@ function Footer() {
 
             <hr className={styles.divider} />
 
-            {/* Direitos Autorais */}
             <div className={styles.copyright}>
                 <p>&copy; 2026 ReadFlow. Todos os direitos reservados.</p>
             </div>
