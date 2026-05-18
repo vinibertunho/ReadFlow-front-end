@@ -24,7 +24,7 @@ function Navbar() {
                 <ul className={styles.links}>
                     <li>
                         <Link to="/" className={getLinkClass('/')}>
-                            Home
+                            Início
                         </Link>
                     </li>
 
