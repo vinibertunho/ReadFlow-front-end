@@ -76,14 +76,10 @@
 .textoHeader h4 {
     color: var(--purple-main);
     background-color: var(--details);
-
     padding: 2.5px 14px;
-
     border-radius: 20px;
-
     font-size: 14px;
-    font-weight: 600;
-
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 
