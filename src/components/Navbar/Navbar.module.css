@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap');
+
 :root {
     --purple-main: #7b43f5;
     --text-dark: #2d3436;
@@ -7,13 +9,17 @@
     --details: #b5aaff;
 }
 
+*{
+    font-family: 'manrope', serif;
+}
+
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 3rem;
     background-color: var(--bg-light);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgb(0, 0, 0);
     display: flex;
 }
 
@@ -77,6 +83,7 @@
     font-weight: bold;
     color: #6d28d9;
     text-decoration: none;
+    font-weight: 1000;
 }
 
 .logoImage {
