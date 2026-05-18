@@ -1,16 +1,77 @@
+import { useEffect, useState } from 'react';
 import Navbar from '../../components/Navbar/Navbar';
 import styles from './Home.module.css';
+import criancasCorrendo from '../../assets/criancas.jpg';
+
+const API_URL = 'https://readflow-m8o6.onrender.com/api/livros';
+const FALLBACK_COVER =
+    'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600"><rect width="400" height="600" fill="%23eef2ff"/><rect x="24" y="24" width="352" height="552" rx="16" fill="%23dbeafe"/><text x="200" y="300" text-anchor="middle" fill="%23334155" font-size="28" font-family="Arial">Sem capa</text></svg>';
+
+const resolveCoverUrl = (url) => {
+    if (!url) return '';
+    return url;
+};
 
 function Home() {
+    const [livros, setLivros] = useState([]);
+
+    useEffect(() => {
+        fetch(API_URL)
+            .then((res) => res.json())
+            .then((data) => {
+                setLivros(data);
+            })
+            .catch((err) => {
+                console.error('Erro ao buscar livros:', err);
+            });
+    }, []);
+
+    const libroPrincipal = livros[0] || {};
+
+    const capaUrlOriginal =
+        libroPrincipal.capa_url ||
+        libroPrincipal.imagem_url ||
+        libroPrincipal.imagem ||
+        libroPrincipal.capas ||
+        libroPrincipal.foto ||
+        '';
+
+    const capaImagem = resolveCoverUrl(capaUrlOriginal);
+    const titulo = libroPrincipal.titulo || 'Capitães da Areia';
+
     return (
         <>
             <Navbar />
-            <main>
+            <main className={styles.homeContainer}>
                 <section className={styles.header}>
-                    <div className={styles.criancasCorrendo}>
-                        
+                    <div className={styles.conteudoHeader}>
+                        <div className={styles.capaLivro}>
+                            {capaImagem ? (
+                                <img
+                                    src={capaImagem}
+                                    alt={titulo}
+                                    className={styles.coverImage}
+                                    onError={(event) => {
+                                        event.currentTarget.onerror = null;
+                                        event.currentTarget.src = FALLBACK_COVER;
+                                    }}
+                                />
+                            ) : (
+                                <div className={styles.coverFallback}>Sem capa</div>
+                            )}
+                        </div>
+                        <div className={styles.textoHeader}>
+                            <h4>Obra de Jorge Amado</h4>
+                            <h1>{titulo}</h1>
+                            <p>{libroPrincipal.resumo || 'resumo do livro aqui rs'}</p>
+                            <button>Explorar mais</button>
+                        </div>
+                        <div className={styles.criancasCorrendo}>
+                            <img src={criancasCorrendo} alt="Crianças correndo" className={styles.criancas} />
+                        </div>
                     </div>
                 </section>
+
                 <section className={styles.destaques}>
                     <div className={styles.apresentacao}>
                         <h3>Apresentação do Projeto</h3>
@@ -35,13 +96,32 @@ function Home() {
                         <div className={styles.simulados}>
                             <h4>Simulados e Quizes</h4>
                             <p>Uooooou</p>
-                            <p>Ver tester → </p>
+                            <p>Ver testes → </p>
                         </div>
                         <div className={styles.videoaulas}>
                             <h4>Videoaulas</h4>
                             <p>Assista às videoaulas...</p>
                             <p>Ver Galeria → </p>
                         </div>
+                        <div className={styles.curiosidades}>
+                            <h4>Curiosidades e Dicas</h4>
+                            <p>Descubra curiosidades sobre o autor e a obra...</p>
+                            <p>Explorar → </p>
+                        </div>
+                    </div>
+                </section>
+
+                <section className={styles.biblioteca}>
+                    <div className={styles.fraseBonitaAesthetic}>
+                        <h6>
+                            "Eram os donos do trapiche e da cidade, pois a cidade de Salvador lhes
+                            pertencia por direito, a eles que não tinham nada e tinham tudo."
+                        </h6>
+                        <p> — Jorge Amado, 1937 </p>
+                    </div>
+                    <div className={styles.bibliotecaRealOficial}>
+                        <h3>Biblioteca de Livros</h3>
+                        <p>Explore as obras analisadas por outras equipes do projeto.</p>
                     </div>
                 </section>
             </main>
