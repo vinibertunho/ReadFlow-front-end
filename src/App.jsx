@@ -6,6 +6,7 @@ import Equipe from "./pages/Equipe/Equipe";
 import Vestibular from "./pages/Vestibular/Vestibular";
 import Videoaulas from "./pages/Videoaulas/Videoaulas";
 import Simulados from "./pages/Simulados e quiz/Simulados";
+import Footer from "../src/components/Footer/Footer"
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/videoaulas" element={<Videoaulas />} />
         <Route path="/simulados" element={<Simulados />} />
       </Routes>
+      <Footer />
     </BrowserRouter>
   );
 }
