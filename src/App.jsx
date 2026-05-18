@@ -5,7 +5,7 @@ import Biblioteca from "./pages/Biblioteca de livros/Biblioteca";
 import Equipe from "./pages/Equipe/Equipe";
 import Vestibular from "./pages/Vestibular/Vestibular";
 import Videoaulas from "./pages/Videoaulas/Videoaulas";
-import Simulados from "./pages/Simulados e quiz/Simulados";
+import Simulados from "./pages/SimuladosEQuiz/Simulados";
 import Curiosidades from "./pages/Curiosidades e dicas/Curiosidades"
 import Footer from "../src/components/Footer/Footer"
 
