@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import  styles from './Curiosidades.module.css';
 import Navbar from '../../components/Navbar/Navbar';
-import cidadeImg from '../../assets/cidade.png'
+import cidadeImg from '../../assets/cidade.png';
+import capitaesImg from '../../assets/capitaes.jpg';
 
 const API_URL = 'https://readflow-m8o6.onrender.com/api/curiosidades';
 
@@ -73,8 +74,8 @@ export default function Curiosidades() {
                 </section>
 
                 <div className={styles.cardGrid}>
-                    <section className={styles.cardCensura}>
-                        <div className={styles.censuraText}>
+                    <section className={styles.cardCensure}>
+                        <div className={styles.cardText}>
                             <div className={styles.cardTitleContainer}>
                                 <span className={styles.cardIcon}>📖</span>
                                 <h3 className={styles.cardTitle}>Impacto Social e Censura</h3>
@@ -86,8 +87,8 @@ export default function Curiosidades() {
                             </div>
                         </div>
 
-                        <div className={styles.censuraImageContainer}>
-                            <img src="" alt="Ilustração de Censura" />
+                        <div className={styles.censureImageContainer}>
+                            <img src={capitaesImg} alt="Ilustração de Censura" />
                         </div>
                     </section>
 
@@ -96,10 +97,10 @@ export default function Curiosidades() {
                             <span className={styles.cardIconWhite}>⚓</span>
                             <h3 className={styles.darkCardTitle}>A Bahia de 1930</h3>
                         </div>
-                        <p className={styles.darkcardTitle}></p>
+                        <p className={styles.darkCardTitle}></p>
                         <ul className={styles.bulletList}>
                             <li className={styles.bulletItem}>Urbanização precária</li>
-                            <li className={styles.bulletItem}>Decadêncua do cacau</li>
+                            <li className={styles.bulletItem}>Decadência do cacau</li>
                             <li className={styles.bulletItem}>Segregação especial</li>
                         </ul>
                     </section>
