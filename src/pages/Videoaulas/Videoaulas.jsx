@@ -1,74 +1,91 @@
-import Navbar from '../../components/Navbar/Navbar';
 import { useState } from 'react';
+import Navbar from '../../components/Navbar/Navbar';
+import './Videoaulas.css';
 
-const VideoAulas = () => {
-    <Navbar />
-    // Estado para simular a troca de vídeos na playlist
+const Videoaulas = () => {
+
     const [videoAtivo, setVideoAtivo] = useState(1);
 
     const playlist = [
-        { id: 1, titulo: "Aula 01: Introdução à Geração de 30 e Jorge Amado", duracao: "15:20", ativa: true },
-        { id: 2, titulo: "Aula 02: O Trapiche como Espaço Social e Determinismo", duracao: "18:45", ativa: false },
-        { id: 3, titulo: "Aula 03: Análise dos Personagens: De Pedro Bala a Dora", duracao: "22:10", ativa: false },
-        { id: 4, titulo: "Aula 04: Linguagem, Oralidade e Sincretismo Religioso", duracao: "14:35", ativa: false },
-        { id: 5, titulo: "Aula 05: Como usar Capitães da Areia na Redação", duracao: "20:05", ativa: false },
+        {
+            id: 1,
+            titulo: 'Aula 01: Introdução à Geração de 30 e Jorge Amado',
+            duracao: '15:20',
+            videoUrl: 'https://www.youtube.com/embed/rGWF3ZsZPYs',
+            descricao:
+                'Nesta aula introdutória, exploramos o contexto histórico da Bahia em 1930 e as motivações de Jorge Amado ao escrever uma das obras mais viscerais da literatura brasileira.',
+        },
+        {
+            id: 2,
+            titulo: 'Aula 02: O Trapiche como Espaço Social e Determinismo',
+            duracao: '18:45',
+            videoUrl: 'https://www.youtube.com/embed/kJQP7kiw5Fk',
+            descricao:
+                'Analisamos como o Trapiche funciona como um personagem coletivo e de que forma o ambiente molda o destino dos meninos, aplicando conceitos de determinismo social.',
+        },
+        {
+            id: 3,
+            titulo: 'Aula 03: Análise dos Personagens: De Pedro Bala a Dora',
+            duracao: '22:10',
+            videoUrl: 'https://www.youtube.com/embed/j8n1pj8RfFs',
+            descricao:
+                'Um mergulho na construção psicológica dos líderes dos Capitães da Areia e o impacto da chegada de Dora no grupo.',
+        },
+        {
+            id: 4,
+            titulo: 'Aula 04: Linguagem, Oralidade e Sincretismo Religioso',
+            duracao: '14:35',
+            videoUrl: 'https://www.youtube.com/embed/4JipHEz53sU',
+            descricao:
+                'Como a variação linguística e as religiões de matriz africana aparecem no texto como forma de resistência cultural e identidade.',
+        },
     ];
 
+    const aulaAtual = playlist.find((v) => v.id === videoAtivo);
+
     return (
-        <div className="page-container">
-            {/* --- Navbar --- */}
-            <nav className="navbar">
-                <div className="logo">Clube do Livro</div>
-                <div className="nav-links">
-                    <a href="#" className="nav-link">Início</a>
-                    <a href="#" className="nav-link">Biblioteca</a>
-                    <a href="#" className="nav-link">Explorar obra</a>
-                    <a href="#" className="nav-link">Vestibulandos</a>
-                    <a href="#" className="nav-link">Quiz</a>
-                    <a href="#" className="nav-link active">Vídeos</a>
-                </div>
-                <div className="nav-lang">PT/EN 🌐</div>
-            </nav>
+        <div className="readflow-wrapper">
+            <Navbar paginaAtiva="videoaulas" />
 
-            {/* --- Conteúdo Principal --- */}
-            <main className="main-content">
-                <div className="video-layout-grid">
-
-                    {/* Coluna da Esquerda: Player e Detalhes */}
-                    <section className="video-player-container">
-                        <div className="video-player-mock">
-                            {/* Aqui entraria o iframe do YouTube/Vimeo ou tag <video> */}
-                            <div className="play-button-icon">▶</div>
-                            <span className="video-time-indicator">Reproduzindo Aula {videoAtivo}</span>
+            <main className="readflow-main">
+                <div className="video-hero-grid">
+                    <div className="player-block">
+                        <div className="video-aspect-box">
+                            <iframe
+                                src={aulaAtual.videoUrl}
+                                title={aulaAtual.titulo}
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen></iframe>
                         </div>
 
-                        <div className="video-info-box">
-                            <span className="video-category-tag">Módulo Intensivo</span>
-                            <h1 className="video-main-title">
-                                {playlist.find(v => v.id === videoAtivo)?.titulo || "Capitães da Areia - Curso Completo"}
-                            </h1>
-                            <p className="video-description">
-                                Nesta videoaula, analisamos em profundidade os aspetos sociopolíticos e as estruturas literárias exigidas pelos principais vestibulares. Descubra como contextualizar o ambiente histórico da Bahia na década de 1930.
-                            </p>
+                        <div className="video-meta-details">
+                            <span className="meta-tag">Módulo Vestibulares</span>
+                            <h1 className="main-video-title">{aulaAtual.titulo}</h1>
+                            <p className="main-video-description">{aulaAtual.descricao}</p>
                         </div>
-                    </section>
+                    </div>
 
-                    {/* Coluna da Direita: Playlist */}
-                    <aside className="playlist-container">
-                        <h3 className="playlist-title">Conteúdo do Curso</h3>
-                        <div className="playlist-scroll">
+                    <aside className="sidebar-playlist">
+                        <div className="playlist-top-info">
+                            <h3>Grade de Aulas</h3>
+                            <p>Capitães da Areia - Jorge Amado</p>
+                        </div>
+
+                        <div className="playlist-items">
                             {playlist.map((video) => (
                                 <div
                                     key={video.id}
-                                    className={`playlist-item ${videoAtivo === video.id ? 'active' : ''}`}
-                                    onClick={() => setVideoAtivo(video.id)}
-                                >
-                                    <div className="playlist-item-status">
-                                        {videoAtivo === video.id ? '▶' : video.id}
-                                    </div>
-                                    <div className="playlist-item-info">
-                                        <h4 className="playlist-item-name">{video.titulo}</h4>
-                                        <span className="playlist-item-duration">⏱ {video.duracao}</span>
+                                    className={`playlist-row ${
+                                        videoAtivo === video.id ? 'is-playing' : ''
+                                    }`}
+                                    onClick={() => setVideoAtivo(video.id)}>
+                                    <span className="row-number">
+                                        {videoAtivo === video.id ? '▶' : `0${video.id}`}
+                                    </span>
+                                    <div className="row-text">
+                                        <h4>{video.titulo}</h4>
+                                        <span>⏱ {video.duracao}</span>
                                     </div>
                                 </div>
                             ))}
@@ -76,31 +93,55 @@ const VideoAulas = () => {
                     </aside>
                 </div>
 
-                {/* --- Seção Inferior: Recursos e Apoio --- */}
-                <section className="resources-section">
-                    <h2 className="section-title">Materiais de Apoio & Downloads</h2>
-                    <div className="resources-grid">
-                        <div className="resource-card">
-                            <div className="resource-icon">📁</div>
-                            <div>
-                                <h4 className="item-title">Slides da Aula (PDF)</h4>
-                                <p className="item-text">Esquema visual com os principais tópicos e citações analisadas.</p>
-                                <button className="download-btn">Baixar PDF</button>
-                            </div>
+                <section className="support-section">
+                    <h2 className="section-subtitle">Materiais e Diretrizes de Estudo</h2>
+                    <div className="support-cards-grid">
+                        <div className="support-card">
+                            <span className="card-badge">PDF</span>
+                            <h3>Slides Completos da Aula</h3>
+                            <p>
+                                Esquema visual com os principais tópicos, citações marcantes e eixos
+                                temáticos prontos para revisão.
+                            </p>
+                            <button className="card-action-btn">Acessar Material →</button>
                         </div>
-                        <div className="resource-card">
-                            <div className="resource-icon">📝</div>
-                            <div>
-                                <h4 className="item-title">Lista de Exercícios</h4>
-                                <p className="item-text">10 questões de vestibulares anteriores com gabarito comentado.</p>
-                                <button className="download-btn">Baixar Exercícios</button>
-                            </div>
+                        <div className="support-card">
+                            <span className="card-badge">Exercícios</span>
+                            <h3>Simulado Comentado</h3>
+                            <p>
+                                Questões selecionadas dos últimos vestibulares com gabarito
+                                analítico detalhado pelo time pedagógico.
+                            </p>
+                            <button className="card-action-btn">Abrir Caderno →</button>
                         </div>
                     </div>
                 </section>
+
+                <footer className="video-footer-accent">
+                    <div className="footer-left-info">
+                        <h2>Dicas de Desempenho</h2>
+                        <p className="footer-subtext">
+                            Como fixar o conteúdo assistido para a sua prova:
+                        </p>
+                        <div className="footer-tip-box">
+                            <h5>Anote Citações Diretas</h5>
+                            <p>
+                                Frases como "A cidade os repudiava..." guardam forte valor
+                                argumentativo para redações de temas sobre desigualdade social.
+                            </p>
+                        </div>
+                    </div>
+                    <div className="footer-badge-red">
+                        <h6>Aviso Importante</h6>
+                        <p>
+                            Não se esqueça de correlacionar a obra com o Modernismo de Segunda
+                            Geração (Geração de 30).
+                        </p>
+                    </div>
+                </footer>
             </main>
         </div>
     );
 };
 
-export default VideoAulas;
+export default Videoaulas;
