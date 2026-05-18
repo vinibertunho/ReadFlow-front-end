@@ -1,17 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
-import styles from "./Navbar.module.css";
-
-
-const NAV_ITEMS = [
-  { path: "/", label: "Início" },
-  { path: "/biblioteca", label: "Biblioteca" },
-  { path: "/livro", label: "Explorar obra" },
-  { path: "/equipe", label: "Equipe" },
-  { path: "/vestibulandos", label: "Vestibulandos" },
-  { path: "/quizzes", label: "Quiz" },
-  { path: "/videoaulas", label: "Vídeos" },
-  { path: "/curiosidades", label: "Curiosidades" },
-];
+import { Link } from 'react-router-dom';
+import styles from './Navbar.module.css';
 
 function Navbar() {
   const location = useLocation();
@@ -24,27 +12,22 @@ function Navbar() {
 
     return (
 <main className={styles.container}>
+  return (
     <nav className={styles.navbar}>
-      <Link to="/" className={styles.navBrand}>
-        <h1>ReadFlow</h1>
-      </Link>
-
-      <ul className={styles.navLinks}>
-        {NAV_ITEMS.map((item) => (
-          <li key={item.path}>
-            <Link to={item.path} className={getLinkClass(item.path)}>
-              {item.label}
-            </Link>
-          </li>
-        ))}
+      <div className={styles.logo}>ReadFlow</div>
+      <ul className={styles.links}>
+        <li><Link to="/">Home</Link></li>
+        <li><Link to="/biblioteca">Biblioteca</Link></li>
+        <li><Link to="/equipe">Equipe</Link></li>
+        <li><Link to="/vestibular">Vestibular</Link></li>
+        <li><Link to="/simulados">Quiz</Link></li>
+        <li><Link to="/videoaulas">Videoaulas</Link></li>
+        <li><Link to="/curiosidades">Curiosidades</Link></li>
       </ul>
-
-      <div className={styles.language}>
-        <button className={styles.langBtn}> PT/EN 🌐 </button>
-      </div>
     </nav>
 </main>
   );
 }
 
 export default Navbar;
+
