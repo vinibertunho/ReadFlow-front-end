@@ -81,6 +81,18 @@ return (
                 </section>
 
                 <footer className="footer-info">
+                    <div className="footer-content">
+                        <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Dicas de Interpretação</h2>
+                        <p className="item-text" style={{ color: '#94a3b8', fontStyle: 'italic' }}>Foque na subjetividade versus realidade social.</p>
+                        <div className="interpret-card">
+                            <h5 style={{ fontSize: '0.7rem', color: '#60a5fa', textTransform: 'uppercase' }}>Discurso Indireto Livre</h5>
+                            <p className="item-text" style={{ color: '#e2e8f0' }}>Identifique quando a voz do narrador se funde aos pensamentos dos meninos.</p>
+                        </div>
+                    </div>
+                    <div className="important-badge">
+                        <h6 style={{ marginBottom: '4px' }}>IMPORTANTE!</h6>
+                        <p style={{ fontSize: '0.6rem' }}>O livro pertence à 2ª fase do Modernismo brasileiro.</p>
+                    </div>
                 </footer>
             </main>
         </div>
