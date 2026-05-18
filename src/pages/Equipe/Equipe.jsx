@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import styles from './Equipe.module.css';
 import Navbar from '../../components/Navbar/Navbar.jsx';
-import Footer from '../../components/Footer/Footer.jsx';
 
 function Equipe() {
     const [membros, setMembros] = useState([]);
@@ -101,7 +100,6 @@ function Equipe() {
                     </div>
                 </section>
             </div>
-            <Footer />
         </>
     );
 }
