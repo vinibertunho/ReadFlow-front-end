@@ -19,6 +19,7 @@ function App() {
         <Route path="/vestibular" element={<Vestibular />} />
         <Route path="/videoaulas" element={<Videoaulas />} />
         <Route path="/simulados" element={<Simulados />} />
+        <Route path="/curiosidades" element={<Curiosidades />} />
       </Routes>
       <Footer />
     </BrowserRouter>
