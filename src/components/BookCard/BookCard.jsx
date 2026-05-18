@@ -32,7 +32,7 @@ function BookCard({ dados }) {
         genero_en,
     } = dados || {};
 
-    // Tenta puxar a capa de varios campos possiveis
+
     const capaImagem = resolveCoverUrl(capa_url || imagem_url || imagem || capas || foto || '');
     const [imgSrc, setImgSrc] = useState(capaImagem || FALLBACK_COVER);
 
