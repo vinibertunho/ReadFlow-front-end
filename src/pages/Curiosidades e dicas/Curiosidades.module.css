@@ -18,7 +18,7 @@
 
 .sectionTwoColumns {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1.5fr;
     gap: 2rem;
     align-items: center;
 }
@@ -61,12 +61,11 @@
 
 .heroImage {
     width: 100%;
-    height: 20rem;
-    object-fit: cover;
+    height: auto;
     display: block;
 }
 
-.imageCapition {
+.imageCaption {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -79,11 +78,11 @@
     gap: 0.25rem;
 }
 
-.imageCapition strong {
+.imageCaption strong {
     font-size: 0.875rem;
 }
 
-.imageCapition span {
+.imageCaption span {
     font-size: 0.75rem;
     color: #cbd5e1;
 }

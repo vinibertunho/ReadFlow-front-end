@@ -1,48 +1,80 @@
 import { useEffect, useState } from 'react';
 import  styles from './Curiosidades.module.css';
 import Navbar from '../../components/Navbar/Navbar';
+import cidadeImg from '../../assets/cidade.png'
+
+const API_URL = 'https://readflow-m8o6.onrender.com/api/curiosidades';
 
 export default function Curiosidades() {
     const [carregando, setCarregando] = useState(true);
+    const [dados, setDados] = useState(null);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setCarregando(false);
-        }, 500);
-        return () => clearTimeout(timer);
+        fetch(API_URL)
+            .then((resposta) => resposta.json())
+            .then((resultado) => {
+                setDados(resultado);
+                setCarregando(false);
+            })
+
+            .catch((erro) => {
+                console.error('Erro ao buscar dados:', erro);
+                setCarregando(false);
+            });
     }, []);
 
     if (carregando) {
         return <h2 className={styles.loading}>Carregando Curiosidades e dicas...</h2>;
     }
 
+    if (!dados || (Array.isArray(dados) && dados.length === 0)) {
+        return <h2 className={styles.loading}>Nenhum dado encontrado.</h2>;
+    }
+
+    /*const data = (Array.isArray(dados) ? dados[0] : dados) || {};
+
+    const {
+        id,
+        livroId,
+        titulo,
+        texto,
+        autorUsuarioId,
+        publicado = false,
+        criadoEm = '',
+        atualizadoEm = '',
+        livro = data.livro || {},
+        autor = data.autor || {},
+    } = data || {}; */
+
     return (
         <>
             <Navbar />
             <div className={styles.container}>
-            <section className={styles.sectionTwoColumns}>
-                <div className={styles.heroTextContainer}>
+                <section className={styles.sectionTwoColumns}>
+                    <div className={styles.heroTextContainer}>
                         <span className={styles.sectionSubtitle}>Exploração Literária</span>
                         <h2 className={styles.sectionTitle}>Curiosidade e Contexto:</h2>
 
-                        <p className={styles.bodyText}>
-
-                        </p>
+                        <p className={styles.bodyText}></p>
                     </div>
 
                     <div className={styles.heroImageWrapper}>
-                        <img src="" alt="Cenário Real" className={styles.heroImage} />
+                        <img
+                            src={cidadeImg}
+                            alt="Cenário Real"
+                            className={styles.heroImage}
+                        />
 
                         <div className={styles.imageCaption}>
                             <strong>Cenário Real</strong>
                             <span>Salvador, Anos 30</span>
                         </div>
-                     </div>
+                    </div>
                 </section>
 
                 <div className={styles.cardGrid}>
-                <section className={styles.cardCensura}>
-                    <div className={styles.censuraText}>
+                    <section className={styles.cardCensura}>
+                        <div className={styles.censuraText}>
                             <div className={styles.cardTitleContainer}>
                                 <span className={styles.cardIcon}>📖</span>
                                 <h3 className={styles.cardTitle}>Impacto Social e Censura</h3>
@@ -121,7 +153,9 @@ export default function Curiosidades() {
                         <div className={styles.timelineRight}>
                             <div className={styles.timelineCardContent}>
                                 <p className={styles.timelineBody}></p>
-                                <strong className={styles.academyTag}>ACADEMIA BRASILEIRA DE LETRAS</strong>
+                                <strong className={styles.academyTag}>
+                                    ACADEMIA BRASILEIRA DE LETRAS
+                                </strong>
                             </div>
                         </div>
                     </div>
@@ -147,9 +181,7 @@ export default function Curiosidades() {
                         />
                     </div>
                 </section>
-
             </div>
-
         </>
     );
 }
