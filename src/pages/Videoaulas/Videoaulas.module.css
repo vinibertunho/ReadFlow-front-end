@@ -1,0 +1,299 @@
+:root {
+    --primary-blue: #1e40af;
+    --bg-light: #f8fafc;
+    --text-main: #334155;
+    --accent-blue: #eff6ff;
+    --dark-section: #1e293b;
+    --video-bg: #0f172a;
+}
+
+.page-container {
+    min-height: 100vh;
+    background-color: var(--bg-light);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--text-main);
+    line-height: 1.5;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 3rem;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.logo {
+    color: var(--primary-blue);
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #64748b;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: var(--primary-blue);
+}
+
+.nav-link.active {
+    border-bottom: 2px solid var(--primary-blue);
+    padding-bottom: 4px;
+}
+
+/* Layout de Conteúdo */
+.main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.video-layout-grid {
+    display: grid;
+    grid-template-columns: 2.5fr 1.2fr;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+/* Player de Vídeo Mock */
+.video-player-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.video-player-mock {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-color: var(--video-bg);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+}
+
+.play-button-icon {
+    width: 70px;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+    border: 2px solid white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.8rem;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+    padding-left: 5px;
+    /* Ajuste óptico do triângulo */
+}
+
+.play-button-icon:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.video-time-indicator {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+/* Informações do Vídeo */
+.video-info-box {
+    margin-top: 1.5rem;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.video-category-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    background: var(--accent-blue);
+    color: var(--primary-blue);
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.video-main-title {
+    font-size: 1.5rem;
+    font-weight: 750;
+    margin: 0.75rem 0;
+    color: var(--dark-section);
+}
+
+.video-description {
+    font-size: 0.9rem;
+    color: #475569;
+    line-height: 1.6;
+}
+
+/* Sidebar Playlist */
+.playlist-container {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    height: max-content;
+}
+
+.playlist-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--dark-section);
+    border-bottom: 2px solid var(--accent-blue);
+    padding-bottom: 0.5rem;
+}
+
+.playlist-scroll {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.playlist-item {
+    display: flex;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: 1px solid transparent;
+}
+
+.playlist-item:hover {
+    background-color: var(--bg-light);
+}
+
+.playlist-item.active {
+    background-color: var(--accent-blue);
+    border-color: #bfdbfe;
+}
+
+.playlist-item-status {
+    width: 28px;
+    height: 28px;
+    background: #cbd5e1;
+    color: #475569;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.playlist-item.active .playlist-item-status {
+    background: var(--primary-blue);
+    color: white;
+}
+
+.playlist-item-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.playlist-item-name {
+    font-size: 0.825rem;
+    font-weight: 600;
+    margin: 0;
+    color: #1e293b;
+}
+
+.playlist-item-duration {
+    font-size: 0.7rem;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+/* Seção de Recursos de Apoio */
+.section-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+}
+
+.resources-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.resource-card {
+    display: flex;
+    gap: 1.25rem;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.resource-icon {
+    font-size: 2rem;
+    background: var(--accent-blue);
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.item-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+}
+
+.item-text {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 1rem;
+}
+
+.download-btn {
+    background: transparent;
+    color: var(--primary-blue);
+    border: 1.5px solid var(--primary-blue);
+    padding: 6px 14px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.download-btn:hover {
+    background: var(--primary-blue);
+    color: white;
+}
