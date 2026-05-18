@@ -40,7 +40,7 @@ function Navbar() {
             </ul>
 
             <button className={styles.langBtn} onClick={toggleLanguage}>
-                <span>PT/EN</span>
+                <span>PT/EN </span>
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="18"
