@@ -3,7 +3,22 @@ import BookCard from '../../components/BookCard/BookCard';
 import Navbar from '../../components/Navbar/Navbar';
 import styles from './Biblioteca.module.css';
 
-const API_URL = "https://readflow-m8o6.onrender.com/api/livros";
+const API_URLS = [
+  '/api/livros',
+  '/api/livros-externos',
+  'https://readflow-m8o6.onrender.com/api/livros',
+];
+
+const getApiKeyForUrl = (url) => {
+  try {
+    if ((url || '').includes('externos')) return import.meta.env.VITE_API_KEY_EXTERNAL;
+  } catch (e) {}
+  try {
+    return import.meta.env.VITE_API_KEY_LOCAL;
+  } catch (e) {
+    return undefined;
+  }
+};
 
 function Biblioteca() {
   const [livros, setLivros] = useState([]);
@@ -44,17 +59,39 @@ function Biblioteca() {
       try {
         setCarregando(true);
 
-        const response = await fetch(API_URL, { signal: controller.signal });
+        const results = await Promise.allSettled(
+          API_URLS.map((url) => {
+            const key = getApiKeyForUrl(url);
+            const options = { signal: controller.signal };
+            if (key) options.headers = { 'x-api-key': key };
+            return fetch(url, options).then((r) => r.ok ? r.json() : null).catch(() => null);
+          })
+        );
 
-        if (!response.ok) {
-          throw new Error('Não foi possível carregar os livros.');
+        // Flatten arrays and accept common envelope keys
+        const combined = [];
+        for (const res of results) {
+          if (res.status !== 'fulfilled' || !res.value) continue;
+          const data = res.value;
+          const list = Array.isArray(data)
+            ? data
+            : data?.books || data?.items || data?.data || [];
+          if (Array.isArray(list)) combined.push(...list);
         }
 
-        const data = await response.json();
-        const list = Array.isArray(data)
-          ? data
-          : data?.books || data?.items || data?.data || [];
-        setLivros(Array.isArray(list) ? list.map(normalizeBook) : []);
+        // Normalize and dedupe by id (or title+author fallback)
+        const mapped = combined.map(normalizeBook);
+        const seen = new Map();
+        const deduped = [];
+        for (const item of mapped) {
+          const key = item.id ?? `${(item.titulo||'').toLowerCase()}::${(item.autor||'').toLowerCase()}`;
+          if (!seen.has(key)) {
+            seen.set(key, true);
+            deduped.push(item);
+          }
+        }
+
+        setLivros(deduped);
       } catch (error) {
         if (error.name !== 'AbortError') {
           setLivros([]);

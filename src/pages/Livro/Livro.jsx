@@ -60,7 +60,10 @@ function Livro() {
             async function fetchLivro() {
                 try {
                     setCarregando(true);
-                    const response = await fetch(`${API_URL}/${id}`);
+                    const key = import.meta.env.VITE_API_KEY_LOCAL || import.meta.env.VITE_API_KEY;
+                    const options = {};
+                    if (key) options.headers = { 'x-api-key': key };
+                    const response = await fetch(`${API_URL}/${id}`, options);
                     if (!response.ok) {
                         throw new Error('Livro não encontrado');
                     }
