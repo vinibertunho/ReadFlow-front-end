@@ -1,7 +1,66 @@
+:root {
+    --purple-main:#7b43f5;
+    --text-dark: #2d3436;
+    --text-light: #636e72;
+    --bg-light: #fdfdfd;
+    --card-bg: #f2eaff;
+    --details: #b5aaff;
+}
+
+
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0.5rem 3rem;
+  background-color: var(--bg-light);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+}
+
+.navBrand {
+    text-decoration: none;
+}
+
+.navLinks {
+    display: flex;
+    flex-direction: row;
+    list-style-type: none;
+    gap: 30px;
+}
+
+.navLinks a {
+    text-decoration: none;
+
+  color: var(--text-light);
+  font-weight: 500;
+  text-decoration: none;
+  padding-bottom: 5px;
+  transition: color 0.3s ease;
+}
+
+.navLink:hover {
+    color: var(--purple-main);
+}
+
+.active {
+    color: var(--purple-main);
+    border-bottom: 2px solid var(--purple-main);
+}
+
+.langBtn {
+    background-color: transparent;
+    border: none;
+    color: var(--text-light);
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 2px 8px;
+    border-radius: 5px;
+}
+
+.langBtn:hover {
+    color: var(--purple-main);
   padding: 1rem 2rem;
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
