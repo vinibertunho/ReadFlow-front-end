@@ -46,7 +46,6 @@ const Videoaulas = () => {
 
     const aulaAtual = playlist.find((v) => v.id === videoAtivo);
 
-    // Constrói a URL final injetando dinamicamente o parâmetro do tempo de início
     const videoSrcComTempo = aulaAtual.startTime
         ? `${aulaAtual.videoUrl}?start=${aulaAtual.startTime}`
         : aulaAtual.videoUrl;
@@ -60,7 +59,7 @@ const Videoaulas = () => {
                     <div className="player-block">
                         <div className="video-aspect-box">
                             <iframe
-                                src={videoSrcComTempo} // <-- URL modificada aqui
+                                src={videoSrcComTempo} 
                                 title={aulaAtual.titulo}
                                 frameBorder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
