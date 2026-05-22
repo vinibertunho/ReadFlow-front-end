@@ -80,7 +80,10 @@ function Home() {
 
                             <h1>{tituloPrincipal}</h1>
 
-                            <p>{libroPrincipal.resumo || 'resumo do livro aqui rs'}</p>
+                            <p>
+                                {libroPrincipal.resumo ||
+                                    'resumo do livro aqui rs Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut blandit felis diam, ac porttitor neque eleifend sit amet. Duis molestie, elit in dapibus lacinia, lectus mi efficitur sapien, a pharetra lorem nisi sit amet turpis. Proin interdum, justo a lacinia pretium, ipsum quam consequat ex, sed tristique augue magna quis mauris. Sed vitae lacus tempor, hendrerit lorem ut, mollis arcu. Aliquam turpis leo, venenatis sit amet nunc eu, rutrum rhoncus neque.'}
+                            </p>
 
                             <Link to="/livro" className={styles.button}>
                                 <button>
@@ -102,43 +105,67 @@ function Home() {
                 <section className={styles.destaques}>
                     <div className={styles.apresentacao}>
                         <h3>Apresentação do Projeto</h3>
-                        <p>Apresentacao do projeto aqui</p>
+                        <p>
+                            Este projeto está sendo feito como uma atividade que liga o instituto
+                            Sesi com Senai, como meio de aprendizagem entres as duas instituições,
+                            utilizando a prática dos dois lados. O projeto consiste em uma
+                            biblioteca virtual onde temos somente livros do vestibular, como foco do
+                            nosso grupo sendo o livro "Capitães da areia".
+                        </p>
                     </div>
 
                     <div className={styles.cards}>
                         <Link to="/livro" className={styles.explorarObra}>
                             <h4>Explorar obra</h4>
-                            <p>Acompanhe a narrativa...</p>
+                            <p>
+                                Acompanhe a narrativa desde a vida no Trapiche até os destinos
+                                traçados pelo bando liderado por Pedro Bala.
+                            </p>
                             <p>Ler Análise → </p>
                         </Link>
 
                         <Link to="/equipe" className={styles.equipe}>
                             <h4>Equipe</h4>
-                            <p>Conheça a equipe por trás do projeto...</p>
+                            <p>
+                                Conheça os desenvolvedores e mentes criativas por trás deste projeto
+                                integrador.
+                            </p>
                             <p>Conhecer → </p>
                         </Link>
 
                         <Link to="/vestibular" className={styles.vestibulandos}>
                             <h4>Vestibulandos</h4>
-                            <p>Página dedicada aos vestibulandos...</p>
+                            <p>
+                                Encontre cronogramas, análises dos principais vestibulares e tudo o
+                                que você precisa para gabaritar a prova.
+                            </p>
                             <p>Estudar → </p>
                         </Link>
 
                         <Link to="/simulados" className={styles.simulados}>
                             <h4>Simulados e Quizes</h4>
-                            <p>Uooooou</p>
+                            <p>
+                                Teste seus conhecimentos com questões exclusivas e prepare-se para o
+                                formato real dos exames.
+                            </p>
                             <p>Ver testes → </p>
                         </Link>
 
                         <Link to="/videoaulas" className={styles.videoaulas}>
                             <h4>Videoaulas</h4>
-                            <p>Assista às videoaulas...</p>
+                            <p>
+                                Assista a resumos em vídeo, análises de personagens e explicações
+                                detalhadas sobre o contexto histórico.
+                            </p>
                             <p>Ver Galeria → </p>
                         </Link>
 
                         <Link to="/curiosidades" className={styles.curiosidades}>
                             <h4>Curiosidades e Dicas</h4>
-                            <p>Descubra curiosidades sobre o autor e a obra...</p>
+                            <p>
+                                Descubra segredos dos bastidores da obra, fatos sobre Jorge Amado e
+                                dicas valiosas de última hora para o seu estudo.
+                            </p>
                             <p>Explorar → </p>
                         </Link>
                     </div>
@@ -161,9 +188,12 @@ function Home() {
                                 <p>Explore as obras analisadas por outras equipes do projeto.</p>
                             </div>
 
-                            <a href="#" className={styles.verTodos}>
-                                Ver Todos <ExternalLink size={16} />
-                            </a>
+                            <Link
+                                to="/biblioteca"
+                                className={styles.verTodos}
+                                onClick={() => setActiveLink('/biblioteca')}>
+                                Ver Todos <ExternalLink size={25} />
+                            </Link>
                         </div>
 
                         <div className={styles.cardsLivro}>
