@@ -32,7 +32,7 @@ function Footer() {
                             <Link to="/vestibular">Vestibular</Link>
                         </li>
                         <li>
-                            <Link to="/quiz">Quiz</Link>
+                            <Link to="/simulados">Quiz</Link>
                         </li>
                         <li>
                             <Link to="/videoaulas">Videoaulas</Link>
