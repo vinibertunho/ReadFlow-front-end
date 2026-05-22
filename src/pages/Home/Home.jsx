@@ -11,36 +11,48 @@ const FALLBACK_COVER =
     'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600"><rect width="400" height="600" fill="%23eef2ff"/><rect x="24" y="24" width="352" height="552" rx="16" fill="%23dbeafe"/><text x="200" y="300" text-anchor="middle" fill="%23334155" font-size="28" font-family="Arial">Sem capa</text></svg>';
 
 const resolveCoverUrl = (url) => {
-    if (!url) return '';
-    return url;
+    if (!url || url.trim() === '') return FALLBACK_COVER;
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+        return url;
+    }
+    return `https://readflow-m8o6.onrender.com${url.startsWith('/') ? '' : '/'}${url}`;
 };
 
 function Home() {
     const [livros, setLivros] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch(API_URL)
+        fetch(API_URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'projetoamods',
+                'x-api-key': 'projetoamods',
+            },
+        })
             .then((res) => res.json())
             .then((data) => {
-                setLivros(data);
+                setLivros(Array.isArray(data) ? data : []);
+                setLoading(false);
             })
             .catch((err) => {
                 console.error('Erro ao buscar livros:', err);
+                setLoading(false);
             });
     }, []);
 
     const libroPrincipal = livros[0] || {};
 
-    const capaUrlOriginal =
-        libroPrincipal.capa_url ||
-        libroPrincipal.imagem_url ||
-        libroPrincipal.imagem ||
-        libroPrincipal.capas ||
-        libroPrincipal.foto ||
-        '';
+    const getCapa = (livro) => {
+        if (!livro) return '';
+        return (
+            livro.capa_url || livro.imagem_url || livro.imagem || livro.capas || livro.foto || ''
+        );
+    };
 
-    const capaImagem = resolveCoverUrl(capaUrlOriginal);
-    const titulo = libroPrincipal.titulo || 'Capitães da Areia';
+    const capaImagemPrincipal = resolveCoverUrl(getCapa(libroPrincipal));
+    const tituloPrincipal = libroPrincipal.titulo || 'Capitães da Areia';
 
     return (
         <>
@@ -50,25 +62,23 @@ function Home() {
                 <section className={styles.header}>
                     <div className={styles.conteudoHeader}>
                         <div className={styles.capaLivro}>
-                            {capaImagem ? (
+                            {!loading && (
                                 <img
-                                    src={capaImagem}
-                                    alt={titulo}
+                                    src={capaImagemPrincipal}
+                                    alt={tituloPrincipal}
                                     className={styles.coverImage}
                                     onError={(event) => {
                                         event.currentTarget.onerror = null;
                                         event.currentTarget.src = FALLBACK_COVER;
                                     }}
                                 />
-                            ) : (
-                                <div className={styles.coverFallback}>Sem capa</div>
                             )}
                         </div>
 
                         <div className={styles.textoHeader}>
                             <h4>Obra de Jorge Amado</h4>
 
-                            <h1>{titulo}</h1>
+                            <h1>{tituloPrincipal}</h1>
 
                             <p>{libroPrincipal.resumo || 'resumo do livro aqui rs'}</p>
 
@@ -148,7 +158,6 @@ function Home() {
                         <div className={styles.topBiblioteca}>
                             <div>
                                 <h3>Biblioteca de Livros</h3>
-
                                 <p>Explore as obras analisadas por outras equipes do projeto.</p>
                             </div>
 
@@ -158,61 +167,45 @@ function Home() {
                         </div>
 
                         <div className={styles.cardsLivro}>
-                            <Link to="/o-cortico" className={styles.cardLivro}>
-                                <div className={styles.capaLivroBiblioteca}>
-                                    <img
-                                        src="https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=1200&auto=format&fit=crop"
-                                        alt="O Cortiço"
-                                    />
-                                </div>
+                            {!loading &&
+                                livros.map((livro) => {
+                                    const capaItem = resolveCoverUrl(getCapa(livro));
+                                    const slug =
+                                        livro.slug ||
+                                        livro.titulo
+                                            ?.toLowerCase()
+                                            .normalize('NFD')
+                                            .replace(/[\u0300-\u036f]/g, '')
+                                            .replace(/[^a-z0-9]+/g, '-') ||
+                                        livro.id;
 
-                                <div className={styles.infoLivro}>
-                                    <h4>O Cortiço</h4>
-                                    <span>Aluísio Azevedo</span>
-                                </div>
-                            </Link>
+                                    return (
+                                        <Link
+                                            to={`/${slug}`}
+                                            key={livro.id || livro._id}
+                                            className={styles.cardLivro}>
+                                            <div className={styles.capaLivroBiblioteca}>
+                                                <img
+                                                    src={capaItem}
+                                                    alt={livro.titulo}
+                                                    onError={(event) => {
+                                                        event.currentTarget.onerror = null;
+                                                        event.currentTarget.src = FALLBACK_COVER;
+                                                    }}
+                                                />
+                                            </div>
 
-                            <Link to="/dom-casmurro" className={styles.cardLivro}>
-                                <div className={styles.capaLivroBiblioteca}>
-                                    <img
-                                        src="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?q=80&w=1200&auto=format&fit=crop"
-                                        alt="Dom Casmurro"
-                                    />
-                                </div>
-
-                                <div className={styles.infoLivro}>
-                                    <h4>Dom Casmurro</h4>
-                                    <span>Machado de Assis</span>
-                                </div>
-                            </Link>
-
-                            <Link to="/macunaima" className={styles.cardLivro}>
-                                <div className={styles.capaLivroBiblioteca}>
-                                    <img
-                                        src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=1200&auto=format&fit=crop"
-                                        alt="Macunaíma"
-                                    />
-                                </div>
-
-                                <div className={styles.infoLivro}>
-                                    <h4>Macunaíma</h4>
-                                    <span>Mário de Andrade</span>
-                                </div>
-                            </Link>
-
-                            <Link to="/a-reliquia" className={styles.cardLivro}>
-                                <div className={styles.capaLivroBiblioteca}>
-                                    <img
-                                        src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=1200&auto=format&fit=crop"
-                                        alt="A Relíquia"
-                                    />
-                                </div>
-
-                                <div className={styles.infoLivro}>
-                                    <h4>A Relíquia</h4>
-                                    <span>Eça de Queirós</span>
-                                </div>
-                            </Link>
+                                            <div className={styles.infoLivro}>
+                                                <h4>{livro.titulo}</h4>
+                                                <span>
+                                                    {livro.autor ||
+                                                        livro.escritor ||
+                                                        'Autor desconhecido'}
+                                                </span>
+                                            </div>
+                                        </Link>
+                                    );
+                                })}
                         </div>
                     </div>
                 </section>
