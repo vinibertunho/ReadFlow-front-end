@@ -41,7 +41,6 @@ function Equipe() {
                         <h2>Nossa Missao</h2>
 
                         <p>
-                            {' '}
                             Nossa missão é criar um ambiente de estudos voltado a livros de
                             vestibulares, para auxiliar os alunos em seus cronogramas de estudos.
                             Transformando o acesso à leitura obrigatória em uma experiência
