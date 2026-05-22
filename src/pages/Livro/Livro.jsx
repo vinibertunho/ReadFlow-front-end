@@ -60,10 +60,12 @@ function Livro() {
             async function fetchLivro() {
                 try {
                     setCarregando(true);
-                    const key = import.meta.env.VITE_API_KEY_LOCAL || import.meta.env.VITE_API_KEY;
-                    const options = {};
-                    if (key) options.headers = { 'x-api-key': key };
-                    const response = await fetch(`${API_URL}/${id}`, options);
+                    const apiKey = import.meta.env.VITE_API_KEY || 'projetoamods';
+                    const response = await fetch(`${API_URL}/${id}`, {
+                      headers: {
+                        'x-api-key': apiKey
+                      }
+                    });
                     if (!response.ok) {
                         throw new Error('Livro não encontrado');
                     }
@@ -133,20 +135,20 @@ function Livro() {
     const caracteristicas = firstText(caracteristicas_literarias_pt, caracteristicas_literarias_en);
     const conclusao = firstText(conclusao_pt, conclusao_en);
 
-    // Analysis fields for the 'Análise da obra' tab
+
     const analiseTexto = firstText(detalhesAutor, conclusao, resumo, contexto);
     const simbolismoLines = normalizeParagraphs(caracteristicas || '');
     const engajamentoLines = normalizeParagraphs(detalhesAutor || estilo || '');
     const temasLines = normalizeParagraphs(contexto || caracteristicas || '');
 
-    // Tabs: ensure 'Personagens' and 'Contexto histórico' tabs are present
+
     const hasFicha = Boolean(
         detalhesAutor || estilo || verossimilhanca || caracteristicas || conclusao || paginas || ano
     );
 
     const tabs = [];
     if (resumo) tabs.push({ id: 'resumo', label: 'Resumo' });
-    // always include personagens and contexto tabs (content may be empty)
+
     tabs.push({ id: 'personagens', label: 'Personagens' });
     tabs.push({ id: 'contexto', label: 'Contexto histórico' });
     if (hasFicha) tabs.push({ id: 'ficha', label: 'Ficha técnica' });
