@@ -26,6 +26,9 @@ function Footer() {
                             <Link to="/biblioteca">Biblioteca</Link>
                         </li>
                         <li>
+                            <Link to="/livro">Explorar Obra</Link>
+                        </li>
+                        <li>
                             <Link to="/equipe">Equipe</Link>
                         </li>
                         <li>
