@@ -5,14 +5,12 @@
     --text-dark: #2d3436;
     --text-light: #636e72;
     --bg-light: #fdfdfd;
-    --card-bg: #f4f2fd;
+    --card-bg: #f0effa;
     --details: #dfdbfd;
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+    font-weight: 400;
 }
 
 .homeContainer {
@@ -47,17 +45,16 @@
     display: flex;
     justify-content: flex-start;
     margin-left: 50px;
+    margin-right: 90px;
 }
 
 .coverImage {
-    width: 100%;
-    max-width: 250px;
+    width: 19rem;
     height: auto;
     border-radius: 4px;
     transform: rotate(-5deg);
     transition: 0.35s ease;
     cursor: pointer;
-
     filter:
         drop-shadow(-20px 30px 15px rgba(0, 0, 0, 0.22))
         brightness(1.03);
@@ -65,7 +62,6 @@
 
 .coverImage:hover {
     transform: rotate(0deg) scale(1.07);
-
     filter:
         drop-shadow(-20px 25px 25px rgba(0, 0, 0, 0.411))
         brightness(1.03);
@@ -86,57 +82,47 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-
     width: fit-content;
-
     margin: 0 0 16px 0;
 }
 
 .textoHeader h1 {
     font-family: 'Newsreader', serif;
-
     font-size: 48px;
     font-weight: 800;
-
     color: var(--text-dark);
-
     margin: 0 0 16px 0;
-
     line-height: 1.2;
 }
 
 .textoHeader p {
     font-size: 18px;
-
     color: var(--text-light);
-
-    margin: 0 0 32px 0;
+    margin-bottom: 1.5rem
 }
 
-.textoHeader button {
+.textoHeader button  {
     background-color: var(--purple-main);
     color: var(--bg-light);
-
     border: none;
-
-    padding: 12px 100px;
-
-    font-size: 16px;
-
+    padding: 1px 100px;
     border-radius: 10px;
-
     cursor: pointer;
-
     width: fit-content;
-
     transition: 0.25s ease;
+}
+
+.textoHeader button p {
+    font-weight: 600;
+    color: var(--bg-light);
+    font-weight: 300;
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 .textoHeader button:hover {
     background-color: #6935db;
-
     transform: translateY(-4px) scale(1.02);
-
     box-shadow: 0 14px 30px rgba(123, 67, 245, 0.28);
 }
 
@@ -146,31 +132,23 @@
 
 .criancasCorrendo {
     width: 100%;
-
+    height: 100%;
     display: flex;
-
     justify-content: flex-end;
-
     margin-right: -220px;
 }
 
 .criancas {
     width: 100%;
     max-width: 900px;
-
     height: 500px;
-
     object-fit: cover;
-
     border-radius: 270px 0px 0px 550px / 200px 0px 0px 600px;
-
-    opacity: 0.3;
+    opacity: 0.35;
 }
 
 .destaques {
     margin: 0 auto;
-    padding-left: 2rem;
-    padding-right: 2rem;
     padding: 4rem;
 }
 
@@ -189,8 +167,9 @@
 
 .apresentacao p {
     color: var(--text-light);
-
     font-size: 16px;
+    margin-left: 7rem;
+    margin-right: 7rem;
 }
 
 .cards {
@@ -205,7 +184,12 @@
     justify-content: center;
 }
 
-.cards > div {
+.cards a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.cards > a {
     background-color: var(--card-bg);
     padding: 32px;
     border-radius: 16px;
@@ -220,7 +204,7 @@
     max-height: 500px;
 }
 
-.cards > div:hover {
+.cards > a:hover {
     transform: translateY(-6px);
     background-color: var(--details);
     box-shadow: 0 20px 30px rgba(0, 0, 0, 0.06);
@@ -255,79 +239,175 @@
 
     display: flex;
     align-items: center;
-
-    transition: color 0.2s ease;
-}
-
-.cards > div:hover p:last-child {
-    color: var(--purple-main);
 }
 
 .biblioteca {
-    padding: 80px 8%;
-
-    background-color: #fafafa;
-
+    padding: 0;
+    background-color: var(--card-bg);
     border-top: 1px solid #e2e8f0;
 }
 
 .fraseBonitaAesthetic {
-    max-width: 800px;
+    width: 100%;
 
-    margin: 0 auto 64px auto;
+    background: var(--bg-light);
 
-    text-align: center;
+    padding: 70px 20px;
+
+    margin-bottom: 5rem;
+    margin-top: 3.5rem;
 }
 
 .fraseBonitaAesthetic h6 {
+    max-width: 650px;
+
+    margin: 0 auto 18px auto;
+
+    text-align: center;
+
     font-size: 22px;
 
     font-style: italic;
-    font-weight: 500;
+    font-weight: 400;
 
-    color: #334155;
+    color: var(--text-dark);
 
     line-height: 1.8;
 
-    margin: 0 0 16px 0;
+    font-family: 'Newsreader', serif;
 }
 
 .fraseBonitaAesthetic p {
-    font-size: 16px;
-
-    color: #94a3b8;
-
-    font-weight: 600;
-
+    text-align: center;
+    font-size: 13px;
+    color: var(--purple-main);
+    font-weight: 700;
+    letter-spacing: .08em;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-
-    margin: 0;
 }
 
 .bibliotecaRealOficial {
-    text-align: center;
-
-    max-width: 1200px;
-
-    margin: 0 auto;
+    padding: 0 30px 90px 30px;
+    margin-top: -40px;
 }
 
-.bibliotecaRealOficial h3 {
-    font-size: 32px;
-
-    color: #0f172a;
-
-    margin-bottom: 8px;
+.topBiblioteca {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2.5rem;
 }
 
-.bibliotecaRealOficial p {
-    color: #64748b;
+.topBiblioteca h3 {
+    font-family: 'Newsreader', serif;
 
-    font-size: 16px;
+    font-size: 1.7rem;
+
+    color: var(--text-dark);
+
+    margin-bottom: 12px;
+
+    font-weight: 700;
+}
+
+.topBiblioteca p {
+    color: var(--text-dark);
+    font-size: 17px;
+    font-weight: 300;
+}
+
+.verTodos {
+    text-decoration: none;
+
+    color: var(--purple-main);
+
+    font-size: 1.3rem;
+
+    transition: 0.2s;
+
+    margin-top: 14px;
+    font-weight: 700;
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.verTodos:hover {
+    opacity: 0.7;
+}
+
+.cardsLivro {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 28px;
+}
+
+.cardLivro {
+    width: 100%;
+    text-decoration: none;
+    color: inherit;
+}
+
+.capaLivroBiblioteca {
+    width: 100%;
+    height: 560px;
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    cursor: pointer;
+
+    transition: 0.35s ease;
+
+    background: #ddd;
+
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.cardLivro:hover .capaLivroBiblioteca {
+    transform: translateY(-8px);
+
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
+}
+
+.capaLivroBiblioteca img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.infoLivro {
+    margin-top: 14px;
+}
+
+.infoLivro h4 {
+    font-size: 1.2rem;
+
+    margin-bottom: 4px;
+
+    font-weight: 600;
+
+    color: #111827;
+}
+
+.infoLivro span {
+    color: #777;
+    font-size: 0.92rem;
+}
+
+@media (max-width: 1200px) {
+
+    .cardsLivro {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
 }
 
 @media (max-width: 1024px) {
+
     .conteudoHeader {
         grid-template-columns: 1fr;
 
@@ -362,16 +442,34 @@
 
     .criancas {
         max-width: 100%;
-
         height: 300px;
     }
 
     .cards {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .bibliotecaRealOficial {
+        padding: 0 40px 70px 40px;
+    }
+
+}
+
+@media (max-width: 700px) {
+
+    .cardsLivro {
+        grid-template-columns: 1fr;
+    }
+
+    .topBiblioteca {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
 }
 
 @media (max-width: 640px) {
+
     .textoHeader h1 {
         font-size: 35px;
     }
@@ -379,4 +477,18 @@
     .cards {
         grid-template-columns: 1fr;
     }
+
+    .fraseBonitaAesthetic {
+        padding: 50px 24px;
+    }
+
+    .fraseBonitaAesthetic h6 {
+        font-size: 18px;
+        line-height: 1.7;
+    }
+
+    .topBiblioteca h3 {
+        font-size: 2.2rem;
+    }
+
 }
