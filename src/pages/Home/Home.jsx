@@ -67,7 +67,11 @@ function Home() {
                             <button>Explorar mais</button>
                         </div>
                         <div className={styles.criancasCorrendo}>
-                            <img src={criancasCorrendo} alt="Crianças correndo" className={styles.criancas} />
+                            <img
+                                src={criancasCorrendo}
+                                alt="Crianças correndo"
+                                className={styles.criancas}
+                            />
                         </div>
                     </div>
                 </section>
@@ -119,9 +123,76 @@ function Home() {
                         </h6>
                         <p> — Jorge Amado, 1937 </p>
                     </div>
+
                     <div className={styles.bibliotecaRealOficial}>
-                        <h3>Biblioteca de Livros</h3>
-                        <p>Explore as obras analisadas por outras equipes do projeto.</p>
+                        <div className={styles.topBiblioteca}>
+                            <div>
+                                <h3>Biblioteca de Livros</h3>
+                                <p>Explore as obras analisadas por outras equipes do projeto.</p>
+                            </div>
+
+                            <a href="#" className={styles.verTodos}>
+                                Ver Todos ↗
+                            </a>
+                        </div>
+
+                        <div className={styles.cardsLivro}>
+                            <div className={styles.cardLivro}>
+                                <div className={styles.capaLivroBiblioteca}>
+                                    <img
+                                        src="https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=1200&auto=format&fit=crop"
+                                        alt="O Cortiço"
+                                    />
+                                </div>
+
+                                <div className={styles.infoLivro}>
+                                    <h4>O Cortiço</h4>
+                                    <span>Aluísio Azevedo</span>
+                                </div>
+                            </div>
+
+                            <div className={styles.cardLivro}>
+                                <div className={styles.capaLivroBiblioteca}>
+                                    <img
+                                        src="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?q=80&w=1200&auto=format&fit=crop"
+                                        alt="Dom Casmurro"
+                                    />
+                                </div>
+
+                                <div className={styles.infoLivro}>
+                                    <h4>Dom Casmurro</h4>
+                                    <span>Machado de Assis</span>
+                                </div>
+                            </div>
+
+                            <div className={styles.cardLivro}>
+                                <div className={styles.capaLivroBiblioteca}>
+                                    <img
+                                        src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=1200&auto=format&fit=crop"
+                                        alt="Macunaíma"
+                                    />
+                                </div>
+
+                                <div className={styles.infoLivro}>
+                                    <h4>Macunaíma</h4>
+                                    <span>Mário de Andrade</span>
+                                </div>
+                            </div>
+
+                            <div className={styles.cardLivro}>
+                                <div className={styles.capaLivroBiblioteca}>
+                                    <img
+                                    src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=1200&auto=format&fit=crop"
+                                        alt="A Relíquia"
+                                    />
+                                </div>
+
+                                <div className={styles.infoLivro}>
+                                    <h4>A Relíquia</h4>
+                                    <span>Eça de Queirós</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </main>
