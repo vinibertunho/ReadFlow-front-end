@@ -31,10 +31,14 @@
 }
 
 .conteudoHeader {
-    display: grid;
-    grid-template-columns: 0.7fr 1fr 2fr;
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
     width: 100%;
+    max-width: 100%;
+    min-width: 300px;
+    min-height: 200px;
+    max-height: 800px;
     padding-left: 150px;
     gap: 10px;
 }
@@ -190,10 +194,14 @@
 }
 
 .cards {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 16px;
     width: 100%;
+    max-width: 100%;
+    min-width: 250px;
+    min-height: 150px;
+    max-height: 2000px;
     justify-content: center;
 }
 
@@ -205,6 +213,11 @@
     cursor: pointer;
     display: flex;
     flex-direction: column;
+    flex: 1 1 calc(33.333% - 16px);
+    max-width: calc(33.333% - 16px);
+    min-width: 250px;
+    min-height: 200px;
+    max-height: 500px;
 }
 
 .cards > div:hover {

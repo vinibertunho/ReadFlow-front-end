@@ -70,9 +70,14 @@
 
 .content-grid {
   display: flex;
+  flex-wrap: wrap;
   gap: 2rem;
   margin-bottom: 3rem;
   align-items: flex-start;
+  max-width: 100%;
+  min-width: 300px;
+  min-height: 300px;
+  max-height: 1500px;
 }
 
 .content-grid > .analysis-box {
@@ -168,6 +173,10 @@
   flex-wrap: wrap;
   gap: 1.5rem;
   margin-top: 1.5rem;
+  max-width: 100%;
+  min-width: 300px;
+  min-height: 200px;
+  max-height: 1500px;
 }
 
 .themes-grid > .theme-card {

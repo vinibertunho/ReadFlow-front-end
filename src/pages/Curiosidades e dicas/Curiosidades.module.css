@@ -100,7 +100,12 @@
 
 .cardGrid {
     display: flex;
+    flex-wrap: wrap;
     gap: 2rem;
+    max-width: 100%;
+    min-width: 300px;
+    min-height: 250px;
+    max-height: 1200px;
 }
 
 .cardGrid > :first-child {

@@ -8,9 +8,12 @@
 
 .container {
     max-width: 75rem;
+    min-width: 200px;
+    min-height: 100px;
+    max-height: 1200px;
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-wrap: wrap;
     gap: 1.875rem;
 }
 
@@ -56,8 +59,8 @@
     list-style: none;
     padding: 0;
     margin: 0;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-wrap: wrap;
     gap: 0.5rem 0.9375rem;
 }
 

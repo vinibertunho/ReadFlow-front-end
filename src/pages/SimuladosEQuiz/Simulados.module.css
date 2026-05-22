@@ -30,14 +30,18 @@
 }
 
 .mainGrid {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: 24px;
+  max-width: 100%;
+  min-width: 300px;
+  min-height: 300px;
+  max-height: 2000px;
 }
 
 @media (min-width: 1024px) {
   .mainGrid {
-    grid-template-columns: 2fr 1fr;
+    gap: 24px;
   }
 }
 
@@ -193,10 +197,14 @@
 }
 
 .mapaGrid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 16px;
+  max-width: 100%;
+  min-width: 200px;
+  min-height: 60px;
+  max-height: 300px;
 }
 
 .badgeQuestao {
