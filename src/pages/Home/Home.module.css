@@ -283,20 +283,16 @@
 
 .fraseBonitaAesthetic p {
     text-align: center;
-
     font-size: 13px;
-
-    color: #7b43f5;
-
+    color: var(--purple-main);
     font-weight: 700;
-
     letter-spacing: .08em;
-
     text-transform: uppercase;
 }
 
 .bibliotecaRealOficial {
     padding: 0 30px 90px 30px;
+    margin-top: -40px;
 }
 
 .topBiblioteca {
@@ -315,24 +311,26 @@
 
     margin-bottom: 12px;
 
-    font-weight: 500;
+    font-weight: 700;
 }
 
 .topBiblioteca p {
-    color: #64748b;
+    color: var(--text-dark);
     font-size: 17px;
+    font-weight: 300;
 }
 
 .verTodos {
     text-decoration: none;
 
-    color: #7b43f5;
+    color: var(--purple-main);
 
     font-size: 1rem;
 
     transition: 0.2s;
 
     margin-top: 14px;
+    font-weight: 700;
 }
 
 .verTodos:hover {
