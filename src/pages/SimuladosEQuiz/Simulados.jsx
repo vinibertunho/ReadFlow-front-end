@@ -222,7 +222,7 @@ function Simulados() {
                                         </strong>
                                     </p>
                                     <p style={{ margin: '2px 0 0 0' }}>
-                                        ✅ Gabarito oficial da API:{' '}
+                                        ✅ Gabarito oficial:{' '}
                                         <strong style={{ color: 'green' }}>
                                             {q.respostaCorreta}
                                         </strong>
