@@ -5,7 +5,7 @@
     --text-dark: #2d3436;
     --text-light: #636e72;
     --bg-light: #fdfdfd;
-    --card-bg: #f0eefa;
+    --card-bg: #f0effa;
     --details: #dfdbfd;
 }
 
@@ -105,29 +105,27 @@
 
 .textoHeader p {
     font-size: 18px;
-
     color: var(--text-light);
-
     margin: 0 0 32px 0;
 }
 
-.textoHeader button {
+.textoHeader button  {
     background-color: var(--purple-main);
     color: var(--bg-light);
-
     border: none;
-
-    padding: 12px 100px;
-
-    font-size: 16px;
-
+    padding: 1px 100px;
     border-radius: 10px;
-
     cursor: pointer;
-
     width: fit-content;
-
     transition: 0.25s ease;
+}
+
+.textoHeader button p {
+    font-weight: 600;
+    color: var(--bg-light);
+    font-weight: 300;
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 .textoHeader button:hover {
@@ -198,7 +196,12 @@
     justify-content: center;
 }
 
-.cards > div {
+.cards a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.cards > a {
     background-color: var(--card-bg);
     padding: 32px;
     border-radius: 16px;
@@ -208,7 +211,7 @@
     flex-direction: column;
 }
 
-.cards > div:hover {
+.cards > a:hover {
     transform: translateY(-6px);
     background-color: var(--details);
     box-shadow: 0 20px 30px rgba(0, 0, 0, 0.06);
@@ -258,7 +261,7 @@
 
     padding: 70px 20px;
 
-    margin-bottom:5rem;
+    margin-bottom: 5rem;
     margin-top: 3.5rem;
 }
 
@@ -325,12 +328,16 @@
 
     color: var(--purple-main);
 
-    font-size: 1rem;
+    font-size: 1.3rem;
 
     transition: 0.2s;
 
     margin-top: 14px;
     font-weight: 700;
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .verTodos:hover {
@@ -345,6 +352,8 @@
 
 .cardLivro {
     width: 100%;
+    text-decoration: none;
+    color: inherit;
 }
 
 .capaLivroBiblioteca {
@@ -364,7 +373,7 @@
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
-.capaLivroBiblioteca:hover {
+.cardLivro:hover .capaLivroBiblioteca {
     transform: translateY(-8px);
 
     box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
