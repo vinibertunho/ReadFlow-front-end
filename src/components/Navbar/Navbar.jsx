@@ -30,7 +30,6 @@ function Navbar() {
                     ReadFlow
                 </div>
 
-                {/* BOTÃO MENU MOBILE */}
                 <button className={styles.menuBtn} onClick={() => setMenuOpen(!menuOpen)}>
                     {menuOpen ? <X size={28} /> : <Menu size={28} />}
                 </button>
