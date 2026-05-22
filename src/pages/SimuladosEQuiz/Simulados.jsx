@@ -21,6 +21,11 @@ function Simulados() {
                     throw new Error('Não foi possível carregar o simulado.');
                 }
 
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('O servidor não retornou um formato de dados válido (JSON).');
+                }
+
                 const dadosQuiz = await response.json();
                 setQuiz(dadosQuiz);
 

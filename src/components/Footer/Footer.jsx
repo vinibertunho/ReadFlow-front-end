@@ -24,10 +24,10 @@ function Footer() {
                             <a href="../../pages/Equipe/Equipe.jsx">Equipe</a>
                         </li>
                         <li>
-                            <a href="../../pages/Vestibular/Vestibular.css">Vestibular</a>
+                            <a href="../../pages/Vestibular/Vestibular.jsx">Vestibular</a>
                         </li>
                         <li>
-                            <a href="../../pages/Simulados e quiz/Simulados.jsx">Quiz</a>
+                            <a href="../../pages/SimuladosEQuiz/Simulados.jsx">Quiz</a>
                         </li>
                         <li>
                             <a href="../../pages/Videoaulas/Videoaulas.jsx">Videoaulas</a>
