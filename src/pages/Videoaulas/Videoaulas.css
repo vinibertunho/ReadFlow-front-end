@@ -20,12 +20,22 @@
   padding: 2.5rem 2rem;
 }
 
-/* GRID DO PLAYER */
+/* LAYOUT DO PLAYER (flex em vez de grid) */
 .video-hero-grid {
-  display: grid;
-  grid-template-columns: 2.2fr 1fr;
+  display: flex;
   gap: 2rem;
   margin-bottom: 3.5rem;
+  align-items: flex-start;
+}
+
+.video-hero-grid > .video-aspect-box {
+  flex: 2.2 1 0%;
+  min-width: 0;
+}
+
+.video-hero-grid > .video-meta-details {
+  flex: 1 1 0%;
+  min-width: 0;
 }
 
 .video-aspect-box {
@@ -120,11 +130,15 @@
 .is-playing h4 { color: var(--readflow-purple); }
 .row-text span { font-size: 0.75rem; color: #94a3b8; }
 
-/* CARDS APOIO */
 .support-cards-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: 1.5rem;
+}
+
+.support-cards-grid > .support-card {
+  flex: 1 1 calc(50% - 0.75rem);
+  min-width: 220px;
 }
 
 .support-card {

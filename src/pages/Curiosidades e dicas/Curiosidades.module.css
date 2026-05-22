@@ -15,10 +15,19 @@
 }
 
 .sectionTwoColumns {
-    display: grid;
-    grid-template-columns: 1fr 2.7fr;
+    display: flex;
     gap: 2rem;
     align-items: center;
+}
+
+.sectionTwoColumns > :first-child {
+    flex: 1 1 0%;
+    min-width: 0;
+}
+
+.sectionTwoColumns > :last-child {
+    flex: 2.7 1 0%;
+    min-width: 0;
 }
 
 .heroTextContainer {
@@ -90,19 +99,33 @@
 }
 
 .cardGrid {
-    display: grid;
-    grid-template-columns: 6fr 2fr;
+    display: flex;
     gap: 2rem;
+}
+
+.cardGrid > :first-child {
+    flex: 6 1 0%;
+    min-width: 0;
+}
+
+.cardGrid > :last-child {
+    flex: 2 1 0%;
+    min-width: 0;
 }
 
 .cardCensure{
     background-color: white;
     border-radius: 1rem;
     padding: 2rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
     gap: 2rem;
+    flex-wrap: wrap;
     align-items: center;
+}
+
+.cardCensure > * {
+    flex: 1 1 50%;
+    min-width: 0;
 }
 
 .cardText {
@@ -279,9 +302,9 @@
     /* Transforma tudo o que era 2 colunas em 1 coluna só */
     .sectionTwoColumns,
     .cardGrid,
-    .cardCensura,
+    .cardCensure,
     .footerSection {
-        grid-template-columns: 1fr !important;
+        flex-direction: column !important;
         gap: 1.25rem;
     }
 
