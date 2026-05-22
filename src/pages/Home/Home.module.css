@@ -35,15 +35,13 @@
     width: 100%;
     padding-left: 10px;
     gap: 50px;
-    margin-top: 3rem;
-    margin-bottom: 3rem;
 }
 
 .capaLivro {
     display: flex;
     justify-content: flex-start;
-    margin-left: 50px;
-    margin-right: 90px;
+    margin-left: 30px;
+    margin-right: 10px;
 }
 
 .coverImage {
@@ -72,9 +70,9 @@
 }
 
 .textoHeader h4 {
-    color: var(--purple-main);
+    color:#5423bd;
     background-color: var(--details);
-    padding: 2.5px 14px;
+    padding: 2px 14px;
     border-radius: 20px;
     font-size: 14px;
     font-weight: 700;
@@ -87,23 +85,23 @@
 .textoHeader h1 {
     font-family: 'Newsreader', serif;
     font-size: 48px;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--text-dark);
     margin: 0 0 16px 0;
     line-height: 1.2;
 }
 
 .textoHeader p {
-    font-size: 18px;
+    font-size: 15px;
     color: var(--text-light);
-    margin-bottom: 1.5rem
+    margin-bottom: 1.5rem;
 }
 
 .textoHeader button  {
     background-color: var(--purple-main);
     color: var(--bg-light);
     border: none;
-    padding: 1px 100px;
+    padding: 0.1rem 10rem;
     border-radius: 10px;
     cursor: pointer;
     width: fit-content;
@@ -111,11 +109,11 @@
 }
 
 .textoHeader button p {
-    font-weight: 600;
-    color: var(--bg-light);
+    font-size: 15px;
     font-weight: 300;
-    margin-top: 15px;
-    margin-bottom: 15px;
+    color: var(--bg-light);
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .textoHeader button:hover {
@@ -133,13 +131,12 @@
     height: 100%;
     display: flex;
     justify-content: flex-end;
-    margin-right: -220px;
 }
 
 .criancas {
     width: 100%;
     max-width: 900px;
-    height: 500px;
+    height: 100%;
     object-fit: cover;
     border-radius: 270px 0px 0px 550px / 200px 0px 0px 600px;
     opacity: 0.35;
@@ -159,15 +156,15 @@
     font-family: 'Newsreader', serif;
     color: var(--text-dark);
     margin-bottom: 8px;
-    font-size: 30px;
-    font-weight: 700;
+    font-size: 27px;
+    font-weight: 600;
 }
 
 .apresentacao p {
     color: var(--text-light);
-    font-size: 16px;
-    margin-left: 7rem;
-    margin-right: 7rem;
+    font-size: 15px;
+    margin-left: 20rem;
+    margin-right: 20rem;
 }
 
 .cards {

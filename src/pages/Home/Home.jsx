@@ -87,7 +87,7 @@ function Home() {
 
                             <Link to="/livro" className={styles.button}>
                                 <button>
-                                    <p>Explorar mais</p>
+                                    <p>Explorar Obra</p>
                                 </button>
                             </Link>
                         </div>
