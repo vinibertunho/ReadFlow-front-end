@@ -7,6 +7,12 @@
   --warning-red: #dc2626;
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 .page-container {
   min-height: 100vh;
   background-color: var(--bg-light);
@@ -27,7 +33,7 @@
   border-radius: 12px;
   overflow: hidden;
   margin-bottom: 2rem;
-  box-shadow: 0 4px 6px -1px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .hero-img {
@@ -144,14 +150,14 @@
   border-radius: 12px;
 }
 
-.podcast-card {
+.videoaula-card {
   background-color: #475569;
   color: white;
   padding: 1.5rem;
   border-radius: 12px;
 }
 
-.podcast-btn {
+.videoaula-btn {
   width: 100%;
   background: white;
   border: none;
@@ -161,6 +167,11 @@
   font-size: 0.8rem;
   cursor: pointer;
   margin-top: 1rem;
+  transition: background-color 0.2s;
+}
+
+.videoaula-btn:hover {
+  background-color: #f1f5f9;
 }
 
 .themes-grid {
@@ -180,7 +191,7 @@
   padding: 1.5rem;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
-  transition: transform 0.2s;
+  transition: transform 0.2s, border-color 0.2s;
 }
 
 .theme-card:hover {
@@ -196,6 +207,7 @@
   padding: 2px 6px;
   border-radius: 4px;
 }
+
 
 .footer-info {
   background-color: #0f172a;
@@ -215,8 +227,8 @@
 }
 
 .interpret-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 1rem;
   border-radius: 8px;
   margin-top: 1rem;
@@ -229,4 +241,60 @@
   width: 150px;
   text-align: center;
   font-size: 0.7rem;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+  }
+
+  .hero-banner {
+    height: auto;
+    min-height: 220px;
+  }
+
+  .hero-content {
+    padding: 1.5rem;
+  }
+
+  .hero-title {
+    font-size: 1.6rem;
+  }
+
+  .hero-desc {
+    font-size: 0.85rem;
+  }
+
+  .content-grid {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .content-grid > .analysis-box,
+  .content-grid > .sidebar {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .analysis-box {
+    padding: 1.5rem;
+  }
+
+  .themes-grid > .theme-card {
+    flex: 1 1 100%;
+  }
+
+  .footer-info {
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1.5rem;
+  }
+
+  .footer-content {
+    max-width: 100%;
+  }
+
+  .important-badge {
+    width: 100%;
+  }
 }
