@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap');
+
 .loading {
     text-align: center;
     color: #6366f1;
@@ -217,6 +219,12 @@
     gap: 0.5rem;
 }
 
+.bulletItem::before {
+    content: ".";
+    color: #3b82f6;
+    font-weight: bold;
+}
+
 .timelineSection {
     display: flex;
     flex-direction: column;
@@ -229,6 +237,14 @@
     color: #64748b;
     margin: 0.25rem;
     text-align: center;
+}
+
+.timelineWrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
 }
 
 .timelineSubtitle:first-of-type {
@@ -280,6 +296,33 @@
     box-shadow: 0 0 0 4px #ffffff;
 }
 
+.timelineCardContent {
+    background-color: #ffffff;
+    border: 1px solid #f1f5f9;
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+}
+
+.timelineCardContentLeft {
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+}
+
+.timelineTitleText {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0.5rem;
+}
+
+.timelineBody {
+    font-size: 0.8125rem;
+    color: #64748b;
+    line-height: 1.5;
+    margin: 0;
+}
+
 .academyTag {
     font-size: 0.6875rem;
     color: #475569;
@@ -288,6 +331,72 @@
     letter-spacing: 0.0313rem;
 }
 
+.religiosidadeSection {
+    background-color: #ebf3ff;
+    border-radius: 1.5rem;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    align-items: center;
+    overflow: hidden;
+    gap: 2.5rem;
+}
+
+.religiosidadeTextContent {
+    padding: 3rem 3.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    grid-column: 1;
+}
+
+.religiosidadeTitle {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+}
+
+.religiosidadeBodyText {
+    font-size: 0.9rem;
+    color: #475569;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.tagContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.tag {
+    background-color: #ffffff;
+    color: #1e293b;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border: 1px;
+}
+
+.religiosidadeImageContainer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: flex-end;
+    grid-column: 2;
+    padding: 1.5rem 1.5rem 1.5rem 0;
+    box-sizing: border-box;
+}
+
+.religiosidadeImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 0.50rem;
+}
 /* ==========================================================================
    RESPONSIVIDADE SUPER ENXUTA
    ========================================================================== */
