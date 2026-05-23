@@ -5,14 +5,14 @@ import cidadeImg from '../../assets/cidade.png';
 import capitaesImg from '../../assets/capitaes.jpg';
 import downloadImg from '../../assets/download.jpg'
 
-const API_URL = 'https://readflow-m8o6.onrender.com/api/curiosidades';
+const URL_API = 'https://readflow-m8o6.onrender.com/api/curiosidades';
 
 export default function Curiosidades() {
     const [carregando, setCarregando] = useState(true);
     const [dados, setDados] = useState(null);
 
     useEffect(() => {
-        fetch(API_URL)
+        fetch(URL_API)
             .then((resposta) => resposta.json())
             .then((resultado) => {
                 setDados(resultado);

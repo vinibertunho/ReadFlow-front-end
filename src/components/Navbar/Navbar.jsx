@@ -9,17 +9,12 @@ function Navbar() {
     const [activeLink, setActiveLink] = useState('/');
     const [menuOpen, setMenuOpen] = useState(false);
 
-    const toggleLanguage = () => {
+    const alternarIdioma = () => {
         console.log('Mudar idioma');
     };
 
-    const getLinkClass = (path) => {
-        return activeLink === path ? `${styles.navLink} ${styles.active}` : styles.navLink;
-    };
-
-    const handleLinkClick = (path) => {
-        setActiveLink(path);
-        setMenuOpen(false);
+    const obterClasseLink = (path) => {
+        return location.pathname === path ? `${styles.navLink} ${styles.active}` : styles.navLink;
     };
 
     return (
@@ -36,73 +31,43 @@ function Navbar() {
 
                 <ul className={`${styles.links} ${menuOpen ? styles.showMenu : ''}`}>
                     <li>
-                        <Link
-                            to="/"
-                            className={getLinkClass('/')}
-                            onClick={() => handleLinkClick('/')}>
+                        <Link to="/" className={obterClasseLink('/')}> 
                             Início
                         </Link>
                     </li>
 
                     <li>
-                        <Link
-                            to="/livro"
-                            className={getLinkClass('/livro')}
-                            onClick={() => handleLinkClick('/livro')}>
-                            Explorar obra
-                        </Link>
-                    </li>
-
-                    <li>
-                        <Link
-                            to="/biblioteca"
-                            className={getLinkClass('/biblioteca')}
-                            onClick={() => handleLinkClick('/biblioteca')}>
+                        <Link to="/biblioteca" className={obterClasseLink('/biblioteca')}>
                             Biblioteca
                         </Link>
                     </li>
 
                     <li>
-                        <Link
-                            to="/equipe"
-                            className={getLinkClass('/equipe')}
-                            onClick={() => handleLinkClick('/equipe')}>
+                        <Link to="/equipe" className={obterClasseLink('/equipe')}>
                             Equipe
                         </Link>
                     </li>
 
                     <li>
-                        <Link
-                            to="/vestibular"
-                            className={getLinkClass('/vestibular')}
-                            onClick={() => handleLinkClick('/vestibular')}>
+                        <Link to="/vestibular" className={obterClasseLink('/vestibular')}>
                             Vestibular
                         </Link>
                     </li>
 
                     <li>
-                        <Link
-                            to="/simulados"
-                            className={getLinkClass('/simulados')}
-                            onClick={() => handleLinkClick('/simulados')}>
+                        <Link to="/simulados" className={obterClasseLink('/simulados')}>
                             Quiz
                         </Link>
                     </li>
 
                     <li>
-                        <Link
-                            to="/videoaulas"
-                            className={getLinkClass('/videoaulas')}
-                            onClick={() => handleLinkClick('/videoaulas')}>
+                        <Link to="/videoaulas" className={obterClasseLink('/videoaulas')}>
                             Videoaulas
                         </Link>
                     </li>
 
                     <li>
-                        <Link
-                            to="/curiosidades"
-                            className={getLinkClass('/curiosidades')}
-                            onClick={() => handleLinkClick('/curiosidades')}>
+                        <Link to="/curiosidades" className={obterClasseLink('/curiosidades')}>
                             Curiosidades
                         </Link>
                     </li>
@@ -113,7 +78,7 @@ function Navbar() {
                     </button>
                 </ul>
 
-                <button className={styles.langBtn} onClick={toggleLanguage}>
+                <button className={styles.langBtn} onClick={alternarIdioma}>
                     <Globe size={18} />
                     <span>PT/EN</span>
                 </button>

@@ -5,17 +5,13 @@ import styles from './Home.module.css';
 import criancasCorrendo from '../../assets/criancas.jpg';
 import { ExternalLink } from 'lucide-react';
 
-const API_URL = 'https://readflow-m8o6.onrender.com/api/livros';
-
-const FALLBACK_COVER =
+const URL_API = 'https://readflow-m8o6.onrender.com/api/livros';
+const CAPA_PADRAO =
     'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600"><rect width="400" height="600" fill="%23eef2ff"/><rect x="24" y="24" width="352" height="552" rx="16" fill="%23dbeafe"/><text x="200" y="300" text-anchor="middle" fill="%23334155" font-size="28" font-family="Arial">Sem capa</text></svg>';
 
-const resolveCoverUrl = (url) => {
-    if (!url || url.trim() === '') return FALLBACK_COVER;
-    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
-        return url;
-    }
-    return `https://readflow-m8o6.onrender.com${url.startsWith('/') ? '' : '/'}${url}`;
+const resolverUrlCapa = (url) => {
+    if (!url) return '';
+    return url;
 };
 
 function Home() {
@@ -23,14 +19,7 @@ function Home() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch(API_URL, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'projetoamods',
-                'x-api-key': 'projetoamods',
-            },
-        })
+        fetch(URL_API)
             .then((res) => res.json())
             .then((data) => {
                 setLivros(Array.isArray(data) ? data : []);
@@ -42,17 +31,18 @@ function Home() {
             });
     }, []);
 
-    const libroPrincipal = livros[0] || {};
+    const livroPrincipal = livros[0] || {};
 
-    const getCapa = (livro) => {
-        if (!livro) return '';
-        return (
-            livro.capa_url || livro.imagem_url || livro.imagem || livro.capas || livro.foto || ''
-        );
-    };
+    const capaUrlOriginal =
+        livroPrincipal.capa_url ||
+        livroPrincipal.imagem_url ||
+        livroPrincipal.imagem ||
+        livroPrincipal.capas ||
+        livroPrincipal.foto ||
+        '';
 
-    const capaImagemPrincipal = resolveCoverUrl(getCapa(libroPrincipal));
-    const tituloPrincipal = libroPrincipal.titulo || 'Capitães da Areia';
+    const capaImagem = resolverUrlCapa(capaUrlOriginal);
+    const titulo = livroPrincipal.titulo || 'Capitães da Areia';
 
     return (
         <>
@@ -69,7 +59,7 @@ function Home() {
                                     className={styles.coverImage}
                                     onError={(event) => {
                                         event.currentTarget.onerror = null;
-                                        event.currentTarget.src = FALLBACK_COVER;
+                                        event.currentTarget.src = CAPA_PADRAO;
                                     }}
                                 />
                             )}
@@ -77,19 +67,9 @@ function Home() {
 
                         <div className={styles.textoHeader}>
                             <h4>Obra de Jorge Amado</h4>
-
-                            <h1>{tituloPrincipal}</h1>
-
-                            <p>
-                                {libroPrincipal.resumo ||
-                                    'resumo do livro aqui rs Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut blandit felis diam, ac porttitor neque eleifend sit amet. Duis molestie, elit in dapibus lacinia, lectus mi efficitur sapien, a pharetra lorem nisi sit amet turpis. Proin interdum, justo a lacinia pretium, ipsum quam consequat ex, sed tristique augue magna quis mauris. Sed vitae lacus tempor, hendrerit lorem ut, mollis arcu. Aliquam turpis leo, venenatis sit amet nunc eu, rutrum rhoncus neque.'}
-                            </p>
-
-                            <Link to="/livro" className={styles.button}>
-                                <button>
-                                    <p>Explorar Obra</p>
-                                </button>
-                            </Link>
+                            <h1>{titulo}</h1>
+                            <p>{livroPrincipal.resumo || 'resumo do livro aqui rs'}</p>
+                            <button>Explorar mais</button>
                         </div>
 
                         <div className={styles.criancasCorrendo}>
