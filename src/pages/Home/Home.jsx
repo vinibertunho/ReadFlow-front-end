@@ -3,11 +3,11 @@ import Navbar from '../../components/Navbar/Navbar';
 import styles from './Home.module.css';
 import criancasCorrendo from '../../assets/criancas.jpg';
 
-const API_URL = 'https://readflow-m8o6.onrender.com/api/livros';
-const FALLBACK_COVER =
+const URL_API = 'https://readflow-m8o6.onrender.com/api/livros';
+const CAPA_PADRAO =
     'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600"><rect width="400" height="600" fill="%23eef2ff"/><rect x="24" y="24" width="352" height="552" rx="16" fill="%23dbeafe"/><text x="200" y="300" text-anchor="middle" fill="%23334155" font-size="28" font-family="Arial">Sem capa</text></svg>';
 
-const resolveCoverUrl = (url) => {
+const resolverUrlCapa = (url) => {
     if (!url) return '';
     return url;
 };
@@ -16,7 +16,7 @@ function Home() {
     const [livros, setLivros] = useState([]);
 
     useEffect(() => {
-        fetch(API_URL)
+        fetch(URL_API)
             .then((res) => res.json())
             .then((data) => {
                 setLivros(data);
@@ -26,18 +26,18 @@ function Home() {
             });
     }, []);
 
-    const libroPrincipal = livros[0] || {};
+    const livroPrincipal = livros[0] || {};
 
     const capaUrlOriginal =
-        libroPrincipal.capa_url ||
-        libroPrincipal.imagem_url ||
-        libroPrincipal.imagem ||
-        libroPrincipal.capas ||
-        libroPrincipal.foto ||
+        livroPrincipal.capa_url ||
+        livroPrincipal.imagem_url ||
+        livroPrincipal.imagem ||
+        livroPrincipal.capas ||
+        livroPrincipal.foto ||
         '';
 
-    const capaImagem = resolveCoverUrl(capaUrlOriginal);
-    const titulo = libroPrincipal.titulo || 'Capitães da Areia';
+    const capaImagem = resolverUrlCapa(capaUrlOriginal);
+    const titulo = livroPrincipal.titulo || 'Capitães da Areia';
 
     return (
         <>
@@ -53,7 +53,7 @@ function Home() {
                                     className={styles.coverImage}
                                     onError={(event) => {
                                         event.currentTarget.onerror = null;
-                                        event.currentTarget.src = FALLBACK_COVER;
+                                        event.currentTarget.src = CAPA_PADRAO;
                                     }}
                                 />
                             ) : (
@@ -63,7 +63,7 @@ function Home() {
                         <div className={styles.textoHeader}>
                             <h4>Obra de Jorge Amado</h4>
                             <h1>{titulo}</h1>
-                            <p>{libroPrincipal.resumo || 'resumo do livro aqui rs'}</p>
+                            <p>{livroPrincipal.resumo || 'resumo do livro aqui rs'}</p>
                             <button>Explorar mais</button>
                         </div>
                         <div className={styles.criancasCorrendo}>

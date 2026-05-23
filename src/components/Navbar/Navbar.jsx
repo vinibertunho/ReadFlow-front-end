@@ -6,11 +6,11 @@ import logo from '../../assets/logo.png';
 function Navbar() {
     const location = useLocation();
 
-    const toggleLanguage = () => {
+    const alternarIdioma = () => {
         console.log('Mudar idioma');
     };
 
-    const getLinkClass = (path) => {
+    const obterClasseLink = (path) => {
         return location.pathname === path ? `${styles.navLink} ${styles.active}` : styles.navLink;
     };
 
@@ -23,49 +23,49 @@ function Navbar() {
 
                 <ul className={styles.links}>
                     <li>
-                        <Link to="/" className={getLinkClass('/')}>
+                        <Link to="/" className={obterClasseLink('/')}> 
                             Início
                         </Link>
                     </li>
 
                     <li>
-                        <Link to="/biblioteca" className={getLinkClass('/biblioteca')}>
+                        <Link to="/biblioteca" className={obterClasseLink('/biblioteca')}>
                             Biblioteca
                         </Link>
                     </li>
 
                     <li>
-                        <Link to="/equipe" className={getLinkClass('/equipe')}>
+                        <Link to="/equipe" className={obterClasseLink('/equipe')}>
                             Equipe
                         </Link>
                     </li>
 
                     <li>
-                        <Link to="/vestibular" className={getLinkClass('/vestibular')}>
+                        <Link to="/vestibular" className={obterClasseLink('/vestibular')}>
                             Vestibular
                         </Link>
                     </li>
 
                     <li>
-                        <Link to="/simulados" className={getLinkClass('/simulados')}>
+                        <Link to="/simulados" className={obterClasseLink('/simulados')}>
                             Quiz
                         </Link>
                     </li>
 
                     <li>
-                        <Link to="/videoaulas" className={getLinkClass('/videoaulas')}>
+                        <Link to="/videoaulas" className={obterClasseLink('/videoaulas')}>
                             Videoaulas
                         </Link>
                     </li>
 
                     <li>
-                        <Link to="/curiosidades" className={getLinkClass('/curiosidades')}>
+                        <Link to="/curiosidades" className={obterClasseLink('/curiosidades')}>
                             Curiosidades
                         </Link>
                     </li>
                 </ul>
 
-                <button className={styles.langBtn} onClick={toggleLanguage}>
+                <button className={styles.langBtn} onClick={alternarIdioma}>
                     <Globe size={18} />
                     <span>PT/EN</span>
                 </button>
