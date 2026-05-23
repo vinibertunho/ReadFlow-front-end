@@ -104,9 +104,22 @@
 
 .cardGrid {
     display: flex;
-    gap: 1.25rem;
-    margin: 2.5rem 0;
-    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 2rem;
+    max-width: 100%;
+    min-width: 300px;
+    min-height: 250px;
+    max-height: 1200px;
+}
+
+.cardGrid > :first-child {
+    flex: 6 1 0%;
+    min-width: 0;
+}
+
+.cardGrid > :last-child {
+    flex: 2 1 0%;
+    min-width: 0;
 }
 
 .cardCensure{

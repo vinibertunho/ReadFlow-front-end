@@ -149,11 +149,18 @@
   display: flex;
   flex-wrap: wrap;
   gap: 1.5rem;
+  max-width: 100%;
+  min-width: 300px;
+  min-height: 150px;
+  max-height: 800px;
 }
 
 .support-cards-grid > .support-card {
   flex: 1 1 calc(50% - 0.75rem);
   min-width: 220px;
+  max-width: calc(50% - 0.75rem);
+  max-height: 400px;
+  min-height: 150px;
 }
 
 .support-card {
