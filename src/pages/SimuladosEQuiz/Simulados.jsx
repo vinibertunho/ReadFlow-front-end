@@ -4,11 +4,10 @@ import styles from './Simulados.module.css';
 
 const URL_API = 'https://readflow-m8o6.onrender.com/api/questoes';
 
-function Simulados() {
-    const [quiz, setQuiz] = useState(null);
+function Simulados({ idiomaDoSite = 'PT' }) {
     const [todasQuestoes, setTodasQuestoes] = useState([]);
     const [questoesFiltradas, setQuestoesFiltradas] = useState([]);
-    const [abaAtiva, setAbaAtiva] = useState('PT');
+    const abaAtiva = String(idiomaDoSite).toUpperCase();
 
     const [indiceAtual, setIndiceAtual] = useState(0);
     const [respostas, setRespostas] = useState({});
@@ -16,6 +15,8 @@ function Simulados() {
     const [erro, setErro] = useState(null);
     const [simuladoConcluido, setSimuladoConcluido] = useState(false);
     const [pontuacao, setPontuacao] = useState(0);
+
+    const questaoAtual = questoesFiltradas[indiceAtual] || null;
 
     useEffect(() => {
         const carregarDadosDaApi = async () => {
@@ -39,28 +40,50 @@ function Simulados() {
                 const dadosQuiz = await response.json();
                 const listaDeQuestoes = Array.isArray(dadosQuiz) ? dadosQuiz : dadosQuiz.questoes;
 
-                setQuiz({
-                    titulo: 'Simulado - Capitães da Areia',
-                    descricao: 'Selecione o idioma desejado para realizar as questões.',
-                });
-
                 if (listaDeQuestoes && listaDeQuestoes.length > 0) {
                     const questoesFormatadas = listaDeQuestoes.map((q) => {
                         const alternativas = [
-                            { id: 'A', texto: `A) ${q.alternativaA}` },
-                            { id: 'B', texto: `B) ${q.alternativaB}` },
-                            { id: 'C', texto: `C) ${q.alternativaC}` },
-                            { id: 'D', texto: `D) ${q.alternativaD}` },
+                            {
+                                id: 'A',
+                                texto: q.alternativaA?.startsWith('A)')
+                                    ? q.alternativaA
+                                    : `A) ${q.alternativaA || ''}`,
+                            },
+                            {
+                                id: 'B',
+                                texto: q.alternativaB?.startsWith('B)')
+                                    ? q.alternativaB
+                                    : `B) ${q.alternativaB || ''}`,
+                            },
+                            {
+                                id: 'C',
+                                texto: q.alternativaC?.startsWith('C)')
+                                    ? q.alternativaC
+                                    : `C) ${q.alternativaC || ''}`,
+                            },
+                            {
+                                id: 'D',
+                                texto: q.alternativaD?.startsWith('D)')
+                                    ? q.alternativaD
+                                    : `D) ${q.alternativaD || ''}`,
+                            },
                         ];
 
                         if (q.alternativaE) {
-                            alternativas.push({ id: 'E', texto: `E) ${q.alternativaE}` });
+                            alternativas.push({
+                                id: 'E',
+                                texto: q.alternativaE?.startsWith('E)')
+                                    ? q.alternativaE
+                                    : `E) ${q.alternativaE}`,
+                            });
                         }
 
+                        const enunciadoSeguro = q.enunciado || '';
+                        const altASegura = q.alternativaA || '';
+                        const altBSegura = q.alternativaB || '';
 
                         const textoCompletoQuestao =
-                            `${q.enunciado} ${q.alternativaA} ${q.alternativaB}`.toLowerCase();
-
+                            `${enunciadoSeguro} ${altASegura} ${altBSegura}`.toLowerCase();
 
                         const termosEmIngles = [
                             /\bthe\b/,
@@ -72,7 +95,6 @@ function Simulados() {
                             /\bin\b/,
                         ];
 
-
                         const ehIngles = termosEmIngles.some((regex) =>
                             regex.test(textoCompletoQuestao),
                         );
@@ -80,23 +102,18 @@ function Simulados() {
 
                         return {
                             id: q.id,
-                            enunciado: q.enunciado,
+                            enunciado: enunciadoSeguro,
                             comentario:
                                 q.comentarioResolucao ||
                                 q.comentario ||
-                                'Nenhum comentário disponível para esta questão.',
-                            alternativas: alternativas,
+                                'Nenhum comentário disponível.',
+                            alternativas,
                             respostaCorreta: q.gabarito || q.respostaCorreta || 'A',
                             idioma: codigoIdiomaFinal,
                         };
                     });
 
                     setTodasQuestoes(questoesFormatadas);
-
-                    const filtradasIniciais = questoesFormatadas.filter(
-                        (item) => item.idioma === 'PT',
-                    );
-                    setQuestoesFiltradas(filtradasIniciais);
                 } else {
                     throw new Error(
                         'A API respondeu com sucesso, mas a lista de questões veio vazia.',
@@ -113,35 +130,34 @@ function Simulados() {
         carregarDadosDaApi();
     }, []);
 
-    const alternarAba = (idioma) => {
-        setAbaAtiva(idioma);
-        const filtradas = todasQuestoes.filter((q) => q.idioma === idioma);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => {
+        const filtradas = todasQuestoes.filter((q) => q.idioma === abaAtiva);
         setQuestoesFiltradas(filtradas);
         setIndiceAtual(0);
-    };
+    }, [abaAtiva, todasQuestoes]);
 
     const selecionarAlternativa = (alternativaId) => {
-        setRespostas({
-            ...respostas,
+        if (!questaoAtual) return;
+        setRespostas((prev) => ({
+            ...prev,
             [questaoAtual.id]: alternativaId,
-        });
+        }));
     };
 
     const finalizarSimulado = () => {
         let acertos = 0;
-
         questoesFiltradas.forEach((questao) => {
             const respostaUsuario = respostas[questao.id];
-            if (respostaUsuario && questao.respostaCorreta) {
-                const usuarioLimpo = String(respostaUsuario).trim().toUpperCase();
-                const corretaLimpa = String(questao.respostaCorreta).trim().toUpperCase();
-
-                if (usuarioLimpo === corretaLimpa) {
-                    acertos++;
-                }
+            if (
+                respostaUsuario &&
+                questao.respostaCorreta &&
+                String(respostaUsuario).trim().toUpperCase() ===
+                    String(questao.respostaCorreta).trim().toUpperCase()
+            ) {
+                acertos++;
             }
         });
-
         setPontuacao(acertos);
         setSimuladoConcluido(true);
     };
@@ -151,20 +167,10 @@ function Simulados() {
         setIndiceAtual(0);
         setSimuladoConcluido(false);
         setPontuacao(0);
-        alternarAba('PT');
     };
 
     if (carregando) return <div className={styles.centralizado}>Carregando questões da API...</div>;
-
-    if (erro)
-        return (
-            <div
-                className={`${styles.centralizado} text-red-500`}
-                style={{ flexDirection: 'column', gap: '10px' }}>
-                <h3>⚠️ Falha ao Carregar Dados</h3>
-                <p>{erro}</p>
-            </div>
-        );
+    if (erro) return <div className={`${styles.centralizado} text-red-500`}>⚠️ {erro}</div>;
 
     if (simuladoConcluido) {
         return (
@@ -172,12 +178,7 @@ function Simulados() {
                 <Navbar />
                 <div
                     className={styles.centralizado}
-                    style={{
-                        flexDirection: 'column',
-                        padding: '20px',
-                        maxWidth: '800px',
-                        margin: '0 auto',
-                    }}>
+                    style={{ flexDirection: 'column', padding: '20px' }}>
                     <h2>Simulado Concluído! ({abaAtiva === 'PT' ? 'Português' : 'Inglês'})</h2>
                     <p style={{ fontSize: '1.2rem' }}>
                         Você acertou <strong>{pontuacao}</strong> de{' '}
@@ -198,7 +199,7 @@ function Simulados() {
                     <div style={{ width: '100%', textAlign: 'left', marginTop: '10px' }}>
                         {questoesFiltradas.map((q, idx) => {
                             const respUser = respostas[q.id] || 'Não respondida';
-                            const acertou =
+                            const acertoQuestao =
                                 String(respUser).trim().toUpperCase() ===
                                 String(q.respostaCorreta).trim().toUpperCase();
 
@@ -209,7 +210,7 @@ function Simulados() {
                                         padding: '15px',
                                         borderBottom: '1px solid #ddd',
                                         marginBottom: '10px',
-                                        backgroundColor: acertou ? '#e8f5e9' : '#ffebee',
+                                        backgroundColor: acertoQuestao ? '#e8f5e9' : '#ffebee',
                                         borderRadius: '6px',
                                     }}>
                                     <p>
@@ -217,12 +218,12 @@ function Simulados() {
                                     </p>
                                     <p style={{ margin: '5px 0 0 0' }}>
                                         👉 Sua resposta:{' '}
-                                        <strong style={{ color: acertou ? 'green' : 'red' }}>
+                                        <strong style={{ color: acertoQuestao ? 'green' : 'red' }}>
                                             {respUser}
                                         </strong>
                                     </p>
                                     <p style={{ margin: '2px 0 0 0' }}>
-                                        ✅ Gabarito oficial da API:{' '}
+                                        ✅ Gabarito oficial:{' '}
                                         <strong style={{ color: 'green' }}>
                                             {q.respostaCorreta}
                                         </strong>
@@ -252,131 +253,92 @@ function Simulados() {
         );
     }
 
-    const questaoAtual = questoesFiltradas[indiceAtual];
-
-    if (!questaoAtual) {
-        return <div className={styles.centralizado}>Carregando questão...</div>;
-    }
-
     return (
         <div className={styles.container}>
             <Navbar />
-
             <header className={styles.header}>
                 <h1 className={styles.logo}>Clube do Livro</h1>
-
-                <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                    <button
-                        onClick={() => alternarAba('PT')}
-                        style={{
-                            padding: '8px 16px',
-                            cursor: 'pointer',
-                            fontWeight: 'bold',
-                            backgroundColor: abaAtiva === 'PT' ? '#4CAF50' : '#ddd',
-                            color: abaAtiva === 'PT' ? 'white' : 'black',
-                            border: 'none',
-                            borderRadius: '4px',
-                        }}>
-                        Português / Literatura
-                    </button>
-                    <button
-                        onClick={() => alternarAba('EN')}
-                        style={{
-                            padding: '8px 16px',
-                            cursor: 'pointer',
-                            fontWeight: 'bold',
-                            backgroundColor: abaAtiva === 'EN' ? '#4CAF50' : '#ddd',
-                            color: abaAtiva === 'EN' ? 'white' : 'black',
-                            border: 'none',
-                            borderRadius: '4px',
-                        }}>
-                        Inglês (English)
-                    </button>
-                </div>
             </header>
 
             {questoesFiltradas.length === 0 ? (
                 <div className={styles.centralizado}>
-                    Nenhuma questão carregada para a aba de{' '}
-                    {abaAtiva === 'PT' ? 'Português' : 'Inglês'}.
+                    Nenhuma questão carregada para o idioma: {abaAtiva}.
                 </div>
             ) : (
                 <div className={styles.mainGrid}>
                     <div className={styles.questaoCard}>
                         <div>
                             <span className={styles.contextoTxt}>
-                                {quiz?.descricao} ({abaAtiva === 'PT' ? 'Seção PT' : 'Seção EN'})
+                                Selecione o idioma desejado para realizar as questões. (Seção{' '}
+                                {abaAtiva})
                             </span>
-
                             <h2 className={styles.tituloQuestao}>
                                 Questão {indiceAtual + 1} de {questoesFiltradas.length}
                             </h2>
 
-                            <p className={styles.enunciado}>{questaoAtual.enunciado}</p>
+                            {questaoAtual && (
+                                <>
+                                    <p className={styles.enunciado}>{questaoAtual.enunciado}</p>
 
-                            <div className={styles.alternativasLista}>
-                                {questaoAtual.alternativas.map((alt) => {
-                                    const selecionada = respostas[questaoAtual.id] === alt.id;
-
-                                    return (
-                                        <button
-                                            key={alt.id}
-                                            onClick={() => selecionarAlternativa(alt.id)}
-                                            className={`${styles.alternativaBtn} ${selecionada ? styles.alternativaSelecionada : ''}`}>
-                                            <div className={styles.radioCircle}>
-                                                {selecionada && (
-                                                    <div className={styles.radioInner} />
-                                                )}
-                                            </div>
-                                            <div>
-                                                <p className={styles.textoAlternativa}>
-                                                    {alt.texto}
-                                                </p>
-                                            </div>
-                                        </button>
-                                    );
-                                })}
-                            </div>
+                                    <div className={styles.alternativasLista}>
+                                        {questaoAtual.alternativas.map((alt) => {
+                                            const selecionada =
+                                                respostas[questaoAtual.id] === alt.id;
+                                            return (
+                                                <button
+                                                    key={alt.id}
+                                                    onClick={() => selecionarAlternativa(alt.id)}
+                                                    className={`${styles.alternativaBtn} ${selecionada ? styles.alternativaSelecionada : ''}`}>
+                                                    <div className={styles.radioCircle}>
+                                                        {selecionada && (
+                                                            <div className={styles.radioInner} />
+                                                        )}
+                                                    </div>
+                                                    <div>
+                                                        <p className={styles.textoAlternativa}>
+                                                            {alt.texto}
+                                                        </p>
+                                                    </div>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </>
+                            )}
                         </div>
 
                         <div className={styles.navegacaoFooter}>
                             <button
-                                onClick={() => indiceAtual > 0 && setIndiceAtual(indiceAtual - 1)}
+                                onClick={() => setIndiceAtual((prev) => Math.max(prev - 1, 0))}
                                 disabled={indiceAtual === 0}
-                                className={styles.btnNavegar}>
-                                ← Anterior
+                                className={styles.btnRevisar}>
+                                Questão Anterior
                             </button>
-
-                            <div className={styles.grupoBotoesDireita}>
-                                <button className={styles.btnRevisar}>Revisar Later</button>
-                                <button
-                                    onClick={() =>
-                                        indiceAtual < questoesFiltradas.length - 1 &&
-                                        setIndiceAtual(indiceAtual + 1)
-                                    }
-                                    disabled={indiceAtual === questoesFiltradas.length - 1}
-                                    className={styles.btnProxima}>
-                                    Próxima Questão →
-                                </button>
-                            </div>
+                            <button
+                                onClick={() =>
+                                    setIndiceAtual((prev) =>
+                                        Math.min(prev + 1, questoesFiltradas.length - 1),
+                                    )
+                                }
+                                disabled={indiceAtual === questoesFiltradas.length - 1}
+                                className={styles.btnProxima}>
+                                Próxima Questão
+                            </button>
                         </div>
                     </div>
 
                     <div>
                         <div className={styles.mapaCard}>
                             <h3 className={styles.mapaTitulo}>Mapa de Questões ({abaAtiva})</h3>
-
                             <div className={styles.mapaGrid}>
                                 {questoesFiltradas.map((q, index) => {
                                     const respondida = respostas[q.id] !== undefined;
                                     const ativa = index === indiceAtual;
 
                                     let classeBotao = styles.badgeQuestao;
-                                    if (ativa) {
-                                        classeBotao += ` ${styles.badgeAtiva}`;
-                                    } else if (respondida) {
+                                    if (ativa) classeBotao += ` ${styles.badgeAtiva}`;
+                                    else if (respondida)
                                         classeBotao += ` ${styles.badgeRespondida}`;
-                                    }
 
                                     return (
                                         <button
@@ -388,7 +350,6 @@ function Simulados() {
                                     );
                                 })}
                             </div>
-
                             <button onClick={finalizarSimulado} className={styles.btnFinalizar}>
                                 Finalizar Seção {abaAtiva}
                             </button>

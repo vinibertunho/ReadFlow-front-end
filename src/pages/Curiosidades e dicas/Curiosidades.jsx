@@ -96,13 +96,13 @@ export default function Curiosidades() {
                 <section className={styles.timelineSection}>
                     <h2 className={styles.timelineSubtitle}>Cronologia: O Pai dos Capitães</h2>
                     <p className={styles.timelineSubtitle}>
-                        A trajetória de Jorge Amado e a criação de sua obra-prima
+                        A trajetória de Jorge Amado e a criação de sua obra-prima.
                     </p>
 
                     <div className={styles.timelineItem}>
                         <div className={styles.timelineLeft}>
                             <h4 className={styles.timelineTitleText}>Nascimento</h4>
-                            <p className={styles.timelineBody}>Jorge Amado nasce em Itabuna, no sul da Bahia</p>
+                            <p className={styles.timelineBody}>Jorge Amado nasce em Itabuna, no sul da Bahia.</p>
                         </div>
                         <div className={styles.timelineCenter}>
                             <div className={styles.timelineBadge}>1912</div>
@@ -125,12 +125,10 @@ export default function Curiosidades() {
                             <div className={styles.timelineBadge}>1937</div>
                         </div>
                         <div className={styles.timelineRight}>
-                            <div className={styles.timelineCardContent}>
                                 <h4 className={styles.timelineTitleText}>A Obra-Prima</h4>
                                 <p className={styles.timelineBody}>A obra choca a sociedade e se torna um marco do Modernismo brasileiro.</p>
                             </div>
                         </div>
-                    </div>
 
                     <div className={styles.timelineItem}>
                         <div className={styles.timelineLeft}>
