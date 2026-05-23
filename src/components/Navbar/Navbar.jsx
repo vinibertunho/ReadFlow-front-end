@@ -1,10 +1,13 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Globe } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Globe, Menu, X } from 'lucide-react';
+
 import styles from './Navbar.module.css';
 import logo from '../../assets/logo.png';
 
 function Navbar() {
-    const location = useLocation();
+    const [activeLink, setActiveLink] = useState('/');
+    const [menuOpen, setMenuOpen] = useState(false);
 
     const alternarIdioma = () => {
         console.log('Mudar idioma');
@@ -18,10 +21,15 @@ function Navbar() {
         <main className={styles.container}>
             <nav className={styles.navbar}>
                 <div className={styles.logo}>
-                    <img className={styles.logoImg} src={logo} alt="Logo ReadFlow" /> ReadFlow
+                    <img className={styles.logoImg} src={logo} alt="Logo ReadFlow" />
+                    ReadFlow
                 </div>
 
-                <ul className={styles.links}>
+                <button className={styles.menuBtn} onClick={() => setMenuOpen(!menuOpen)}>
+                    {menuOpen ? <X size={28} /> : <Menu size={28} />}
+                </button>
+
+                <ul className={`${styles.links} ${menuOpen ? styles.showMenu : ''}`}>
                     <li>
                         <Link to="/" className={obterClasseLink('/')}> 
                             Início
@@ -63,6 +71,11 @@ function Navbar() {
                             Curiosidades
                         </Link>
                     </li>
+
+                    <button className={styles.langBtnMobile} onClick={toggleLanguage}>
+                        <Globe size={18} />
+                        <span>PT/EN</span>
+                    </button>
                 </ul>
 
                 <button className={styles.langBtn} onClick={alternarIdioma}>

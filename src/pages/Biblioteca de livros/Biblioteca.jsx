@@ -7,12 +7,12 @@ const API_INTEGRACAO_URL = 'https://readflow-m8o6.onrender.com/api/integracao';
 const MINHA_API_URL = 'https://readflow-m8o6.onrender.com/api/livros';
 const API_KEY = import.meta.env.VITE_API_KEY;
 
-function Biblioteca() {
+export default function Biblioteca() {
   const [livros, setLivros] = useState([]);
   const [carregando, setCarregando] = useState(true);
-  const [query, setQuery] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState('Todos');
-  const [sort, setSort] = useState('melhor');
+  const [query, setQuery] = useState("");
+  const [selectedGenre, setSelectedGenre] = useState("Todos");
+  const [sort, setSort] = useState("melhor");
 
   useEffect(() => {
     const controller = new AbortController();
@@ -100,17 +100,15 @@ function Biblioteca() {
           setLivros([]);
         }
       } finally {
-        clearTimeout(timeoutId);
-        setCarregando(false);
+        if (!controller.signal.aborted) {
+          setCarregando(false);
+        }
       }
     }
 
     fetchLivros();
 
-    return () => {
-      clearTimeout(timeoutId);
-      controller.abort();
-    };
+    return () => controller.abort();
   }, []);
 
   const listaGeneros = ['Todos'];

@@ -28,7 +28,7 @@ const Videoaulas = () => {
             id: 3,
             titulo: 'Aula 03: Análise dos Personagens: De Pedro Bala a Dora',
             duracao: '22:10',
-            videoUrl: 'https://www.youtube.com/embed/j8n1pj8RfFs',
+            videoUrl: 'https://www.youtube.com/embed/Ys7-6_t7OEQ',
             startTime: 0, // Exemplo: Começa em 2:30 (2 * 60 + 30)
             descricao:
                 'Um mergulho na construção psicológica dos líderes dos Capitães da Areia e o impacto da chegada de Dora no grupo.',
@@ -37,7 +37,7 @@ const Videoaulas = () => {
             id: 4,
             titulo: 'Aula 04: Linguagem, Oralidade e Sincretismo Religioso',
             duracao: '14:35',
-            videoUrl: 'https://www.youtube.com/embed/4JipHEz53sU',
+            videoUrl: 'https://www.youtube.com/embed/YVkUvmDQ3HY',
             startTime: 0,
             descricao:
                 'Como a variação linguística e as religiões de matriz africana aparecem no texto como forma de resistência cultural e identidade.',
@@ -46,7 +46,6 @@ const Videoaulas = () => {
 
     const aulaAtual = playlist.find((v) => v.id === videoAtivo);
 
-    // Constrói a URL final injetando dinamicamente o parâmetro do tempo de início
     const videoSrcComTempo = aulaAtual.startTime
         ? `${aulaAtual.videoUrl}?start=${aulaAtual.startTime}`
         : aulaAtual.videoUrl;
@@ -60,7 +59,7 @@ const Videoaulas = () => {
                     <div className="player-block">
                         <div className="video-aspect-box">
                             <iframe
-                                src={videoSrcComTempo} // <-- URL modificada aqui
+                                src={videoSrcComTempo} 
                                 title={aulaAtual.titulo}
                                 frameBorder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
