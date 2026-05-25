@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import BookCard from '../../components/BookCard/BookCard';
 import Navbar from '../../components/Navbar/Navbar';
 import styles from './Biblioteca.module.css';
@@ -13,8 +13,8 @@ export default function Biblioteca() {
   const [selectedGenre, setSelectedGenre] = useState("Todos");
   const [sort, setSort] = useState("melhor");
 
-    useEffect(() => {
-        const API_KEY = import.meta.env.VITE_API_KEY;
+  useEffect(() => {
+    const API_KEY = import.meta.env.VITE_API_KEY;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 12000);
 
@@ -100,54 +100,48 @@ export default function Biblioteca() {
           setLivros([]);
         }
       } finally {
-          clearTimeout(timeoutId);
-        if (!controller.signal.aborted) {
-          setCarregando(false);
-        }
+        clearTimeout(timeoutId);
+        setCarregando(false);
       }
     }
 
     fetchLivros();
 
-        return () => {
-            controller.abort();
-            clearTimeout(timeoutId);
-        }
+    return () => {
+      controller.abort();
+      clearTimeout(timeoutId);
+    };
   }, []);
 
-const listaGeneros = ['Todos'];
-livros.forEach((l) => {
-    if (l.genero_pt && !listaGeneros.includes(l.genero_pt)) {
-        listaGeneros.push(l.genero_pt);
+  const listaGeneros = useMemo(() => {
+    const generos = new Set(['Todos']);
+    livros.forEach((l) => {
+      if (l.genero_pt) generos.add(l.genero_pt);
+    });
+    return Array.from(generos);
+  }, [livros]);
+
+  const filtered = useMemo(() => {
+    const resultado = livros.filter(l => {
+      const atendeTexto = query === '' ||
+        (l.titulo || '').toLowerCase().includes(query.toLowerCase()) ||
+        (l.autor || '').toLowerCase().includes(query.toLowerCase());
+
+      const atendeGenero = selectedGenre === 'Todos' || l.genero_pt === selectedGenre;
+
+      return atendeTexto && atendeGenero;
+    });
+
+    const resultadoOrdenado = [...resultado];
+
+    if (sort === 'melhor') {
+      resultadoOrdenado.sort((a, b) => (Number(b.avaliacao || b.media_avaliacao) || 0) - (Number(a.avaliacao || a.media_avaliacao) || 0));
+    } else if (sort === 'recentes') {
+      resultadoOrdenado.sort((a, b) => (Number(b.anoPublicacao || b.ano) || 0) - (Number(a.anoPublicacao || a.ano) || 0));
     }
-});
 
-  let filtered = livros.filter(l => {
-    const atendeTexto = query === '' ||
-      (l.titulo || '').toLowerCase().includes(query.toLowerCase()) ||
-      (l.autor || '').toLowerCase().includes(query.toLowerCase());
-
-    const atendeGenero = selectedGenre === 'Todos' || l.genero_pt === selectedGenre;
-
-    return atendeTexto && atendeGenero;
-  });
-
-  if (sort === 'melhor') {
-    filtered.sort((a, b) => (b.avaliacao || b.media_avaliacao || 0) - (a.avaliacao || a.media_avaliacao || 0));
-  } else if (sort === 'recentes') {
-    filtered.sort((a, b) => (b.anoPublicacao || b.ano || 0) - (a.anoPublicacao || a.ano || 0));
-  }
-
-  if (carregando) {
-    return (
-      <>
-        <Navbar />
-        <main className={styles.container}>
-          <p className={styles.loading}>Carregando catálogo unificado... 📚</p>
-        </main>
-      </>
-    );
-  }
+    return resultadoOrdenado;
+  }, [livros, query, selectedGenre, sort]);
 
   return (
     <>
@@ -172,24 +166,26 @@ livros.forEach((l) => {
             </select>
 
             <select className={styles.select} value={sort} onChange={e => setSort(e.target.value)}>
-              <option value="melhor">Melhor Evaluados</option>
+              <option value="melhor">Melhor Avaliados</option>
               <option value="recentes">Mais Recentes</option>
             </select>
           </div>
         </header>
 
-        <section className={styles.grid}>
-          {filtered.map((livro, index) => (
-            <BookCard key={livro.id || `livro-${index}`} dados={livro} />
-          ))}
-        </section>
+        {carregando ? (
+          <p className={styles.loading}>Carregando catálogo unificado... 📚</p>
+        ) : (
+          <section className={styles.grid}>
+            {filtered.map((livro, index) => (
+              <BookCard key={livro.id || `livro-${index}`} dados={livro} />
+            ))}
+          </section>
+        )}
 
-        {!filtered.length && (
+        {!carregando && !filtered.length && (
           <p className={styles.loading}>Nenhum livro encontrado com os filtros atuais.</p>
         )}
       </main>
     </>
   );
 }
-
-
