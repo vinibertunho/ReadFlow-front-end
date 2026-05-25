@@ -60,14 +60,15 @@ return (
                         <p>Ler Análise → </p>
                     </Link>
 
-                    <Link to="/equipe" className={styles.equipe}>
-                        <h4>Equipe</h4>
-                        <p>
-                            Conheça os desenvolvedores e mentes criativas por trás deste projeto
-                            integrador.
-                        </p>
-                        <p>Conhecer → </p>
-                    </Link>
+                    <div className={styles.cards}>
+                        <Link to={`/livro/${livroPrincipal.slug || livroPrincipal.titulo?.toLowerCase().replace(/\s+/g, '-') || 'livro'}`} className={styles.explorarObra}>
+                            <h4>Explorar obra</h4>
+                            <p>
+                                Acompanhe a narrativa desde a vida no Trapiche até os destinos
+                                traçados pelo bando liderado por Pedro Bala.
+                            </p>
+                            <p>Ler Análise → </p>
+                        </Link>
 
                     <Link to="/vestibular" className={styles.vestibulandos}>
                         <h4>Vestibulandos</h4>
