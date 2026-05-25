@@ -72,7 +72,7 @@ function Navbar() {
                         </Link>
                     </li>
 
-                    <button className={styles.langBtnMobile} onClick={toggleLanguage}>
+                    <button className={styles.langBtnMobile} onClick={alternarIdioma}>
                         <Globe size={18} />
                         <span>PT/EN</span>
                     </button>
