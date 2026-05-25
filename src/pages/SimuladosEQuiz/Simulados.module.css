@@ -29,20 +29,13 @@
   padding-bottom: 4px;
 }
 
+/* Alinhamento da Grid Principal */
 .mainGrid {
   display: flex;
   flex-wrap: wrap;
   gap: 24px;
   max-width: 100%;
-  min-width: 300px;
-  min-height: 300px;
-  max-height: 2000px;
-}
-
-@media (min-width: 1024px) {
-  .mainGrid {
-    gap: 24px;
-  }
+  align-items: flex-start; /* Evita que o mapa estique verticalmente acompanhando a questão */
 }
 
 .questaoCard {
@@ -53,6 +46,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  flex: 1 1 600px; /* Permite que cresça, mas quebre linha em telas muito pequenas */
 }
 
 .contextoTxt {
@@ -143,50 +137,29 @@
   border-top: 1px solid #e2e8f0;
 }
 
-.btnNavegar {
-  background: none;
-  border: none;
-  color: #64748b;
-  cursor: pointer;
+.btnRevisar, .btnProxima {
+  padding: 8px 16px;
   font-size: 0.875rem;
+  border: none;
+  border-radius: 6px;
+  background: #334155;
+  color: white;
+  cursor: pointer;
 }
 
-.btnNavegar:disabled, .btnProxima:disabled {
+.btnRevisar:disabled, .btnProxima:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
 
-.grupoBotoesDireita {
-  display: flex;
-  gap: 8px;
-}
-
-.btnRevisar {
-  padding: 8px 16px;
-  font-size: 0.875rem;
-  border: none;
-  border-radius: 6px;
-  background: #334155;
-  color: white;
-  cursor: pointer;
-}
-
-.btnProxima {
-  padding: 8px 16px;
-  font-size: 0.875rem;
-  border: none;
-  border-radius: 6px;
-  background: #334155;
-  color: white;
-  cursor: pointer;
-}
-
+/* Card do Mapa Lateral */
 .mapaCard {
   background: white;
   border-radius: 8px;
   border: 1px solid #e2e8f0;
   padding: 16px;
-  margin-bottom: 24px;
+  flex: 0 0 340px; /* Largura fixa ideal para o mapa na lateral */
+  box-sizing: border-box;
 }
 
 .mapaTitulo {
@@ -201,14 +174,16 @@
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 16px;
-  max-width: 100%;
-  min-width: 200px;
-  min-height: 60px;
-  max-height: 300px;
 }
 
+/* Badges/Quadradinhos das Questões */
 .badgeQuestao {
-  height: 40px;
+  width: 40px;           /* Força tamanho quadrado */
+  height: 40px;          /* Força tamanho quadrado */
+  flex-shrink: 0;        /* Impede o flexbox de amassar o botão */
+  display: flex;         /* Centraliza o número perfeitamente */
+  align-items: center;
+  justify-content: center;
   border-radius: 4px;
   border: 1px solid #e2e8f0;
   background: #f8fafc;
@@ -243,27 +218,10 @@
   cursor: pointer;
 }
 
-.dicaCard {
-  background-color: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 8px;
-  padding: 16px;
-}
-
-.dicaTitulo {
-  font-size: 0.75rem;
-  font-weight: bold;
-  color: #1e40af;
-  margin-bottom: 4px;
-}
-
-.dicaTexto {
-  font-size: 0.75rem;
-  color: #1e3a8a;
-  line-height: 1.5;
-}
-
 .centralizado {
   text-align: center;
   padding: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
