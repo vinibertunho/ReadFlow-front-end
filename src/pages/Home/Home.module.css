@@ -101,7 +101,7 @@
     background-color: var(--purple-main);
     color: var(--bg-light);
     border: none;
-    padding: 0.1rem 10rem;
+    padding: 0.5rem 10rem;
     border-radius: 10px;
     cursor: pointer;
     width: fit-content;

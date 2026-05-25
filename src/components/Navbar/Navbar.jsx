@@ -31,7 +31,7 @@ function Navbar() {
 
                 <ul className={`${styles.links} ${menuOpen ? styles.showMenu : ''}`}>
                     <li>
-                        <Link to="/" className={obterClasseLink('/')}> 
+                        <Link to="/" className={obterClasseLink('/')}>
                             Início
                         </Link>
                     </li>
@@ -39,6 +39,12 @@ function Navbar() {
                     <li>
                         <Link to="/biblioteca" className={obterClasseLink('/biblioteca')}>
                             Biblioteca
+                        </Link>
+                    </li>
+
+                    <li>
+                        <Link to="/livro" className={obterClasseLink('/livro')}>
+                            Explorar Obra
                         </Link>
                     </li>
 
