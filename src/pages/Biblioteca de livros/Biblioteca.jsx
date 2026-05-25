@@ -5,7 +5,6 @@ import styles from './Biblioteca.module.css';
 
 const API_INTEGRACAO_URL = 'https://readflow-m8o6.onrender.com/api/integracao';
 const MINHA_API_URL = 'https://readflow-m8o6.onrender.com/api/livros';
-const API_KEY = import.meta.env.VITE_API_KEY;
 
 export default function Biblioteca() {
   const [livros, setLivros] = useState([]);
@@ -14,7 +13,8 @@ export default function Biblioteca() {
   const [selectedGenre, setSelectedGenre] = useState("Todos");
   const [sort, setSort] = useState("melhor");
 
-  useEffect(() => {
+    useEffect(() => {
+        const API_KEY = import.meta.env.VITE_API_KEY;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 12000);
 
@@ -38,7 +38,7 @@ export default function Biblioteca() {
 
         if (resIntegracao) {
           const dadosBase = resIntegracao.data || resIntegracao;
-          
+
           if (Array.isArray(dadosBase)) {
             dadosBase.forEach(item => {
               if (item && Array.isArray(item.conteudo)) {
@@ -68,7 +68,7 @@ export default function Biblioteca() {
           if (!tituloLimpo || tituloLimpo.toLowerCase().includes('nao informado')) return;
 
           const chaveUnica = String(tituloLimpo).normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
-          
+
           if (!vistos.has(chaveUnica)) {
             vistos.add(chaveUnica);
             listaFinalSemDuplicatas.push({
@@ -79,7 +79,7 @@ export default function Biblioteca() {
               genero_pt: livro.genero_pt || livro.genero || 'Geral'
             });
           } else {
-            const indexExistente = listaFinalSemDuplicatas.findIndex(l => 
+            const indexExistente = listaFinalSemDuplicatas.findIndex(l =>
               String(l.titulo).normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim() === chaveUnica
             );
             if (indexExistente !== -1) {
@@ -100,6 +100,7 @@ export default function Biblioteca() {
           setLivros([]);
         }
       } finally {
+          clearTimeout(timeoutId);
         if (!controller.signal.aborted) {
           setCarregando(false);
         }
@@ -108,21 +109,24 @@ export default function Biblioteca() {
 
     fetchLivros();
 
-    return () => controller.abort();
+        return () => {
+            controller.abort();
+            clearTimeout(timeoutId);
+        }
   }, []);
 
-  const listaGeneros = ['Todos'];
-  livros.forEach(l => {
+const listaGeneros = ['Todos'];
+livros.forEach((l) => {
     if (l.genero_pt && !listaGeneros.includes(l.genero_pt)) {
-      listaGeneros.push(l.genero_pt);
+        listaGeneros.push(l.genero_pt);
     }
-  });
+});
 
   let filtered = livros.filter(l => {
-    const atendeTexto = query === '' || 
-      (l.titulo || '').toLowerCase().includes(query.toLowerCase()) || 
+    const atendeTexto = query === '' ||
+      (l.titulo || '').toLowerCase().includes(query.toLowerCase()) ||
       (l.autor || '').toLowerCase().includes(query.toLowerCase());
-    
+
     const atendeGenero = selectedGenre === 'Todos' || l.genero_pt === selectedGenre;
 
     return atendeTexto && atendeGenero;
@@ -188,4 +192,4 @@ export default function Biblioteca() {
   );
 }
 
-export default Biblioteca;
+
