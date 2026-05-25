@@ -44,6 +44,19 @@ function Home() {
     const capaImagem = resolverUrlCapa(capaUrlOriginal);
     const titulo = livroPrincipal.titulo || 'Capitães da Areia';
 
+    const FALLBACK_COVER = CAPA_PADRAO;
+
+    const getCapa = (livro) => {
+        return (
+            livro.capa_url ||
+            livro.imagem_url ||
+            livro.imagem ||
+            livro.capas ||
+            livro.foto ||
+            null
+        );
+    };
+
     return (
         <>
             <Navbar />
@@ -54,8 +67,8 @@ function Home() {
                         <div className={styles.capaLivro}>
                             {!loading && (
                                 <img
-                                    src={capaImagemPrincipal}
-                                    alt={tituloPrincipal}
+                                    src={capaImagem || CAPA_PADRAO}
+                                    alt={titulo}
                                     className={styles.coverImage}
                                     onError={(event) => {
                                         event.currentTarget.onerror = null;
@@ -171,7 +184,7 @@ function Home() {
                             <Link
                                 to="/biblioteca"
                                 className={styles.verTodos}
-                                onClick={() => setActiveLink('/biblioteca')}>
+                                onClick={() => {}}>
                                 Ver Todos <ExternalLink size={25} />
                             </Link>
                         </div>
@@ -179,7 +192,7 @@ function Home() {
                         <div className={styles.cardsLivro}>
                             {!loading &&
                                 livros.map((livro) => {
-                                    const capaItem = resolveCoverUrl(getCapa(livro));
+                                    const capaItem = resolverUrlCapa(getCapa(livro));
                                     const slug =
                                         livro.slug ||
                                         livro.titulo
@@ -196,7 +209,7 @@ function Home() {
                                             className={styles.cardLivro}>
                                             <div className={styles.capaLivroBiblioteca}>
                                                 <img
-                                                    src={capaItem}
+                                                    src={capaItem || FALLBACK_COVER}
                                                     alt={livro.titulo}
                                                     onError={(event) => {
                                                         event.currentTarget.onerror = null;
