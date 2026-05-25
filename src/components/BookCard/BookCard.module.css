@@ -6,7 +6,8 @@
   flex-direction: column;
   box-shadow: 0 0.125rem 0.375rem rgba(16, 24, 40, 0.04);
   width: 100%;
-  max-width: 280px; /* limita largura do card para evitar imagens muito grandes */
+  max-width: 280px;
+
   flex: 0 0 auto;
 }
 
@@ -15,7 +16,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem; /* espaço ao redor da imagem */
+  padding: 0.75rem; 
 }
 
 .badge {

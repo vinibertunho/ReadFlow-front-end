@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './BookCard.module.css';
 
-const FALLBACK_COVER =
+const CAPA_PADRAO =
     'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600"><rect width="400" height="600" fill="%23eef2ff"/><rect x="24" y="24" width="352" height="552" rx="16" fill="%23dbeafe"/><text x="200" y="300" text-anchor="middle" fill="%23334155" font-size="28" font-family="Arial">Sem capa</text></svg>';
 
-function resolveCoverUrl(url) {
+function resolverUrlCapa(url) {
     if (!url || typeof url !== 'string') return '';
     const value = url.trim();
     if (!value) return '';
@@ -33,8 +33,8 @@ function BookCard({ dados }) {
     } = dados || {};
 
 
-    const capaImagem = resolveCoverUrl(capa_url || imagem_url || imagem || capas || foto || '');
-    const [imgSrc, setImgSrc] = useState(capaImagem || FALLBACK_COVER);
+    const capaImagem = resolverUrlCapa(capa_url || imagem_url || imagem || capas || foto || '');
+    const [imgSrc, setImgSrc] = useState(capaImagem || CAPA_PADRAO);
 
     const r = dados?.avaliacao || dados?.media_avaliacao || dados?.avaliacao_media || 4.6;
     const rating = typeof r === 'number' ? r : parseFloat(r) || 4.6;
@@ -53,7 +53,7 @@ function BookCard({ dados }) {
                     className={styles.foto}
                     src={imgSrc}
                     alt={titulo || 'Capa'}
-                    onError={() => setImgSrc(FALLBACK_COVER)}
+                    onError={() => setImgSrc(CAPA_PADRAO)}
                 />
             </div>
 
