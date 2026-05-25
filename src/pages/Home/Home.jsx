@@ -57,17 +57,15 @@ export default function Home() {
                     </div>
                 </section>
 
-                <section className={styles.destaques}>
-                    <div className={styles.apresentacao}>
-                        <h3>Apresentação do Projeto</h3>
-                        <p>
-                            Este projeto está sendo feito como uma atividade que liga o instituto
-                            Sesi com Senai, como meio de aprendizagem entres as duas instituições,
-                            utilizando a prática dos dois lados. O projeto consiste em uma
-                            biblioteca virtual onde temos somente livros do vestibular, como foco do
-                            nosso grupo sendo o livro "Capitães da areia".
-                        </p>
-                    </div>
+                    <div className={styles.cards}>
+                        <Link to={`/livro/${livroPrincipal.slug || livroPrincipal.titulo?.toLowerCase().replace(/\s+/g, '-') || 'livro'}`} className={styles.explorarObra}>
+                            <h4>Explorar obra</h4>
+                            <p>
+                                Acompanhe a narrativa desde a vida no Trapiche até os destinos
+                                traçados pelo bando liderado por Pedro Bala.
+                            </p>
+                            <p>Ler Análise → </p>
+                        </Link>
 
                     <div className={styles.cards}>
                         <Link to="/livro" className={styles.explorarObra}>
