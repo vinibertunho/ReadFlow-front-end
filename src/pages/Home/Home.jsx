@@ -1,61 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar';
 import styles from './Home.module.css';
 import criancasCorrendo from '../../assets/criancas.jpg';
+import capa from '../../assets/capa.png';
 import { ExternalLink } from 'lucide-react';
 
-const URL_API = 'https://readflow-m8o6.onrender.com/api/livros';
-const CAPA_PADRAO =
-    'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600"><rect width="400" height="600" fill="%23eef2ff"/><rect x="24" y="24" width="352" height="552" rx="16" fill="%23dbeafe"/><text x="200" y="300" text-anchor="middle" fill="%23334155" font-size="28" font-family="Arial">Sem capa</text></svg>';
+export default function Home() {
+    const [titulo] = useState('Capitães da Areia');
+    const [livroPrincipal] = useState({
+        resumo: 'Acompanhe a vida dos meninos de rua que lutam pela sobrevivência nas ruas de Salvador.',
+    });
+    const [livro] = useState({
+        titulo: 'Capitães da Areia',
+        autor: 'Jorge Amado',
+    });
 
-const resolverUrlCapa = (url) => {
-    if (!url) return '';
-    return url;
-};
-
-function Home() {
-    const [livros, setLivros] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetch(URL_API)
-            .then((res) => res.json())
-            .then((data) => {
-                setLivros(Array.isArray(data) ? data : []);
-                setLoading(false);
-            })
-            .catch((err) => {
-                console.error('Erro ao buscar livros:', err);
-                setLoading(false);
-            });
-    }, []);
-
-    const livroPrincipal = livros[0] || {};
-
-    const capaUrlOriginal =
-        livroPrincipal.capa_url ||
-        livroPrincipal.imagem_url ||
-        livroPrincipal.imagem ||
-        livroPrincipal.capas ||
-        livroPrincipal.foto ||
-        '';
-
-    const capaImagem = resolverUrlCapa(capaUrlOriginal);
-    const titulo = livroPrincipal.titulo || 'Capitães da Areia';
-
-    const FALLBACK_COVER = CAPA_PADRAO;
-
-    const getCapa = (livro) => {
-        return (
-            livro.capa_url ||
-            livro.imagem_url ||
-            livro.imagem ||
-            livro.capas ||
-            livro.foto ||
-            null
-        );
-    };
+    const obterClasseLink = (path) => {
+            return location.pathname === path ? `${styles.navLink} ${styles.active}` : styles.navLink;
+        };
 
     return (
         <>
@@ -65,24 +28,23 @@ function Home() {
                 <section className={styles.header}>
                     <div className={styles.conteudoHeader}>
                         <div className={styles.capaLivro}>
-                            {!loading && (
-                                <img
-                                    src={capaImagem || CAPA_PADRAO}
-                                    alt={titulo}
-                                    className={styles.coverImage}
-                                    onError={(event) => {
-                                        event.currentTarget.onerror = null;
-                                        event.currentTarget.src = CAPA_PADRAO;
-                                    }}
-                                />
-                            )}
+                            <img
+                                src={capa}
+                                alt="Capa do livro Capitães de Areia"
+                                className={styles.coverImage}
+                            />
                         </div>
 
                         <div className={styles.textoHeader}>
                             <h4>Obra de Jorge Amado</h4>
                             <h1>{titulo}</h1>
                             <p>{livroPrincipal.resumo || 'resumo do livro aqui rs'}</p>
-                            <button>Explorar mais</button>
+                            <li>
+                                <Link to="/livro" className={obterClasseLink('/livro')}>
+                                    <button>Explorar Obra</button>
+                                </Link>
+                            </li>
+
                         </div>
 
                         <div className={styles.criancasCorrendo}>
@@ -95,20 +57,18 @@ function Home() {
                     </div>
                 </section>
 
-                <section className={styles.destaques}>
-                    <div className={styles.apresentacao}>
-                        <h3>Apresentação do Projeto</h3>
-                        <p>
-                            Este projeto está sendo feito como uma atividade que liga o instituto
-                            Sesi com Senai, como meio de aprendizagem entres as duas instituições,
-                            utilizando a prática dos dois lados. O projeto consiste em uma
-                            biblioteca virtual onde temos somente livros do vestibular, como foco do
-                            nosso grupo sendo o livro "Capitães da areia".
-                        </p>
-                    </div>
-
                     <div className={styles.cards}>
                         <Link to={`/livro/${livroPrincipal.slug || livroPrincipal.titulo?.toLowerCase().replace(/\s+/g, '-') || 'livro'}`} className={styles.explorarObra}>
+                            <h4>Explorar obra</h4>
+                            <p>
+                                Acompanhe a narrativa desde a vida no Trapiche até os destinos
+                                traçados pelo bando liderado por Pedro Bala.
+                            </p>
+                            <p>Ler Análise → </p>
+                        </Link>
+
+                    <div className={styles.cards}>
+                        <Link to="/livro" className={styles.explorarObra}>
                             <h4>Explorar obra</h4>
                             <p>
                                 Acompanhe a narrativa desde a vida no Trapiche até os destinos
@@ -181,54 +141,22 @@ function Home() {
                                 <p>Explore as obras analisadas por outras equipes do projeto.</p>
                             </div>
 
-                            <Link
-                                to="/biblioteca"
-                                className={styles.verTodos}
-                                onClick={() => {}}>
+                            <Link to="/biblioteca" className={styles.verTodos}>
                                 Ver Todos <ExternalLink size={25} />
                             </Link>
                         </div>
 
                         <div className={styles.cardsLivro}>
-                            {!loading &&
-                                livros.map((livro) => {
-                                    const capaItem = resolverUrlCapa(getCapa(livro));
-                                    const slug =
-                                        livro.slug ||
-                                        livro.titulo
-                                            ?.toLowerCase()
-                                            .normalize('NFD')
-                                            .replace(/[\u0300-\u036f]/g, '')
-                                            .replace(/[^a-z0-9]+/g, '-') ||
-                                        livro.id;
+                            <Link to="/biblioteca">
+                                <div className={styles.capaLivroBiblioteca}>
+                                    <img src={capa} alt={livro.titulo} />
+                                </div>
 
-                                    return (
-                                        <Link
-                                            to={`/${slug}`}
-                                            key={livro.id || livro._id}
-                                            className={styles.cardLivro}>
-                                            <div className={styles.capaLivroBiblioteca}>
-                                                <img
-                                                    src={capaItem || FALLBACK_COVER}
-                                                    alt={livro.titulo}
-                                                    onError={(event) => {
-                                                        event.currentTarget.onerror = null;
-                                                        event.currentTarget.src = FALLBACK_COVER;
-                                                    }}
-                                                />
-                                            </div>
-
-                                            <div className={styles.infoLivro}>
-                                                <h4>{livro.titulo}</h4>
-                                                <span>
-                                                    {livro.autor ||
-                                                        livro.escritor ||
-                                                        'Autor desconhecido'}
-                                                </span>
-                                            </div>
-                                        </Link>
-                                    );
-                                })}
+                                <div className={styles.infoLivro}>
+                                    <h4>{livro.titulo}</h4>
+                                    <span>{livro.autor || 'Autor desconhecido'}</span>
+                                </div>
+                            </Link>
                         </div>
                     </div>
                 </section>
@@ -236,5 +164,3 @@ function Home() {
         </>
     );
 }
-
-export default Home;

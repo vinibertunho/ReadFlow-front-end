@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import  styles from './Curiosidades.module.css';
 import Navbar from '../../components/Navbar/Navbar';
 import cidadeImg from '../../assets/cidade.png';
-import capitaesImg from '../../assets/capitaes.jpg';
+import fotoImg from '../../assets/foto.jpg';
 import downloadImg from '../../assets/download.jpg'
 
 const URL_API = 'https://readflow-m8o6.onrender.com/api/curiosidades';
@@ -75,7 +75,7 @@ export default function Curiosidades() {
                         </div>
 
                         <div className={styles.censureImageContainer}>
-                            <img src={capitaesImg} alt="Ilustração de Censura" />
+                            <img src={fotoImg} alt="Ilustração de Censura" />
                         </div>
                     </section>
 
@@ -100,7 +100,7 @@ export default function Curiosidades() {
                     </p>
 
                     <div className={styles.timelineItem}>
-                        <div className={styles.timelineLeft}>
+                        <div className={styles.timelineCardTransparentLeft}>
                             <h4 className={styles.timelineTitleText}>Nascimento</h4>
                             <p className={styles.timelineBody}>Jorge Amado nasce em Itabuna, no sul da Bahia.</p>
                         </div>
@@ -124,14 +124,14 @@ export default function Curiosidades() {
                         <div className={styles.timelineCenter}>
                             <div className={styles.timelineBadge}>1937</div>
                         </div>
-                        <div className={styles.timelineRight}>
+                        <div className={styles.timelineCardTransparentRight}>
                                 <h4 className={styles.timelineTitleText}>A Obra-Prima</h4>
                                 <p className={styles.timelineBody}>A obra choca a sociedade e se torna um marco do Modernismo brasileiro.</p>
                             </div>
                         </div>
 
                     <div className={styles.timelineItem}>
-                        <div className={styles.timelineLeft}>
+                        <div className={styles.timelineCardTransparentLeft}>
                             <h4 className={styles.timelineTitleText}>Academia Brasileira</h4>
                             <p className={styles.timelineBody}>Eleito para a cadeira número 23 da ABL.</p>
                         </div>

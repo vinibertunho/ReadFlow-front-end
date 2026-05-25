@@ -132,6 +132,7 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
 
     return (
         <div className={styles.mainGrid}>
+            {/* Bloco Esquerdo: Questão */}
             <div className={styles.questaoCard}>
                 <div>
                     <span className={styles.contextoTxt}>
@@ -187,31 +188,30 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
                 </div>
             </div>
 
-            <div>
-                <div className={styles.mapaCard}>
-                    <h3 className={styles.mapaTitulo}>Mapa de Questões ({abaAtiva})</h3>
-                    <div className={styles.mapaGrid}>
-                        {questoesFiltradas.map((q, index) => {
-                            const respondida = respostas[q.id] !== undefined;
-                            const ativa = index === indiceAtual;
-                            let classeBotao = styles.badgeQuestao;
-                            if (ativa) classeBotao += ` ${styles.badgeAtiva}`;
-                            else if (respondida) classeBotao += ` ${styles.badgeRespondida}`;
+            {/* Bloco Direito: Mapa de Questões (Sem a div extra atrapalhando) */}
+            <div className={styles.mapaCard}>
+                <h3 className={styles.mapaTitulo}>Mapa de Questões ({abaAtiva})</h3>
+                <div className={styles.mapaGrid}>
+                    {questoesFiltradas.map((q, index) => {
+                        const respondida = respostas[q.id] !== undefined;
+                        const ativa = index === indiceAtual;
+                        let classeBotao = styles.badgeQuestao;
+                        if (ativa) classeBotao += ` ${styles.badgeAtiva}`;
+                        else if (respondida) classeBotao += ` ${styles.badgeRespondida}`;
 
-                            return (
-                                <button
-                                    key={q.id}
-                                    onClick={() => setIndiceAtual(index)}
-                                    className={classeBotao}>
-                                    {index + 1}
-                                </button>
-                            );
-                        })}
-                    </div>
-                    <button onClick={finalizarSimulado} className={styles.btnFinalizar}>
-                        Finalizar Seção {abaAtiva}
-                    </button>
+                        return (
+                            <button
+                                key={q.id}
+                                onClick={() => setIndiceAtual(index)}
+                                className={classeBotao}>
+                                {index + 1}
+                            </button>
+                        );
+                    })}
                 </div>
+                <button onClick={finalizarSimulado} className={styles.btnFinalizar}>
+                    Finalizar Seção {abaAtiva}
+                </button>
             </div>
         </div>
     );

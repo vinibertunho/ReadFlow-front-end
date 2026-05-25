@@ -36,9 +36,9 @@ function Equipe() {
                     </div>
                 </section>
 
-                <section className={styles.missao}>
-                    <div className={styles.texto}>
-                        <h2>Nossa Missao</h2>
+                <section className={styles.texto}>
+                    <div className={styles.missao}>
+                        <h3>Nossa Missao</h3>
 
                         <p>
                             Nossa missão é criar um ambiente de estudos voltado a livros de
