@@ -1,12 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
-import BookCard from "../../components/BookCard/BookCard";
-import Navbar from "../../components/Navbar/Navbar";
-import styles from "./Biblioteca.module.css";
+import { useEffect, useState, useMemo } from "react";
+import BookCard from '../../components/BookCard/BookCard';
+import Navbar from '../../components/Navbar/Navbar';
+import styles from './Biblioteca.module.css';
 
-const API_KEY = "projetoamods";
-const LOCAL_URL = "/api/livros";
-const EXTERNAL_URL = "https://readflow-m8o6.onrender.com/livrosExternos";
-const RANA_URL = "https://readflow-m8o6.onrender.com/livrosExternos/rana/livros";
+const API_INTEGRACAO_URL = 'https://readflow-m8o6.onrender.com/api/integracao';
+const MINHA_API_URL = 'https://readflow-m8o6.onrender.com/api/livros';
 
 export default function Biblioteca() {
   const [livros, setLivros] = useState([]);
@@ -16,138 +14,134 @@ export default function Biblioteca() {
   const [sort, setSort] = useState("melhor");
 
   useEffect(() => {
+    const API_KEY = import.meta.env.VITE_API_KEY;
     const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
 
     async function fetchLivros() {
       try {
         setCarregando(true);
 
-        const resultados = await Promise.allSettled([
-          fetch(LOCAL_URL, {
-            signal: controller.signal,
-            headers: { "x-api-key": API_KEY },
-          }).then(res => res.ok ? res.json() : null),
-          
-          fetch(EXTERNAL_URL, {
-            signal: controller.signal,
-          }).then(res => res.ok ? res.json() : null),
-
-          fetch(RANA_URL, {
-            signal: controller.signal,
-          }).then(res => res.ok ? res.json() : null),
-        ]);
-
-        let localBooks = [];
-        let externalBooks = [];
-        let ranaBooks = [];
-
-        if (resultados[0].status === "fulfilled" && resultados[0].value) {
-          const dataLocal = resultados[0].value;
-          localBooks = Array.isArray(dataLocal) ? dataLocal : [dataLocal];
-        }
-
-        const extrairArray = (data) => {
-          if (Array.isArray(data)) return data;
-          if (data && typeof data === "object") {
-            const possivelArray = Object.values(data).find(val => Array.isArray(val));
-            return possivelArray || [data];
-          }
-          return [];
+        const headersPadrao = {
+          'Content-Type': 'application/json',
+          'x-api-key': API_KEY,
+          'Authorization': `Bearer ${API_KEY}`
         };
 
-        if (resultados[1].status === "fulfilled" && resultados[1].value) {
-          externalBooks = extrairArray(resultados[1].value);
-        }
+        const [resIntegracao, resMinhaApi] = await Promise.all([
+          fetch(API_INTEGRACAO_URL, { signal: controller.signal, headers: headersPadrao }).then(r => r.ok ? r.json() : null).catch(() => null),
+          fetch(MINHA_API_URL, { signal: controller.signal, headers: headersPadrao }).then(r => r.ok ? r.json() : null).catch(() => null)
+        ]);
 
-        if (resultados[2].status === "fulfilled" && resultados[2].value) {
-          ranaBooks = extrairArray(resultados[2].value);
-        }
+        const meusLivros = Array.isArray(resMinhaApi) ? resMinhaApi : (resMinhaApi?.data && Array.isArray(resMinhaApi.data) ? resMinhaApi.data : []);
+        const livrosParceiros = [];
 
-        const combined = [...localBooks, ...externalBooks, ...ranaBooks];
-        
-        const normalized = combined.map((livro) => ({
-          ...livro,
-          id: livro?.id || livro?._id || Math.random().toString(36).substr(2, 9),
-          titulo: livro?.titulo || livro?.title || livro?.nome || "Sem título",
-          autor: livro?.autor || livro?.author || livro?.autorName || "Desconhecido",
-          ano_publicacao: livro?.ano_publicacao ?? livro?.anoPublicacao ?? null,
-          genero_pt: livro?.genero_pt || livro?.genre || "Outros",
-          genero_en: livro?.genero_en ?? "",
-          capa_url: livro?.capa_url || livro?.image || livro?.cover || "",
-          sinopse: livro?.sinopse ?? livro?.description ?? "",
-          avaliacao: livro?.avaliacao ?? livro?.media_avaliacao ?? livro?.rating ?? 0,
-        }));
+        if (resIntegracao) {
+          const dadosBase = resIntegracao.data || resIntegracao;
 
-        const unique = [];
-        const seen = new Set();
-        for (const livro of normalized) {
-          const key = `${livro.titulo.toLowerCase()}::${livro.autor.toLowerCase()}`;
-          if (!seen.has(key)) {
-            seen.add(key);
-            unique.push(livro);
+          if (Array.isArray(dadosBase)) {
+            dadosBase.forEach(item => {
+              if (item && Array.isArray(item.conteudo)) {
+                livrosParceiros.push(...item.conteudo);
+              } else if (item) {
+                livrosParceiros.push(item);
+              }
+            });
           }
         }
 
-        setLivros(unique);
+        const todosLivrosMisturados = [...meusLivros, ...livrosParceiros];
+        const vistos = new Set();
+        const listaFinalSemDuplicatas = [];
+
+        todosLivrosMisturados.forEach(livro => {
+          if (!livro) return;
+
+          let tituloLimpo = livro.titulo || livro.title || livro.tituloDoLivro || '';
+          let autorLimpo = livro.autor || livro.author || livro.autores || '';
+
+          if (tituloLimpo.toLowerCase().includes('nao informado') && autorLimpo.toLowerCase().includes('memorias postumas')) {
+            tituloLimpo = "Memórias Póstumas de Brás Cubas";
+            autorLimpo = "Machado de Assis";
+          }
+
+          if (!tituloLimpo || tituloLimpo.toLowerCase().includes('nao informado')) return;
+
+          const chaveUnica = String(tituloLimpo).normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+
+          if (!vistos.has(chaveUnica)) {
+            vistos.add(chaveUnica);
+            listaFinalSemDuplicatas.push({
+              ...livro,
+              titulo: tituloLimpo,
+              autor: autorLimpo || 'Autor não informado',
+              capa_url: livro.capa_url || livro.capa || livro.image || livro.capaURL || null,
+              genero_pt: livro.genero_pt || livro.genero || 'Geral'
+            });
+          } else {
+            const indexExistente = listaFinalSemDuplicatas.findIndex(l =>
+              String(l.titulo).normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim() === chaveUnica
+            );
+            if (indexExistente !== -1) {
+              if (!listaFinalSemDuplicatas[indexExistente].capa_url && (livro.capa_url || livro.capa || livro.image)) {
+                listaFinalSemDuplicatas[indexExistente].capa_url = livro.capa_url || livro.capa || livro.image;
+              }
+              if (!listaFinalSemDuplicatas[indexExistente].sinopse && livro.sinopse) {
+                listaFinalSemDuplicatas[indexExistente].sinopse = livro.sinopse;
+              }
+            }
+          }
+        });
+
+        setLivros(listaFinalSemDuplicatas);
       } catch (error) {
-        if (error.name !== "AbortError") {
+        if (error.name !== 'AbortError') {
+          console.error('Erro ao buscar catálogos:', error);
           setLivros([]);
         }
       } finally {
-        if (!controller.signal.aborted) {
-          setCarregando(false);
-        }
+        clearTimeout(timeoutId);
+        setCarregando(false);
       }
     }
 
     fetchLivros();
 
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+      clearTimeout(timeoutId);
+    };
   }, []);
 
-  const genres = useMemo(() => {
-    const set = new Set();
-    livros.forEach((livro) => {
-      if (livro.genero_pt) set.add(livro.genero_pt);
+  const listaGeneros = useMemo(() => {
+    const generos = new Set(['Todos']);
+    livros.forEach((l) => {
+      if (l.genero_pt) generos.add(l.genero_pt);
     });
-    return ["Todos", ...Array.from(set)];
+    return Array.from(generos);
   }, [livros]);
 
   const filtered = useMemo(() => {
-    let list = livros.slice();
+    const resultado = livros.filter(l => {
+      const atendeTexto = query === '' ||
+        (l.titulo || '').toLowerCase().includes(query.toLowerCase()) ||
+        (l.autor || '').toLowerCase().includes(query.toLowerCase());
 
-    if (query) {
-      const q = query.toLowerCase();
-      list = list.filter(
-        (livro) =>
-          livro.titulo.toLowerCase().includes(q) ||
-          livro.autor.toLowerCase().includes(q)
-      );
+      const atendeGenero = selectedGenre === 'Todos' || l.genero_pt === selectedGenre;
+
+      return atendeTexto && atendeGenero;
+    });
+
+    const resultadoOrdenado = [...resultado];
+
+    if (sort === 'melhor') {
+      resultadoOrdenado.sort((a, b) => (Number(b.avaliacao || b.media_avaliacao) || 0) - (Number(a.avaliacao || a.media_avaliacao) || 0));
+    } else if (sort === 'recentes') {
+      resultadoOrdenado.sort((a, b) => (Number(b.anoPublicacao || b.ano) || 0) - (Number(a.anoPublicacao || a.ano) || 0));
     }
 
-    if (selectedGenre !== "Todos") {
-      list = list.filter((livro) => livro.genero_pt === selectedGenre);
-    }
-
-    if (sort === "melhor") {
-      list.sort((a, b) => b.avaliacao - a.avaliacao);
-    } else if (sort === "recentes") {
-      list.sort((a, b) => (b.ano_publicacao || 0) - (a.ano_publicacao || 0));
-    }
-
-    return list;
+    return resultadoOrdenado;
   }, [livros, query, selectedGenre, sort]);
-
-  if (carregando) {
-    return (
-      <>
-        <Navbar />
-        <main className={styles.container}>
-          <p className={styles.loading}>Carregando catálogo... 📚</p>
-        </main>
-      </>
-    );
-  }
 
   return (
     <>
@@ -167,36 +161,28 @@ export default function Biblioteca() {
               onChange={(e) => setQuery(e.target.value)}
             />
 
-            <select
-              className={styles.select}
-              value={selectedGenre}
-              onChange={(e) => setSelectedGenre(e.target.value)}
-            >
-              {genres.map((genre) => (
-                <option key={genre} value={genre}>{genre}</option>
-              ))}
+            <select className={styles.select} value={selectedGenre} onChange={e => setSelectedGenre(e.target.value)}>
+              {listaGeneros.map(g => <option key={g} value={g}>{g}</option>)}
             </select>
 
-            <select
-              className={styles.select}
-              value={sort}
-              onChange={(e) => setSort(e.target.value)}
-            >
+            <select className={styles.select} value={sort} onChange={e => setSort(e.target.value)}>
               <option value="melhor">Melhor Avaliados</option>
               <option value="recentes">Mais Recentes</option>
             </select>
           </div>
         </header>
 
-        <section className={styles.grid}>
-          {filtered.map((livro) => (
-            <div key={livro.id} className={styles.item}>
-              <BookCard dados={livro} />
-            </div>
-          ))}
-        </section>
+        {carregando ? (
+          <p className={styles.loading}>Carregando catálogo unificado... 📚</p>
+        ) : (
+          <section className={styles.grid}>
+            {filtered.map((livro, index) => (
+              <BookCard key={livro.id || `livro-${index}`} dados={livro} />
+            ))}
+          </section>
+        )}
 
-        {!filtered.length && (
+        {!carregando && !filtered.length && (
           <p className={styles.loading}>Nenhum livro encontrado com os filtros atuais.</p>
         )}
       </main>
