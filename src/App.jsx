@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import Livro from "./pages/Livro/Livro";
 import Biblioteca from "./pages/Biblioteca de livros/Biblioteca";
@@ -15,7 +15,13 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/biblioteca" element={<Biblioteca />} />
-        <Route path="/livro/:id" element={<Livro />} />
+        <Route path="/livro/:slug" element={<Livro />} />
+        {/* Rotas antigas redirecionadas para a estrutura nova */}
+        <Route path="/guarani" element={<Navigate to="/livro/guarani" replace />} />
+        <Route path="/quartos-despejo" element={<Navigate to="/livro/quartos-despejo" replace />} />
+        <Route path="/memorias-cubas" element={<Navigate to="/livro/memorias-cubas" replace />} />
+        <Route path="/bookverse" element={<Navigate to="/livro/bookverse" replace />} />
+        <Route path="/vidas-secas" element={<Navigate to="/livro/vidas-secas" replace />} />
         <Route path="/equipe" element={<Equipe />} />
         <Route path="/vestibular" element={<Vestibular />} />
         <Route path="/videoaulas" element={<Videoaulas />} />

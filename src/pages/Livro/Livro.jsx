@@ -9,6 +9,15 @@ const API_KEY = import.meta.env.VITE_API_KEY;
 const CAPA_PADRAO =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600"><rect width="400" height="600" fill="%23eef2ff"/><rect x="24" y="24" width="352" height="552" rx="16" fill="%23dbeafe"/><text x="200" y="300" text-anchor="middle" fill="%23334155" font-size="28" font-family="Arial">Sem capa</text></svg>';
 
+const ALIASES_LIVROS = {
+  'o-guarani': ['o guarani', 'guarani'],
+  guarani: ['o guarani', 'guarani'],
+  'quartos-despejo': ['quartos de despejo', 'quartos-despejo'],
+  'memorias-cubas': ['memórias póstumas de brás cubas', 'memorias postumas de bras cubas', 'bras cubas'],
+  bookverse: ['bookverse'],
+  'vidas-secas': ['vidas secas', 'vidas-secas'],
+};
+
 function resolverUrlCapa(url) {
   if (!url || typeof url !== "string") return "";
   const value = url.trim();
@@ -21,11 +30,59 @@ function obterTextoValido(...valores) {
   return valores.find((v) => typeof v === "string" && v.trim())?.trim() || "";
 }
 
+function textoIndesejado(valor) {
+  const texto = String(valor || '').toLowerCase();
+  return (
+    texto.includes('fontes de apoio') ||
+    texto.includes('fonte de apoio') ||
+    texto.includes('cnnbrasil.com.br') ||
+    texto.includes('fonte:')
+  );
+}
+
+function textoSeguro(valor, fallback = "") {
+  if (typeof valor === "string") {
+    const texto = valor.trim();
+    if (!texto || textoIndesejado(texto)) return fallback;
+    return texto;
+  }
+  if (typeof valor === "number" || typeof valor === "boolean") return String(valor);
+
+  if (Array.isArray(valor)) {
+    const itens = valor
+      .map((item) => textoSeguro(item, ""))
+      .filter(Boolean);
+    return itens.join("\n") || fallback;
+  }
+
+  if (valor && typeof valor === "object") {
+    const candidatos = [
+      valor.nome,
+      valor.name,
+      valor.titulo,
+      valor.title,
+      valor.descricao,
+      valor.biografia,
+      valor.contextoHistorico,
+      valor.texto,
+    ];
+
+    for (const candidato of candidatos) {
+      const texto = textoSeguro(candidato, "");
+      if (texto) return texto;
+    }
+
+    return fallback;
+  }
+
+  return fallback;
+}
+
 function normalizarParagrafos(valor) {
   if (!valor) return [];
   if (Array.isArray(valor)) {
     return valor
-      .flatMap((item) => String(item).split(/\n+/))
+      .flatMap((item) => textoSeguro(item, "").split(/\n+/))
       .map((item) => item.trim())
       .filter(Boolean);
   }
@@ -38,144 +95,154 @@ function normalizarParagrafos(valor) {
   return [];
 }
 
+function normalizarChave(valor = '') {
+  return String(valor)
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .trim();
+}
+
+function obterChavesBusca(routeId = '') {
+  const chave = normalizarChave(routeId);
+  if (!chave) return [];
+
+  const candidatos = new Set([chave]);
+  (ALIASES_LIVROS[chave] || []).forEach((item) => candidatos.add(normalizarChave(item)));
+
+  return Array.from(candidatos);
+}
+
 function Livro() {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
+  const routeId = id || location.pathname.split('/livro/')[1]?.split('/')[0] || '';
+
   const [livro, setLivro] = useState(location.state?.livro || null);
   const [carregando, setCarregando] = useState(!livro);
   const [erro, setErro] = useState(null);
+  
+  // Controlamos apenas o ID da aba ativa como estado recarregável
   const [activeTab, setActiveTab] = useState("");
-  const [listaPersonagens, setListaPersonagens] = useState([]);
+  const livroBase = livro || {};
 
+  // 1. useEffect Corrigido (Apenas routeId como dependência)
   useEffect(() => {
-    if (!livro && id) {
-      async function fetchLivro() {
+    if (livro) return;
+
+    // Se o livro já veio por state, não busca de novo
+    async function fetchLivro() {
+      try {
+        setCarregando(true);
+        setErro(null);
+        const headersPadrao = {
+          "Content-Type": "application/json",
+          "x-api-key": API_KEY,
+          Authorization: `Bearer ${API_KEY}`,
+        };
+
+        let dadosLivro = null;
+
+        // Tenta buscar no banco local por ID
         try {
-          setCarregando(true);
-          const headersPadrao = {
-            "Content-Type": "application/json",
-            "x-api-key": API_KEY,
-            Authorization: `Bearer ${API_KEY}`,
-          };
-
-          let dadosLivro = null;
-
-          // 1. Tenta buscar no banco local por ID
-          try {
-            const response = await fetch(`${URL_API}/${id}`, {
-              headers: headersPadrao,
-            });
-            if (response.ok) {
-              dadosLivro = await response.json();
-            }
-          } catch {
-            console.log("Buscando rotas alternativas de integração...");
+          const response = await fetch(`${URL_API}/${routeId}`, { headers: headersPadrao });
+          if (response.ok) {
+            dadosLivro = await response.json();
           }
+        } catch {
+          console.log("Buscando rotas alternativas de integração...");
+        }
 
-          // 2. Se não achar local, varre a API de integração buscando por ID ou Título
-          if (!dadosLivro) {
-            const resposta = await fetch(API_INTEGRACAO_URL, {
-              headers: headersPadrao,
-            });
-            if (resposta.ok) {
-              const resultadoJson = await resposta.json();
-              const dadosBase = resultadoJson?.data || resultadoJson || [];
+        // Se não achar local, varre a API de integração
+        if (!dadosLivro) {
+          const resposta = await fetch(API_INTEGRACAO_URL, { headers: headersPadrao });
+          if (resposta.ok) {
+            const resultadoJson = await resposta.json();
+            const dadosBase = resultadoJson?.data || resultadoJson || [];
 
-              const listaUnificada = [];
-              if (Array.isArray(dadosBase)) {
-                dadosBase.forEach((item) => {
-                  if (item && Array.isArray(item.conteudo)) {
-                    listaUnificada.push(...item.conteudo);
-                  } else if (item) {
-                    listaUnificada.push(item);
-                  }
-                });
-              }
-
-              const termoBusca = decodeURIComponent(id).toLowerCase().trim();
-              
-              dadosLivro = listaUnificada.find((l) => {
-                let t = l?.titulo || l?.title || l?.tituloDoLivro || "";
-                let autorMapeado = l?.autor || l?.author || l?.autores || "";
-
-                // Correção em tempo de execução para os metadados de Memórias Póstumas
-                if (t.toLowerCase().includes('nao informado') && autorMapeado.toLowerCase().includes('memorias postumas')) {
-                  t = "Memórias Póstumas de Brás Cubas";
+            const listaUnificada = [];
+            if (Array.isArray(dadosBase)) {
+              dadosBase.forEach((item) => {
+                if (item && Array.isArray(item.conteudo)) {
+                  listaUnificada.push(...item.conteudo);
+                } else if (item) {
+                  listaUnificada.push(item);
                 }
-
-                const livroId = l?.id ? String(l.id).toLowerCase().trim() : "";
-                return (
-                  t.toLowerCase().trim() === termoBusca ||
-                  livroId === termoBusca
-                );
               });
             }
+
+            const termosBusca = obterChavesBusca(routeId);
+            
+            dadosLivro = listaUnificada.find((l) => {
+              let t = l?.titulo || l?.title || l?.tituloDoLivro || "";
+              let autorMapeado = l?.autor || l?.author || l?.autores || "";
+
+              if (t.toLowerCase().includes('nao informado') && autorMapeado.toLowerCase().includes('memorias postumas')) {
+                t = "Memórias Póstumas de Brás Cubas";
+              }
+
+              const livroId = l?.id ? String(l.id).toLowerCase().trim() : "";
+              const tituloNormalizado = normalizarChave(t);
+
+              return termosBusca.includes(tituloNormalizado) || termosBusca.includes(livroId);
+            });
           }
-
-          if (!dadosLivro)
-            throw new Error("Livro não encontrado nos catálogos.");
-
-          setLivro(dadosLivro);
-        } catch (error) {
-          setErro(error.message);
-          console.error("Erro ao buscar livro:", error);
-        } finally {
-          setCarregando(false);
         }
-      }
 
+        if (!dadosLivro) throw new Error("Livro não encontrado nos catálogos.");
+
+        setLivro(dadosLivro);
+      } catch (error) {
+        setErro(error.message);
+        console.error("Erro ao buscar livro:", error);
+      } finally {
+        setCarregando(false);
+      }
+    }
+
+    if (routeId) {
       fetchLivro();
     }
-  }, [id, livro]);
+  }, [routeId, livro]);
 
-  // Sincroniza os dados de personagens e define a primeira aba padrão ativa
-  useEffect(() => {
-    if (livro) {
-      setListaPersonagens(
-        normalizarParagrafos(
-          livro.personagens_pt ||
-            livro.personagens ||
-            livro.personagens_en ||
-            "",
-        ),
-      );
-    }
-  }, [livro]);
+  const tituloTexto = textoSeguro(livroBase.titulo, "Título não cadastrado");
+  const autorTexto = textoSeguro(livroBase.autor, "Autor não informado");
+  const generoTexto = textoSeguro(livroBase.genero_pt || livroBase.genero_en, "");
+  const resumo = obterTextoValido(
+    textoSeguro(livroBase.sinopse, ""),
+    textoSeguro(livroBase.descricao_pt, ""),
+    textoSeguro(livroBase.descricao_en, "")
+  );
+  const contextoTexto = obterTextoValido(
+    textoSeguro(livroBase.contexto_historico_pt, ""),
+    textoSeguro(livroBase.contexto_historico_en, ""),
+    textoSeguro(livroBase.contexto_pt, ""),
+    textoSeguro(livroBase.contexto_en, "")
+  );
+  const detalhesAutor = obterTextoValido(textoSeguro(livroBase.detalhes_autor_pt, ""), textoSeguro(livroBase.detalhes_autor_en, ""));
+  const estilo = obterTextoValido(textoSeguro(livroBase.estilo_escrita_pt, ""), textoSeguro(livroBase.estilo_escrita_en, ""));
+  const verossimilhanca = obterTextoValido(textoSeguro(livroBase.verossimilhanca_pt, ""), textoSeguro(livroBase.verossimilhanca_en, ""));
+  const caracteristicas = obterTextoValido(textoSeguro(livroBase.caracteristicas_literarias_pt, ""), textoSeguro(livroBase.caracteristicas_literarias_en, ""));
+  const conclusao = obterTextoValido(textoSeguro(livroBase.conclusao_pt, ""), textoSeguro(livroBase.conclusao_en, ""));
+  const anoPublicacao = livroBase.ano_publicacao || livroBase.anoPublicacao || null;
+  const listaPersonagens = normalizarParagrafos(textoSeguro(livroBase.personagens_pt || livroBase.personagens || livroBase.personagens_en || "", ""));
+  const simbolismoLines = normalizarParagrafos(obterTextoValido(textoSeguro(livroBase.simbolismo_pt, ""), textoSeguro(livroBase.simbolismo_en, "")));
+  const engajamentoLines = normalizarParagrafos(obterTextoValido(textoSeguro(livroBase.engajamento_pt, ""), textoSeguro(livroBase.engajamento_en, "")));
+  const temasLines = normalizarParagrafos(obterTextoValido(textoSeguro(livroBase.temas_chave_pt, ""), textoSeguro(livroBase.temas_chave_en, "")));
 
-  // Efeito isolado para garantir que a activeTab seja calculada de forma correta e sem loops
-  useEffect(() => {
-    if (livro) {
-      const resumo = obterTextoValido(livro.sinopse, livro.descricao_pt, livro.descricao_en);
-      const personagensExistentes = normalizarParagrafos(livro.personagens_pt || livro.personagens || livro.personagens_en || "");
-      const contextoTexto = obterTextoValido(livro.contexto_historico_pt, livro.contexto_historico_en, livro.contexto_pt, livro.contexto_en);
-      
-      const hasFicha = Boolean(
-        obterTextoValido(livro.detalhes_autor_pt, livro.detalhes_autor_en) ||
-        obterTextoValido(livro.estilo_escrita_pt, livro.estilo_escrita_en) ||
-        obterTextoValido(livro.verossimilhanca_pt, livro.verossimilhanca_en) ||
-        obterTextoValido(livro.caracteristicas_literarias_pt, livro.caracteristicas_literarias_en) ||
-        obterTextoValido(livro.conclusao_pt, livro.conclusao_en) ||
-        livro.paginas ||
-        livro.ano_publicacao || 
-        livro.anoPublicacao
-      );
+  const hasFicha = Boolean(detalhesAutor || estilo || verossimilhanca || caracteristicas || conclusao || livroBase.paginas || anoPublicacao);
+  const hasAnalise = Boolean(simbolismoLines.length || engajamentoLines.length || temasLines.length || livroBase.simbolismo_pt || livroBase.simbolismo_en || livroBase.engajamento_pt || livroBase.engajamento_en || livroBase.temas_chave_pt || livroBase.temas_chave_en);
 
-      const hasAnalise = Boolean(
-        livro.simbolismo_pt || livro.simbolismo_en || 
-        livro.engajamento_pt || livro.engajamento_en || 
-        livro.temas_chave_pt || livro.temas_chave_en
-      );
-
-      if (resumo) setActiveTab("resumo");
-      else if (personagensExistentes.length > 0) setActiveTab("personagens");
-      else if (contextoTexto) setActiveTab("contexto");
-      else if (hasFicha) setActiveTab("ficha");
-      else if (livro.video_url) setActiveTab("video");
-      else if (hasAnalise) setActiveTab("dados");
-    }
-  }, [livro]);
+  const tabs = [];
+  if (resumo) tabs.push({ id: "resumo", label: "Resumo" });
+  if (listaPersonagens.length > 0) tabs.push({ id: "personagens", label: "Personagens" });
+  if (contextoTexto) tabs.push({ id: "contexto", label: "Contexto histórico" });
+  if (hasFicha) tabs.push({ id: "ficha", label: "Ficha técnica" });
+  if (livroBase.video_url) tabs.push({ id: "video", label: "Vídeo" });
+  if (hasAnalise) tabs.push({ id: "dados", label: "Análise da obra" });
+  const abaAtiva = tabs.some((tab) => tab.id === activeTab) ? activeTab : (tabs[0]?.id || "");
 
   if (carregando) {
     return (
@@ -191,9 +258,7 @@ function Livro() {
     return (
       <div className={styles.page}>
         <div className={styles.container}>
-          <p className={styles.error}>
-            {erro || "Obra indisponível no momento."}
-          </p>
+          <p className={styles.error}>{erro || "Obra indisponível no momento."}</p>
           <button onClick={() => navigate(-1)} className={styles.botaoRoxo}>
             Voltar
           </button>
@@ -202,80 +267,10 @@ function Livro() {
     );
   }
 
-  const {
-    titulo,
-    autor,
-    capa_url,
-    imagem,
-    imagem_url,
-    capas,
-    foto,
-    genero_pt,
-    genero_en,
-    sinopse,
-    descricao_pt,
-    descricao_en,
-    contexto_pt,
-    contexto_en,
-    contexto_historico_pt,
-    contexto_historico_en,
-    simbolismo_pt,
-    simbolismo_en,
-    engajamento_pt,
-    engajamento_en,
-    temas_chave_pt,
-    temas_chave_en,
-    detalhes_autor_pt,
-    detalhes_autor_en,
-    estilo_escrita_pt,
-    estilo_escrita_en,
-    verossimilhanca_pt,
-    verossimilhanca_en,
-    caracteristicas_literarias_pt,
-    caracteristicas_literarias_en,
-    conclusao_pt,
-    conclusao_en,
-    video_url,
-    ano_publicacao,
-    anoPublicacao,
-    paginas,
-    avaliacao,
-    media_avaliacao,
-    avaliacao_media,
-    criadoEm,
-    atualizadoEm,
-  } = livro;
-
-  const capaImagem = resolverUrlCapa(capa_url || imagem_url || imagem || capas || foto || "");
-  const ano = ano_publicacao || anoPublicacao || null;
-  const rating = parseFloat(avaliacao || media_avaliacao || avaliacao_media || 0);
-
-  const resumo = obterTextoValido(sinopse, descricao_pt, descricao_en);
-  const contextoTexto = obterTextoValido(contexto_historico_pt, contexto_historico_en, contexto_pt, contexto_en);
-  const detalhesAutor = obterTextoValido(detalhes_autor_pt, detalhes_autor_en);
-  const estilo = obterTextoValido(estilo_escrita_pt, estilo_escrita_en);
-  const verossimilhanca = obterTextoValido(verossimilhanca_pt, verossimilhanca_en);
-  const caracteristicas = obterTextoValido(caracteristicas_literarias_pt, caracteristicas_literarias_en);
-  const conclusao = obterTextoValido(conclusao_pt, conclusao_en);
-
-  const simbolismoTexto = obterTextoValido(simbolismo_pt, simbolismo_en);
-  const engajamentoTexto = obterTextoValido(engajamento_pt, engajamento_en);
-  const temasTexto = obterTextoValido(temas_chave_pt, temas_chave_en);
-
-  const simbolismoLines = normalizarParagrafos(simbolismoTexto);
-  const engajamentoLines = normalizarParagrafos(engajamentoTexto);
-  const temasLines = normalizarParagrafos(temasTexto);
-
-  const hasFicha = Boolean(detalhesAutor || estilo || verossimilhanca || caracteristicas || conclusao || paginas || ano);
-  const hasAnalise = Boolean(simbolismoTexto || engajamentoTexto || temasTexto);
-
-  const tabs = [];
-  if (resumo) tabs.push({ id: "resumo", label: "Resumo" });
-  if (listaPersonagens.length > 0) tabs.push({ id: "personagens", label: "Personagens" });
-  if (contextoTexto) tabs.push({ id: "contexto", label: "Contexto histórico" });
-  if (hasFicha) tabs.push({ id: "ficha", label: "Ficha técnica" });
-  if (video_url) tabs.push({ id: "video", label: "Vídeo" });
-  if (hasAnalise) tabs.push({ id: "dados", label: "Análise da obra" });
+  const capaImagem = resolverUrlCapa(textoSeguro(livro.capa_url || livro.imagem_url || livro.imagem || livro.capas || livro.foto || "", ""));
+  const paginas = livro.paginas;
+  const videoUrl = livro.video_url;
+  const rating = parseFloat(livro.avaliacao || livro.media_avaliacao || livro.avaliacao_media || 0);
 
   return (
     <div className={styles.page}>
@@ -289,7 +284,7 @@ function Livro() {
             {capaImagem ? (
               <img
                 src={capaImagem}
-                alt={titulo || "Capa do livro"}
+                alt={tituloTexto || "Capa do livro"}
                 className={styles.coverImage}
                 onError={(event) => {
                   event.currentTarget.onerror = null;
@@ -302,12 +297,10 @@ function Livro() {
           </div>
 
           <div className={styles.heroContent}>
-            {(genero_pt || genero_en) && (
-              <span className={styles.tag}>{genero_pt || genero_en}</span>
+            {generoTexto && (
+              <span className={styles.tag}>{generoTexto}</span>
             )}
-            <h1 className={styles.title}>
-              {titulo || "Título não cadastrado"}
-            </h1>
+            <h1 className={styles.title}>{tituloTexto}</h1>
 
             {rating > 0 && (
               <div className={styles.ratingRow}>
@@ -332,20 +325,20 @@ function Livro() {
             )}
 
             <div className={styles.metaInfo}>
-              {ano && <span>📅 {ano}</span>}
+              {anoPublicacao && <span>📅 {anoPublicacao}</span>}
               {paginas && <span>📄 {paginas} páginas</span>}
-              {autor && (
+              {autorTexto && (
                 <span>
-                  Autor: <strong>{autor}</strong>
+                  Autor: <strong>{autorTexto}</strong>
                 </span>
               )}
             </div>
 
             <div className={styles.actions}>
-              {video_url && (
+              {videoUrl && (
                 <a
                   className={styles.primaryButton}
-                  href={video_url}
+                  href={videoUrl}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -364,17 +357,13 @@ function Livro() {
 
         {tabs.length > 0 && (
           <main className={styles.main}>
-            <div
-              className={styles.tabsBar}
-              role="tablist"
-              aria-label="Seções do livro"
-            >
+            <div className={styles.tabsBar} role="tablist" aria-label="Seções do livro">
               {tabs.map((t) => (
                 <button
                   key={t.id}
                   role="tab"
-                  aria-selected={activeTab === t.id}
-                  className={activeTab === t.id ? styles.tabActive : styles.tab}
+                  aria-selected={abaAtiva === t.id}
+                  className={abaAtiva === t.id ? styles.tabActive : styles.tab}
                   onClick={() => setActiveTab(t.id)}
                 >
                   {t.label}
@@ -383,14 +372,14 @@ function Livro() {
             </div>
 
             <div className={styles.tabContent}>
-              {activeTab === "resumo" && resumo && (
+              {abaAtiva === "resumo" && resumo && (
                 <section className={styles.introCard}>
                   <h2 className={styles.sectionTitle}>Resumo da obra</h2>
                   <p className={styles.fieldValue}>{resumo}</p>
                 </section>
               )}
 
-              {activeTab === "personagens" && listaPersonagens.length > 0 && (
+              {abaAtiva === "personagens" && listaPersonagens.length > 0 && (
                 <section className={styles.introCard}>
                   <h2 className={styles.sectionTitle}>Personagens</h2>
                   <ul className={styles.list}>
@@ -401,14 +390,14 @@ function Livro() {
                 </section>
               )}
 
-              {activeTab === "contexto" && contextoTexto && (
+              {abaAtiva === "contexto" && contextoTexto && (
                 <section className={styles.introCard}>
                   <h2 className={styles.sectionTitle}>Contexto histórico</h2>
                   <p className={styles.fieldValue}>{contextoTexto}</p>
                 </section>
               )}
 
-              {activeTab === "ficha" && (
+              {abaAtiva === "ficha" && (
                 <section className={styles.grid}>
                   {detalhesAutor && (
                     <article className={styles.field}>
@@ -430,9 +419,7 @@ function Livro() {
                   )}
                   {caracteristicas && (
                     <article className={styles.field}>
-                      <p className={styles.fieldLabel}>
-                        Características literárias
-                      </p>
+                      <p className={styles.fieldLabel}>Características literárias</p>
                       <p className={styles.fieldValue}>{caracteristicas}</p>
                     </article>
                   )}
@@ -445,11 +432,11 @@ function Livro() {
                 </section>
               )}
 
-              {activeTab === "video" && video_url && (
+              {abaAtiva === "video" && videoUrl && (
                 <section className={styles.introCard}>
                   <h2 className={styles.sectionTitle}>Conteúdo em vídeo</h2>
                   <a
-                    href={video_url}
+                    href={videoUrl}
                     target="_blank"
                     rel="noreferrer"
                     className={styles.primaryButton}
@@ -459,7 +446,7 @@ function Livro() {
                 </section>
               )}
 
-              {activeTab === "dados" && (
+              {abaAtiva === "dados" && (
                 <section>
                   <div className={styles.analysisGrid}>
                     {simbolismoLines.length > 0 && (
@@ -467,9 +454,7 @@ function Livro() {
                         <h3 className={styles.analysisCardTitle}>Simbolismo</h3>
                         <div className={styles.analysisCardContent}>
                           {simbolismoLines.map((line, idx) => (
-                            <p key={idx} className={styles.fieldValue}>
-                              {line}
-                            </p>
+                            <p key={idx} className={styles.fieldValue}>{line}</p>
                           ))}
                         </div>
                       </div>
@@ -477,14 +462,10 @@ function Livro() {
 
                     {engajamentoLines.length > 0 && (
                       <div className={styles.analysisCard}>
-                        <h3 className={styles.analysisCardTitle}>
-                          Engajamento
-                        </h3>
+                        <h3 className={styles.analysisCardTitle}>Engajamento</h3>
                         <div className={styles.analysisCardContent}>
                           {engajamentoLines.map((line, idx) => (
-                            <p key={idx} className={styles.fieldValue}>
-                              {line}
-                            </p>
+                            <p key={idx} className={styles.fieldValue}>{line}</p>
                           ))}
                         </div>
                       </div>
@@ -492,14 +473,10 @@ function Livro() {
 
                     {temasLines.length > 0 && (
                       <div className={styles.analysisCard}>
-                        <h3 className={styles.analysisCardTitle}>
-                          Temas chave
-                        </h3>
+                        <h3 className={styles.analysisCardTitle}>Temas chave</h3>
                         <div className={styles.analysisCardContent}>
                           {temasLines.map((line, idx) => (
-                            <p key={idx} className={styles.fieldValue}>
-                              {line}
-                            </p>
+                            <p key={idx} className={styles.fieldValue}>{line}</p>
                           ))}
                         </div>
                       </div>
@@ -507,30 +484,24 @@ function Livro() {
                   </div>
 
                   <div className={styles.introCard}>
-                    <h2 className={styles.sectionTitle}>
-                      Metadados do Registro
-                    </h2>
+                    <h2 className={styles.sectionTitle}>Metadados do Registro</h2>
                     <ul className={styles.list}>
-                      {titulo && (
-                        <li>
-                          <strong>Título original:</strong> {titulo}
-                        </li>
+                      {tituloTexto && (
+                        <li><strong>Título original:</strong> {tituloTexto}</li>
                       )}
-                      {autor && (
-                        <li>
-                          <strong>Autor mapeado:</strong> {autor}
-                        </li>
+                      {autorTexto && (
+                        <li><strong>Autor mapeado:</strong> {autorTexto}</li>
                       )}
-                      {criadoEm && (
+                      {livro.criadoEm && (
                         <li>
                           <strong>Data de cadastro:</strong>{" "}
-                          {new Date(criadoEm).toLocaleDateString("pt-BR")}
+                          {new Date(livro.criadoEm).toLocaleDateString("pt-BR")}
                         </li>
                       )}
-                      {atualizadoEm && (
+                      {livro.atualizadoEm && (
                         <li>
                           <strong>Última sincronização:</strong>{" "}
-                          {new Date(atualizadoEm).toLocaleDateString("pt-BR")}
+                          {new Date(livro.atualizadoEm).toLocaleDateString("pt-BR")}
                         </li>
                       )}
                     </ul>
