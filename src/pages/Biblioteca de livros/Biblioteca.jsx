@@ -149,20 +149,20 @@ export default function Biblioteca() {
       <main className={styles.container}>
         <header className={styles.header}>
           <div>
-            <h1 className={styles.title}>Catálogo de Livros</h1>
+            <h1 className={styles.title}>Biblioteca de Livros</h1>
             <p className={styles.subtitle}>Explore nossa coleção curada de obras literárias</p>
           </div>
 
           <div className={styles.controls}>
             <input
               className={styles.search}
-              placeholder="Buscar por título ou autor..."
+              placeholder="Pesquisar livros..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
 
             <select className={styles.select} value={selectedGenre} onChange={e => setSelectedGenre(e.target.value)}>
-              {listaGeneros.map(g => <option key={g} value={g}>{g}</option>)}
+              {listaGeneros.map(g => <option key={g} value={g}>{g === 'Todos' ? 'Sem filtro' : g}</option>)}
             </select>
 
             <select className={styles.select} value={sort} onChange={e => setSort(e.target.value)}>
@@ -182,8 +182,8 @@ export default function Biblioteca() {
           </section>
         )}
 
-        {!carregando && !filtered.length && (
-          <p className={styles.loading}>Nenhum livro encontrado com os filtros atuais.</p>
+        {!filtered.length && (
+          <p className={styles.loading}>Nenhum livro encontrado com esses critérios</p>
         )}
       </main>
     </>

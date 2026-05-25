@@ -10,12 +10,16 @@ const CAPA_PADRAO =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600"><rect width="400" height="600" fill="%23eef2ff"/><rect x="24" y="24" width="352" height="552" rx="16" fill="%23dbeafe"/><text x="200" y="300" text-anchor="middle" fill="%23334155" font-size="28" font-family="Arial">Sem capa</text></svg>';
 
 const ALIASES_LIVROS = {
-  'o-guarani': ['o guarani', 'guarani'],
-  guarani: ['o guarani', 'guarani'],
-  'quartos-despejo': ['quartos de despejo', 'quartos-despejo'],
-  'memorias-cubas': ['memórias póstumas de brás cubas', 'memorias postumas de bras cubas', 'bras cubas'],
-  bookverse: ['bookverse'],
-  'vidas-secas': ['vidas secas', 'vidas-secas'],
+  "o-guarani": ["o guarani", "guarani"],
+  guarani: ["o guarani", "guarani"],
+  "quartos-despejo": ["quartos de despejo", "quartos-despejo"],
+  "memorias-cubas": [
+    "memórias póstumas de brás cubas",
+    "memorias postumas de bras cubas",
+    "bras cubas",
+  ],
+  bookverse: ["bookverse"],
+  "vidas-secas": ["vidas secas", "vidas-secas"],
 };
 
 function resolverUrlCapa(url) {
@@ -31,12 +35,12 @@ function obterTextoValido(...valores) {
 }
 
 function textoIndesejado(valor) {
-  const texto = String(valor || '').toLowerCase();
+  const texto = String(valor || "").toLowerCase();
   return (
-    texto.includes('fontes de apoio') ||
-    texto.includes('fonte de apoio') ||
-    texto.includes('cnnbrasil.com.br') ||
-    texto.includes('fonte:')
+    texto.includes("fontes de apoio") ||
+    texto.includes("fonte de apoio") ||
+    texto.includes("cnnbrasil.com.br") ||
+    texto.includes("fonte:")
   );
 }
 
@@ -46,12 +50,11 @@ function textoSeguro(valor, fallback = "") {
     if (!texto || textoIndesejado(texto)) return fallback;
     return texto;
   }
-  if (typeof valor === "number" || typeof valor === "boolean") return String(valor);
+  if (typeof valor === "number" || typeof valor === "boolean")
+    return String(valor);
 
   if (Array.isArray(valor)) {
-    const itens = valor
-      .map((item) => textoSeguro(item, ""))
-      .filter(Boolean);
+    const itens = valor.map((item) => textoSeguro(item, "")).filter(Boolean);
     return itens.join("\n") || fallback;
   }
 
@@ -95,20 +98,22 @@ function normalizarParagrafos(valor) {
   return [];
 }
 
-function normalizarChave(valor = '') {
+function normalizarChave(valor = "") {
   return String(valor)
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
     .toLowerCase()
     .trim();
 }
 
-function obterChavesBusca(routeId = '') {
+function obterChavesBusca(routeId = "") {
   const chave = normalizarChave(routeId);
   if (!chave) return [];
 
   const candidatos = new Set([chave]);
-  (ALIASES_LIVROS[chave] || []).forEach((item) => candidatos.add(normalizarChave(item)));
+  (ALIASES_LIVROS[chave] || []).forEach((item) =>
+    candidatos.add(normalizarChave(item)),
+  );
 
   return Array.from(candidatos);
 }
@@ -118,12 +123,13 @@ function Livro() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const routeId = id || location.pathname.split('/livro/')[1]?.split('/')[0] || '';
+  const routeId =
+    id || location.pathname.split("/livro/")[1]?.split("/")[0] || "";
 
   const [livro, setLivro] = useState(location.state?.livro || null);
   const [carregando, setCarregando] = useState(!livro);
   const [erro, setErro] = useState(null);
-  
+
   // Controlamos apenas o ID da aba ativa como estado recarregável
   const [activeTab, setActiveTab] = useState("");
   const livroBase = livro || {};
@@ -147,7 +153,9 @@ function Livro() {
 
         // Tenta buscar no banco local por ID
         try {
-          const response = await fetch(`${URL_API}/${routeId}`, { headers: headersPadrao });
+          const response = await fetch(`${URL_API}/${routeId}`, {
+            headers: headersPadrao,
+          });
           if (response.ok) {
             dadosLivro = await response.json();
           }
@@ -157,7 +165,9 @@ function Livro() {
 
         // Se não achar local, varre a API de integração
         if (!dadosLivro) {
-          const resposta = await fetch(API_INTEGRACAO_URL, { headers: headersPadrao });
+          const resposta = await fetch(API_INTEGRACAO_URL, {
+            headers: headersPadrao,
+          });
           if (resposta.ok) {
             const resultadoJson = await resposta.json();
             const dadosBase = resultadoJson?.data || resultadoJson || [];
@@ -174,24 +184,46 @@ function Livro() {
             }
 
             const termosBusca = obterChavesBusca(routeId);
-            
+
             dadosLivro = listaUnificada.find((l) => {
               let t = l?.titulo || l?.title || l?.tituloDoLivro || "";
               let autorMapeado = l?.autor || l?.author || l?.autores || "";
 
-              if (t.toLowerCase().includes('nao informado') && autorMapeado.toLowerCase().includes('memorias postumas')) {
+              if (!t && autorMapeado.toLowerCase().includes("memória")) {
+                t = autorMapeado;
+                autorMapeado = "Machado de Assis";
+              }
+
+              if (
+                t.toLowerCase().includes("nao informado") &&
+                autorMapeado.toLowerCase().includes("memorias postumas")
+              ) {
                 t = "Memórias Póstumas de Brás Cubas";
               }
 
               const livroId = l?.id ? String(l.id).toLowerCase().trim() : "";
               const tituloNormalizado = normalizarChave(t);
 
-              return termosBusca.includes(tituloNormalizado) || termosBusca.includes(livroId);
+              return (
+                termosBusca.includes(tituloNormalizado) ||
+                termosBusca.includes(livroId)
+              );
             });
           }
         }
 
         if (!dadosLivro) throw new Error("Livro não encontrado nos catálogos.");
+
+        // Normaliza dados antes de guardar
+        if (
+          !dadosLivro.titulo &&
+          dadosLivro.autor &&
+          dadosLivro.autor.toLowerCase().includes("memória")
+        ) {
+          const autorOriginal = dadosLivro.autor;
+          dadosLivro.titulo = autorOriginal;
+          dadosLivro.autor = "Machado de Assis";
+        }
 
         setLivro(dadosLivro);
       } catch (error) {
@@ -209,40 +241,103 @@ function Livro() {
 
   const tituloTexto = textoSeguro(livroBase.titulo, "Título não cadastrado");
   const autorTexto = textoSeguro(livroBase.autor, "Autor não informado");
-  const generoTexto = textoSeguro(livroBase.genero_pt || livroBase.genero_en, "");
+  const generoTexto = textoSeguro(
+    livroBase.genero_pt || livroBase.genero_en,
+    "",
+  );
   const resumo = obterTextoValido(
     textoSeguro(livroBase.sinopse, ""),
     textoSeguro(livroBase.descricao_pt, ""),
-    textoSeguro(livroBase.descricao_en, "")
+    textoSeguro(livroBase.descricao_en, ""),
   );
   const contextoTexto = obterTextoValido(
     textoSeguro(livroBase.contexto_historico_pt, ""),
     textoSeguro(livroBase.contexto_historico_en, ""),
     textoSeguro(livroBase.contexto_pt, ""),
-    textoSeguro(livroBase.contexto_en, "")
+    textoSeguro(livroBase.contexto_en, ""),
   );
-  const detalhesAutor = obterTextoValido(textoSeguro(livroBase.detalhes_autor_pt, ""), textoSeguro(livroBase.detalhes_autor_en, ""));
-  const estilo = obterTextoValido(textoSeguro(livroBase.estilo_escrita_pt, ""), textoSeguro(livroBase.estilo_escrita_en, ""));
-  const verossimilhanca = obterTextoValido(textoSeguro(livroBase.verossimilhanca_pt, ""), textoSeguro(livroBase.verossimilhanca_en, ""));
-  const caracteristicas = obterTextoValido(textoSeguro(livroBase.caracteristicas_literarias_pt, ""), textoSeguro(livroBase.caracteristicas_literarias_en, ""));
-  const conclusao = obterTextoValido(textoSeguro(livroBase.conclusao_pt, ""), textoSeguro(livroBase.conclusao_en, ""));
-  const anoPublicacao = livroBase.ano_publicacao || livroBase.anoPublicacao || null;
-  const listaPersonagens = normalizarParagrafos(textoSeguro(livroBase.personagens_pt || livroBase.personagens || livroBase.personagens_en || "", ""));
-  const simbolismoLines = normalizarParagrafos(obterTextoValido(textoSeguro(livroBase.simbolismo_pt, ""), textoSeguro(livroBase.simbolismo_en, "")));
-  const engajamentoLines = normalizarParagrafos(obterTextoValido(textoSeguro(livroBase.engajamento_pt, ""), textoSeguro(livroBase.engajamento_en, "")));
-  const temasLines = normalizarParagrafos(obterTextoValido(textoSeguro(livroBase.temas_chave_pt, ""), textoSeguro(livroBase.temas_chave_en, "")));
+  const detalhesAutor = obterTextoValido(
+    textoSeguro(livroBase.detalhes_autor_pt, ""),
+    textoSeguro(livroBase.detalhes_autor_en, ""),
+  );
+  const estilo = obterTextoValido(
+    textoSeguro(livroBase.estilo_escrita_pt, ""),
+    textoSeguro(livroBase.estilo_escrita_en, ""),
+  );
+  const verossimilhanca = obterTextoValido(
+    textoSeguro(livroBase.verossimilhanca_pt, ""),
+    textoSeguro(livroBase.verossimilhanca_en, ""),
+  );
+  const caracteristicas = obterTextoValido(
+    textoSeguro(livroBase.caracteristicas_literarias_pt, ""),
+    textoSeguro(livroBase.caracteristicas_literarias_en, ""),
+  );
+  const conclusao = obterTextoValido(
+    textoSeguro(livroBase.conclusao_pt, ""),
+    textoSeguro(livroBase.conclusao_en, ""),
+  );
+  const anoPublicacao =
+    livroBase.ano_publicacao || livroBase.anoPublicacao || null;
+  const listaPersonagens = normalizarParagrafos(
+    textoSeguro(
+      livroBase.personagens_pt ||
+        livroBase.personagens ||
+        livroBase.personagens_en ||
+        "",
+      "",
+    ),
+  );
+  const simbolismoLines = normalizarParagrafos(
+    obterTextoValido(
+      textoSeguro(livroBase.simbolismo_pt, ""),
+      textoSeguro(livroBase.simbolismo_en, ""),
+    ),
+  );
+  const engajamentoLines = normalizarParagrafos(
+    obterTextoValido(
+      textoSeguro(livroBase.engajamento_pt, ""),
+      textoSeguro(livroBase.engajamento_en, ""),
+    ),
+  );
+  const temasLines = normalizarParagrafos(
+    obterTextoValido(
+      textoSeguro(livroBase.temas_chave_pt, ""),
+      textoSeguro(livroBase.temas_chave_en, ""),
+    ),
+  );
 
-  const hasFicha = Boolean(detalhesAutor || estilo || verossimilhanca || caracteristicas || conclusao || livroBase.paginas || anoPublicacao);
-  const hasAnalise = Boolean(simbolismoLines.length || engajamentoLines.length || temasLines.length || livroBase.simbolismo_pt || livroBase.simbolismo_en || livroBase.engajamento_pt || livroBase.engajamento_en || livroBase.temas_chave_pt || livroBase.temas_chave_en);
+  const hasFicha = Boolean(
+    detalhesAutor ||
+    estilo ||
+    verossimilhanca ||
+    caracteristicas ||
+    conclusao ||
+    livroBase.paginas ||
+    anoPublicacao,
+  );
+  const hasAnalise = Boolean(
+    simbolismoLines.length ||
+    engajamentoLines.length ||
+    temasLines.length ||
+    livroBase.simbolismo_pt ||
+    livroBase.simbolismo_en ||
+    livroBase.engajamento_pt ||
+    livroBase.engajamento_en ||
+    livroBase.temas_chave_pt ||
+    livroBase.temas_chave_en,
+  );
 
   const tabs = [];
-  if (resumo) tabs.push({ id: "resumo", label: "Resumo" });
-  if (listaPersonagens.length > 0) tabs.push({ id: "personagens", label: "Personagens" });
-  if (contextoTexto) tabs.push({ id: "contexto", label: "Contexto histórico" });
-  if (hasFicha) tabs.push({ id: "ficha", label: "Ficha técnica" });
+  if (resumo) tabs.push({ id: "resumo", label: "Sinopse" });
+  if (listaPersonagens.length > 0)
+    tabs.push({ id: "personagens", label: "Personagens" });
+  if (contextoTexto) tabs.push({ id: "contexto", label: "Contexto Histórico" });
+  if (hasFicha) tabs.push({ id: "ficha", label: "Especificações Técnicas" });
   if (livroBase.video_url) tabs.push({ id: "video", label: "Vídeo" });
-  if (hasAnalise) tabs.push({ id: "dados", label: "Análise da obra" });
-  const abaAtiva = tabs.some((tab) => tab.id === activeTab) ? activeTab : (tabs[0]?.id || "");
+  if (hasAnalise) tabs.push({ id: "dados", label: "Análise" });
+  const abaAtiva = tabs.some((tab) => tab.id === activeTab)
+    ? activeTab
+    : tabs[0]?.id || "";
 
   if (carregando) {
     return (
@@ -258,7 +353,9 @@ function Livro() {
     return (
       <div className={styles.page}>
         <div className={styles.container}>
-          <p className={styles.error}>{erro || "Obra indisponível no momento."}</p>
+          <p className={styles.error}>
+            {erro || "Obra indisponível no momento."}
+          </p>
           <button onClick={() => navigate(-1)} className={styles.botaoRoxo}>
             Voltar
           </button>
@@ -267,10 +364,22 @@ function Livro() {
     );
   }
 
-  const capaImagem = resolverUrlCapa(textoSeguro(livro.capa_url || livro.imagem_url || livro.imagem || livro.capas || livro.foto || "", ""));
+  const capaImagem = resolverUrlCapa(
+    textoSeguro(
+      livro.capa_url ||
+        livro.imagem_url ||
+        livro.imagem ||
+        livro.capas ||
+        livro.foto ||
+        "",
+      "",
+    ),
+  );
   const paginas = livro.paginas;
   const videoUrl = livro.video_url;
-  const rating = parseFloat(livro.avaliacao || livro.media_avaliacao || livro.avaliacao_media || 0);
+  const rating = parseFloat(
+    livro.avaliacao || livro.media_avaliacao || livro.avaliacao_media || 0,
+  );
 
   return (
     <div className={styles.page}>
@@ -297,9 +406,7 @@ function Livro() {
           </div>
 
           <div className={styles.heroContent}>
-            {generoTexto && (
-              <span className={styles.tag}>{generoTexto}</span>
-            )}
+            {generoTexto && <span className={styles.tag}>{generoTexto}</span>}
             <h1 className={styles.title}>{tituloTexto}</h1>
 
             {rating > 0 && (
@@ -357,7 +464,11 @@ function Livro() {
 
         {tabs.length > 0 && (
           <main className={styles.main}>
-            <div className={styles.tabsBar} role="tablist" aria-label="Seções do livro">
+            <div
+              className={styles.tabsBar}
+              role="tablist"
+              aria-label="Seções do livro"
+            >
               {tabs.map((t) => (
                 <button
                   key={t.id}
@@ -419,7 +530,9 @@ function Livro() {
                   )}
                   {caracteristicas && (
                     <article className={styles.field}>
-                      <p className={styles.fieldLabel}>Características literárias</p>
+                      <p className={styles.fieldLabel}>
+                        Características literárias
+                      </p>
                       <p className={styles.fieldValue}>{caracteristicas}</p>
                     </article>
                   )}
@@ -454,7 +567,9 @@ function Livro() {
                         <h3 className={styles.analysisCardTitle}>Simbolismo</h3>
                         <div className={styles.analysisCardContent}>
                           {simbolismoLines.map((line, idx) => (
-                            <p key={idx} className={styles.fieldValue}>{line}</p>
+                            <p key={idx} className={styles.fieldValue}>
+                              {line}
+                            </p>
                           ))}
                         </div>
                       </div>
@@ -462,10 +577,14 @@ function Livro() {
 
                     {engajamentoLines.length > 0 && (
                       <div className={styles.analysisCard}>
-                        <h3 className={styles.analysisCardTitle}>Engajamento</h3>
+                        <h3 className={styles.analysisCardTitle}>
+                          Engajamento
+                        </h3>
                         <div className={styles.analysisCardContent}>
                           {engajamentoLines.map((line, idx) => (
-                            <p key={idx} className={styles.fieldValue}>{line}</p>
+                            <p key={idx} className={styles.fieldValue}>
+                              {line}
+                            </p>
                           ))}
                         </div>
                       </div>
@@ -473,10 +592,14 @@ function Livro() {
 
                     {temasLines.length > 0 && (
                       <div className={styles.analysisCard}>
-                        <h3 className={styles.analysisCardTitle}>Temas chave</h3>
+                        <h3 className={styles.analysisCardTitle}>
+                          Temas chave
+                        </h3>
                         <div className={styles.analysisCardContent}>
                           {temasLines.map((line, idx) => (
-                            <p key={idx} className={styles.fieldValue}>{line}</p>
+                            <p key={idx} className={styles.fieldValue}>
+                              {line}
+                            </p>
                           ))}
                         </div>
                       </div>
@@ -484,13 +607,19 @@ function Livro() {
                   </div>
 
                   <div className={styles.introCard}>
-                    <h2 className={styles.sectionTitle}>Metadados do Registro</h2>
+                    <h2 className={styles.sectionTitle}>
+                      Metadados do Registro
+                    </h2>
                     <ul className={styles.list}>
                       {tituloTexto && (
-                        <li><strong>Título original:</strong> {tituloTexto}</li>
+                        <li>
+                          <strong>Título original:</strong> {tituloTexto}
+                        </li>
                       )}
                       {autorTexto && (
-                        <li><strong>Autor mapeado:</strong> {autorTexto}</li>
+                        <li>
+                          <strong>Autor mapeado:</strong> {autorTexto}
+                        </li>
                       )}
                       {livro.criadoEm && (
                         <li>
@@ -501,7 +630,9 @@ function Livro() {
                       {livro.atualizadoEm && (
                         <li>
                           <strong>Última sincronização:</strong>{" "}
-                          {new Date(livro.atualizadoEm).toLocaleDateString("pt-BR")}
+                          {new Date(livro.atualizadoEm).toLocaleDateString(
+                            "pt-BR",
+                          )}
                         </li>
                       )}
                     </ul>
