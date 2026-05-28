@@ -21,6 +21,30 @@ function obterTextoValido(...valores) {
   return valores.find((v) => typeof v === "string" && v.trim())?.trim() || "";
 }
 
+function extrairNomeObjeto(valor) {
+  if (!valor && valor !== 0) return "";
+  if (typeof valor === "string") return valor.trim();
+  if (typeof valor === "number") return String(valor);
+  if (Array.isArray(valor)) return valor.map(extrairNomeObjeto).filter(Boolean).join(", ");
+  if (typeof valor === "object") {
+    return (
+      obterTextoValido(
+        valor.nome,
+        valor.name,
+        valor.titulo,
+        valor.title,
+        valor.autor,
+        valor.author,
+        valor.personagem,
+        valor.personagemNome,
+        valor.label,
+        valor.displayName
+      ) || ""
+    );
+  }
+  return String(valor || "").trim();
+}
+
 function normalizarParagrafos(valor) {
   if (!valor) return [];
   if (Array.isArray(valor)) {
@@ -47,7 +71,6 @@ function Livro() {
   const [carregando, setCarregando] = useState(!livro);
   const [erro, setErro] = useState(null);
   const [activeTab, setActiveTab] = useState("");
-  const [listaPersonagens, setListaPersonagens] = useState([]);
 
   useEffect(() => {
     if (!livro && id) {
@@ -94,21 +117,34 @@ function Livro() {
                 });
               }
 
-              const termoBusca = decodeURIComponent(id).toLowerCase().trim();
-              
+              const termoBuscaRaw = decodeURIComponent(id).toLowerCase().trim();
+
+              const slugify = (text) =>
+                String(text || "")
+                  .toLowerCase()
+                  .normalize("NFD")
+                  .replace(/\p{Diacritic}/gu, "")
+                  .replace(/[^a-z0-9]+/g, "-")
+                  .replace(/(^-|-$)/g, "");
+
+              const termoBusca = termoBuscaRaw;
+
               dadosLivro = listaUnificada.find((l) => {
                 let t = l?.titulo || l?.title || l?.tituloDoLivro || "";
                 let autorMapeado = l?.autor || l?.author || l?.autores || "";
 
-                // Correção em tempo de execução para os metadados de Memórias Póstumas
-                if (t.toLowerCase().includes('nao informado') && autorMapeado.toLowerCase().includes('memorias postumas')) {
+                if (t.toLowerCase().includes("nao informado") && autorMapeado.toLowerCase().includes("memorias postumas")) {
                   t = "Memórias Póstumas de Brás Cubas";
                 }
 
                 const livroId = l?.id ? String(l.id).toLowerCase().trim() : "";
+                const tituloNormalizado = t.toLowerCase().trim();
+                const tituloSlug = slugify(t);
+
                 return (
-                  t.toLowerCase().trim() === termoBusca ||
-                  livroId === termoBusca
+                  tituloNormalizado === termoBusca ||
+                  livroId === termoBusca ||
+                  tituloSlug === termoBusca
                 );
               });
             }
@@ -129,53 +165,6 @@ function Livro() {
       fetchLivro();
     }
   }, [id, livro]);
-
-  // Sincroniza os dados de personagens e define a primeira aba padrão ativa
-  useEffect(() => {
-    if (livro) {
-      setListaPersonagens(
-        normalizarParagrafos(
-          livro.personagens_pt ||
-            livro.personagens ||
-            livro.personagens_en ||
-            "",
-        ),
-      );
-    }
-  }, [livro]);
-
-  // Efeito isolado para garantir que a activeTab seja calculada de forma correta e sem loops
-  useEffect(() => {
-    if (livro) {
-      const resumo = obterTextoValido(livro.sinopse, livro.descricao_pt, livro.descricao_en);
-      const personagensExistentes = normalizarParagrafos(livro.personagens_pt || livro.personagens || livro.personagens_en || "");
-      const contextoTexto = obterTextoValido(livro.contexto_historico_pt, livro.contexto_historico_en, livro.contexto_pt, livro.contexto_en);
-      
-      const hasFicha = Boolean(
-        obterTextoValido(livro.detalhes_autor_pt, livro.detalhes_autor_en) ||
-        obterTextoValido(livro.estilo_escrita_pt, livro.estilo_escrita_en) ||
-        obterTextoValido(livro.verossimilhanca_pt, livro.verossimilhanca_en) ||
-        obterTextoValido(livro.caracteristicas_literarias_pt, livro.caracteristicas_literarias_en) ||
-        obterTextoValido(livro.conclusao_pt, livro.conclusao_en) ||
-        livro.paginas ||
-        livro.ano_publicacao || 
-        livro.anoPublicacao
-      );
-
-      const hasAnalise = Boolean(
-        livro.simbolismo_pt || livro.simbolismo_en || 
-        livro.engajamento_pt || livro.engajamento_en || 
-        livro.temas_chave_pt || livro.temas_chave_en
-      );
-
-      if (resumo) setActiveTab("resumo");
-      else if (personagensExistentes.length > 0) setActiveTab("personagens");
-      else if (contextoTexto) setActiveTab("contexto");
-      else if (hasFicha) setActiveTab("ficha");
-      else if (livro.video_url) setActiveTab("video");
-      else if (hasAnalise) setActiveTab("dados");
-    }
-  }, [livro]);
 
   if (carregando) {
     return (
@@ -268,6 +257,33 @@ function Livro() {
 
   const hasFicha = Boolean(detalhesAutor || estilo || verossimilhanca || caracteristicas || conclusao || paginas || ano);
   const hasAnalise = Boolean(simbolismoTexto || engajamentoTexto || temasTexto);
+  const rawPersonagens = livro.personagens_pt || livro.personagens || livro.personagens_en || "";
+  let listaPersonagens = [];
+
+  if (Array.isArray(rawPersonagens)) {
+    listaPersonagens = rawPersonagens.flatMap((item) => {
+      if (typeof item === "string") return normalizarParagrafos(item);
+      if (typeof item === "object") {
+        const nm = extrairNomeObjeto(item);
+        return nm ? [nm] : [];
+      }
+      return [];
+    });
+  } else {
+    listaPersonagens = normalizarParagrafos(rawPersonagens);
+  }
+
+  const autorDisplay = extrairNomeObjeto(autor) || extrairNomeObjeto(livro.author) || extrairNomeObjeto(livro.autores) || "";
+  const activeTabPadrao = (() => {
+    if (resumo) return "resumo";
+    if (listaPersonagens.length > 0) return "personagens";
+    if (contextoTexto) return "contexto";
+    if (hasFicha) return "ficha";
+    if (video_url) return "video";
+    if (hasAnalise) return "dados";
+    return "";
+  })();
+  const abaAtiva = activeTab || activeTabPadrao;
 
   const tabs = [];
   if (resumo) tabs.push({ id: "resumo", label: "Resumo" });
@@ -334,9 +350,9 @@ function Livro() {
             <div className={styles.metaInfo}>
               {ano && <span>📅 {ano}</span>}
               {paginas && <span>📄 {paginas} páginas</span>}
-              {autor && (
+              {autorDisplay && (
                 <span>
-                  Autor: <strong>{autor}</strong>
+                  Autor: <strong>{autorDisplay}</strong>
                 </span>
               )}
             </div>
@@ -373,8 +389,8 @@ function Livro() {
                 <button
                   key={t.id}
                   role="tab"
-                  aria-selected={activeTab === t.id}
-                  className={activeTab === t.id ? styles.tabActive : styles.tab}
+                  aria-selected={abaAtiva === t.id}
+                  className={abaAtiva === t.id ? styles.tabActive : styles.tab}
                   onClick={() => setActiveTab(t.id)}
                 >
                   {t.label}
@@ -383,14 +399,14 @@ function Livro() {
             </div>
 
             <div className={styles.tabContent}>
-              {activeTab === "resumo" && resumo && (
+              {abaAtiva === "resumo" && resumo && (
                 <section className={styles.introCard}>
                   <h2 className={styles.sectionTitle}>Resumo da obra</h2>
                   <p className={styles.fieldValue}>{resumo}</p>
                 </section>
               )}
 
-              {activeTab === "personagens" && listaPersonagens.length > 0 && (
+              {abaAtiva === "personagens" && listaPersonagens.length > 0 && (
                 <section className={styles.introCard}>
                   <h2 className={styles.sectionTitle}>Personagens</h2>
                   <ul className={styles.list}>
@@ -401,14 +417,14 @@ function Livro() {
                 </section>
               )}
 
-              {activeTab === "contexto" && contextoTexto && (
+              {abaAtiva === "contexto" && contextoTexto && (
                 <section className={styles.introCard}>
                   <h2 className={styles.sectionTitle}>Contexto histórico</h2>
                   <p className={styles.fieldValue}>{contextoTexto}</p>
                 </section>
               )}
 
-              {activeTab === "ficha" && (
+              {abaAtiva === "ficha" && (
                 <section className={styles.grid}>
                   {detalhesAutor && (
                     <article className={styles.field}>
@@ -445,7 +461,7 @@ function Livro() {
                 </section>
               )}
 
-              {activeTab === "video" && video_url && (
+              {abaAtiva === "video" && video_url && (
                 <section className={styles.introCard}>
                   <h2 className={styles.sectionTitle}>Conteúdo em vídeo</h2>
                   <a
@@ -459,7 +475,7 @@ function Livro() {
                 </section>
               )}
 
-              {activeTab === "dados" && (
+              {abaAtiva === "dados" && (
                 <section>
                   <div className={styles.analysisGrid}>
                     {simbolismoLines.length > 0 && (
@@ -516,9 +532,9 @@ function Livro() {
                           <strong>Título original:</strong> {titulo}
                         </li>
                       )}
-                      {autor && (
+                      {autorDisplay && (
                         <li>
-                          <strong>Autor mapeado:</strong> {autor}
+                          <strong>Autor:</strong> {autorDisplay}
                         </li>
                       )}
                       {criadoEm && (
@@ -542,7 +558,7 @@ function Livro() {
         )}
       </div>
     </div>
-  );
+  ); 
 }
 
 export default Livro;
