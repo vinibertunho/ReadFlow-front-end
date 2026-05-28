@@ -50,8 +50,18 @@ function BookCard({ dados }) {
     const rating = typeof r === 'number' ? r : parseFloat(r) || 4.6;
 
     const handleClick = () => {
-        const slug = dados?.slug || dados?.titulo?.toLowerCase().replace(/\s+/g, '-') || 'livro';
-        navigate(`/livro/${slug}`, { state: { livro: dados } });
+        const criarSlug = (text) => {
+            if (!text) return '';
+            return String(text)
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/\p{Diacritic}/gu, '')
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/(^-|-$)/g, '');
+        };
+
+        const routeParam = id ? String(id) : criarSlug(titulo || dados?.title || dados?.tituloDoLivro || dados?.slug || '');
+        if (routeParam) navigate(`/livro/${routeParam}`, { state: { livro: dados } });
     };
 
     return (

@@ -13,6 +13,8 @@ function Navbar() {
         console.log('Mudar idioma');
     };
 
+    const toggleLanguage = alternarIdioma;
+
     const obterClasseLink = (path) => {
         return location.pathname === path ? `${styles.navLink} ${styles.active}` : styles.navLink;
     };
