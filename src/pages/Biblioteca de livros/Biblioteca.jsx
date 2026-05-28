@@ -101,6 +101,7 @@ function Biblioteca() {
   const [visibleCount, setVisibleCount] = useState(6);
 
   useEffect(() => {
+    const API_KEY = import.meta.env.VITE_API_KEY;
     const controller = new AbortController();
     const timeoutId = window.setTimeout(() => controller.abort(), 6000);
 
@@ -151,9 +152,8 @@ function Biblioteca() {
           setLivros([]);
         }
       } finally {
-        if (!controller.signal.aborted) {
-          setCarregando(false);
-        }
+        clearTimeout(timeoutId);
+        setCarregando(false);
       }
     }
 
@@ -449,5 +449,3 @@ function Biblioteca() {
     </>
   );
 }
-
-export default Biblioteca;

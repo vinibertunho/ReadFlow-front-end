@@ -29,16 +29,12 @@
 }
 
 .conteudoHeader {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 0.7fr 1fr 2fr;
     align-items: center;
     width: 100%;
-    max-width: 100%;
-    min-width: 300px;
-    min-height: 200px;
-    max-height: 800px;
-    padding-left: 150px;
-    gap: 10px;
+    padding-left: 10px;
+    gap: 50px;
 }
 
 .capaLivro {
@@ -105,7 +101,7 @@
     background-color: var(--purple-main);
     color: var(--bg-light);
     border: none;
-    padding: 0.1rem 10rem;
+    padding: 0.5rem 10rem;
     border-radius: 10px;
     cursor: pointer;
     width: fit-content;
@@ -172,14 +168,10 @@
 }
 
 .cards {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
     width: 100%;
-    max-width: 100%;
-    min-width: 250px;
-    min-height: 150px;
-    max-height: 2000px;
     justify-content: center;
 }
 
@@ -196,11 +188,6 @@
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    flex: 1 1 calc(33.333% - 16px);
-    max-width: calc(33.333% - 16px);
-    min-width: 250px;
-    min-height: 200px;
-    max-height: 500px;
 }
 
 .cards > a:hover {

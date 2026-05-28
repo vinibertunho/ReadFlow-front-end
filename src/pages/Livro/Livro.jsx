@@ -9,6 +9,19 @@ const API_KEY = import.meta.env.VITE_API_KEY;
 const CAPA_PADRAO =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600"><rect width="400" height="600" fill="%23eef2ff"/><rect x="24" y="24" width="352" height="552" rx="16" fill="%23dbeafe"/><text x="200" y="300" text-anchor="middle" fill="%23334155" font-size="28" font-family="Arial">Sem capa</text></svg>';
 
+const ALIASES_LIVROS = {
+  "o-guarani": ["o guarani", "guarani"],
+  guarani: ["o guarani", "guarani"],
+  "quartos-despejo": ["quartos de despejo", "quartos-despejo"],
+  "memorias-cubas": [
+    "memórias póstumas de brás cubas",
+    "memorias postumas de bras cubas",
+    "bras cubas",
+  ],
+  bookverse: ["bookverse"],
+  "vidas-secas": ["vidas secas", "vidas-secas"],
+};
+
 function resolverUrlCapa(url) {
   if (!url || typeof url !== "string") return "";
   const value = url.trim();
@@ -49,7 +62,7 @@ function normalizarParagrafos(valor) {
   if (!valor) return [];
   if (Array.isArray(valor)) {
     return valor
-      .flatMap((item) => String(item).split(/\n+/))
+      .flatMap((item) => textoSeguro(item, "").split(/\n+/))
       .map((item) => item.trim())
       .filter(Boolean);
   }
@@ -62,59 +75,99 @@ function normalizarParagrafos(valor) {
   return [];
 }
 
+function normalizarChave(valor = "") {
+  return String(valor)
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase()
+    .trim();
+}
+
+function obterChavesBusca(routeId = "") {
+  const chave = normalizarChave(routeId);
+  if (!chave) return [];
+
+  const candidatos = new Set([chave]);
+  (ALIASES_LIVROS[chave] || []).forEach((item) =>
+    candidatos.add(normalizarChave(item)),
+  );
+
+  return Array.from(candidatos);
+}
+
 function Livro() {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
+  const routeId =
+    id || location.pathname.split("/livro/")[1]?.split("/")[0] || "";
+
   const [livro, setLivro] = useState(location.state?.livro || null);
   const [carregando, setCarregando] = useState(!livro);
   const [erro, setErro] = useState(null);
+
+  // Controlamos apenas o ID da aba ativa como estado recarregável
   const [activeTab, setActiveTab] = useState("");
 
+  // 1. useEffect Corrigido (Apenas routeId como dependência)
   useEffect(() => {
-    if (!livro && id) {
-      async function fetchLivro() {
+    if (livro) return;
+
+    // Se o livro já veio por state, não busca de novo
+    async function fetchLivro() {
+      try {
+        setCarregando(true);
+        setErro(null);
+        const headersPadrao = {
+          "Content-Type": "application/json",
+          "x-api-key": API_KEY,
+          Authorization: `Bearer ${API_KEY}`,
+        };
+
+        let dadosLivro = null;
+
+        // Tenta buscar no banco local por ID
         try {
-          setCarregando(true);
-          const headersPadrao = {
-            "Content-Type": "application/json",
-            "x-api-key": API_KEY,
-            Authorization: `Bearer ${API_KEY}`,
-          };
-
-          let dadosLivro = null;
-
-          // 1. Tenta buscar no banco local por ID
-          try {
-            const response = await fetch(`${URL_API}/${id}`, {
-              headers: headersPadrao,
-            });
-            if (response.ok) {
-              dadosLivro = await response.json();
-            }
-          } catch {
-            console.log("Buscando rotas alternativas de integração...");
+          const response = await fetch(`${URL_API}/${routeId}`, {
+            headers: headersPadrao,
+          });
+          if (response.ok) {
+            dadosLivro = await response.json();
           }
+        } catch {
+          console.log("Buscando rotas alternativas de integração...");
+        }
 
-          // 2. Se não achar local, varre a API de integração buscando por ID ou Título
-          if (!dadosLivro) {
-            const resposta = await fetch(API_INTEGRACAO_URL, {
-              headers: headersPadrao,
-            });
-            if (resposta.ok) {
-              const resultadoJson = await resposta.json();
-              const dadosBase = resultadoJson?.data || resultadoJson || [];
+        // Se não achar local, varre a API de integração
+        if (!dadosLivro) {
+          const resposta = await fetch(API_INTEGRACAO_URL, {
+            headers: headersPadrao,
+          });
+          if (resposta.ok) {
+            const resultadoJson = await resposta.json();
+            const dadosBase = resultadoJson?.data || resultadoJson || [];
 
-              const listaUnificada = [];
-              if (Array.isArray(dadosBase)) {
-                dadosBase.forEach((item) => {
-                  if (item && Array.isArray(item.conteudo)) {
-                    listaUnificada.push(...item.conteudo);
-                  } else if (item) {
-                    listaUnificada.push(item);
-                  }
-                });
+            const listaUnificada = [];
+            if (Array.isArray(dadosBase)) {
+              dadosBase.forEach((item) => {
+                if (item && Array.isArray(item.conteudo)) {
+                  listaUnificada.push(...item.conteudo);
+                } else if (item) {
+                  listaUnificada.push(item);
+                }
+              });
+            }
+
+            const termosBusca = obterChavesBusca(routeId);
+
+            dadosLivro = listaUnificada.find((l) => {
+              let t = l?.titulo || l?.title || l?.tituloDoLivro || "";
+              let autorMapeado = l?.autor || l?.author || l?.autores || "";
+
+              if (!t && autorMapeado.toLowerCase().includes("memória")) {
+                t = autorMapeado;
+                autorMapeado = "Machado de Assis";
               }
 
               const termoBuscaRaw = decodeURIComponent(id).toLowerCase().trim();
@@ -149,22 +202,34 @@ function Livro() {
               });
             }
           }
-
-          if (!dadosLivro)
-            throw new Error("Livro não encontrado nos catálogos.");
-
-          setLivro(dadosLivro);
-        } catch (error) {
-          setErro(error.message);
-          console.error("Erro ao buscar livro:", error);
-        } finally {
-          setCarregando(false);
         }
-      }
 
+        if (!dadosLivro) throw new Error("Livro não encontrado nos catálogos.");
+
+        // Normaliza dados antes de guardar
+        if (
+          !dadosLivro.titulo &&
+          dadosLivro.autor &&
+          dadosLivro.autor.toLowerCase().includes("memória")
+        ) {
+          const autorOriginal = dadosLivro.autor;
+          dadosLivro.titulo = autorOriginal;
+          dadosLivro.autor = "Machado de Assis";
+        }
+
+        setLivro(dadosLivro);
+      } catch (error) {
+        setErro(error.message);
+        console.error("Erro ao buscar livro:", error);
+      } finally {
+        setCarregando(false);
+      }
+    }
+
+    if (routeId) {
       fetchLivro();
     }
-  }, [id, livro]);
+  }, [routeId, livro]);
 
   if (carregando) {
     return (
@@ -305,7 +370,7 @@ function Livro() {
             {capaImagem ? (
               <img
                 src={capaImagem}
-                alt={titulo || "Capa do livro"}
+                alt={tituloTexto || "Capa do livro"}
                 className={styles.coverImage}
                 onError={(event) => {
                   event.currentTarget.onerror = null;
@@ -318,12 +383,8 @@ function Livro() {
           </div>
 
           <div className={styles.heroContent}>
-            {(genero_pt || genero_en) && (
-              <span className={styles.tag}>{genero_pt || genero_en}</span>
-            )}
-            <h1 className={styles.title}>
-              {titulo || "Título não cadastrado"}
-            </h1>
+            {generoTexto && <span className={styles.tag}>{generoTexto}</span>}
+            <h1 className={styles.title}>{tituloTexto}</h1>
 
             {rating > 0 && (
               <div className={styles.ratingRow}>
@@ -348,7 +409,7 @@ function Livro() {
             )}
 
             <div className={styles.metaInfo}>
-              {ano && <span>📅 {ano}</span>}
+              {anoPublicacao && <span>📅 {anoPublicacao}</span>}
               {paginas && <span>📄 {paginas} páginas</span>}
               {autorDisplay && (
                 <span>
@@ -358,10 +419,10 @@ function Livro() {
             </div>
 
             <div className={styles.actions}>
-              {video_url && (
+              {videoUrl && (
                 <a
                   className={styles.primaryButton}
-                  href={video_url}
+                  href={videoUrl}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -465,7 +526,7 @@ function Livro() {
                 <section className={styles.introCard}>
                   <h2 className={styles.sectionTitle}>Conteúdo em vídeo</h2>
                   <a
-                    href={video_url}
+                    href={videoUrl}
                     target="_blank"
                     rel="noreferrer"
                     className={styles.primaryButton}
@@ -527,9 +588,9 @@ function Livro() {
                       Metadados do Registro
                     </h2>
                     <ul className={styles.list}>
-                      {titulo && (
+                      {tituloTexto && (
                         <li>
-                          <strong>Título original:</strong> {titulo}
+                          <strong>Título original:</strong> {tituloTexto}
                         </li>
                       )}
                       {autorDisplay && (
@@ -537,16 +598,18 @@ function Livro() {
                           <strong>Autor:</strong> {autorDisplay}
                         </li>
                       )}
-                      {criadoEm && (
+                      {livro.criadoEm && (
                         <li>
                           <strong>Data de cadastro:</strong>{" "}
-                          {new Date(criadoEm).toLocaleDateString("pt-BR")}
+                          {new Date(livro.criadoEm).toLocaleDateString("pt-BR")}
                         </li>
                       )}
-                      {atualizadoEm && (
+                      {livro.atualizadoEm && (
                         <li>
                           <strong>Última sincronização:</strong>{" "}
-                          {new Date(atualizadoEm).toLocaleDateString("pt-BR")}
+                          {new Date(livro.atualizadoEm).toLocaleDateString(
+                            "pt-BR",
+                          )}
                         </li>
                       )}
                     </ul>

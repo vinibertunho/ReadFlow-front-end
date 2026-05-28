@@ -32,6 +32,16 @@ function BookCard({ dados }) {
         genero_en,
     } = dados || {};
 
+    // Normaliza autor quando a API retorna um objeto ao invés de string
+    const autorLabel = typeof autor === 'string'
+        ? autor
+        : (autor && typeof autor === 'object')
+            ? (autor.nome || autor.name || autor.autor || 'Desconhecido')
+            : 'Desconhecido';
+
+    // Garante que sinopse seja string antes de usar slice
+    const sinopseText = typeof sinopse === 'string' ? sinopse : (sinopse && typeof sinopse === 'object' ? (sinopse.text || sinopse.descricao || JSON.stringify(sinopse)) : '');
+
 
     const capaImagem = resolverUrlCapa(capa_url || imagem_url || imagem || capas || foto || '');
     const [imgSrc, setImgSrc] = useState(capaImagem || CAPA_PADRAO);
@@ -74,12 +84,12 @@ function BookCard({ dados }) {
                 </div>
 
                 <h2 className={styles.titulo}>{titulo || 'Título não disponível'}</h2>
-                <p className={styles.autor}>{autor || 'Desconhecido'}</p>
+                <p className={styles.autor}>{autorLabel}</p>
                 {(ano_publicacao || anoPublicacao) ? (
                     <p className={styles.autor}>{ano_publicacao || anoPublicacao}</p>
                 ) : null}
-                {sinopse ? (
-                    <p className={styles.autor}>{sinopse.slice(0, 90)}...</p>
+                {sinopseText ? (
+                    <p className={styles.autor}>{sinopseText.slice(0, 90)}...</p>
                 ) : null}
 
                 <div className={styles.ratingRow}>
