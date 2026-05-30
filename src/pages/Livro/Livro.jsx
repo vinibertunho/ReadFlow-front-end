@@ -161,46 +161,44 @@ function Livro() {
 
             const termosBusca = obterChavesBusca(routeId);
 
+            const termoBuscaRaw = decodeURIComponent(routeId).toLowerCase().trim();
+
+            const slugify = (text) =>
+              String(text || "")
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/\p{Diacritic}/gu, "")
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/(^-|-$)/g, "");
+
+            const termoBusca = termoBuscaRaw;
+
             dadosLivro = listaUnificada.find((l) => {
               let t = l?.titulo || l?.title || l?.tituloDoLivro || "";
               let autorMapeado = l?.autor || l?.author || l?.autores || "";
+
+              if (
+                t.toLowerCase().includes("nao informado") &&
+                autorMapeado.toLowerCase().includes("memorias postumas")
+              ) {
+                t = "Memórias Póstumas de Brás Cubas";
+              }
 
               if (!t && autorMapeado.toLowerCase().includes("memória")) {
                 t = autorMapeado;
                 autorMapeado = "Machado de Assis";
               }
 
-              const termoBuscaRaw = decodeURIComponent(id).toLowerCase().trim();
+              const livroId = l?.id ? String(l.id).toLowerCase().trim() : "";
+              const tituloNormalizado = t.toLowerCase().trim();
+              const tituloSlug = slugify(t);
 
-              const slugify = (text) =>
-                String(text || "")
-                  .toLowerCase()
-                  .normalize("NFD")
-                  .replace(/\p{Diacritic}/gu, "")
-                  .replace(/[^a-z0-9]+/g, "-")
-                  .replace(/(^-|-$)/g, "");
-
-              const termoBusca = termoBuscaRaw;
-
-              dadosLivro = listaUnificada.find((l) => {
-                let t = l?.titulo || l?.title || l?.tituloDoLivro || "";
-                let autorMapeado = l?.autor || l?.author || l?.autores || "";
-
-                if (t.toLowerCase().includes("nao informado") && autorMapeado.toLowerCase().includes("memorias postumas")) {
-                  t = "Memórias Póstumas de Brás Cubas";
-                }
-
-                const livroId = l?.id ? String(l.id).toLowerCase().trim() : "";
-                const tituloNormalizado = t.toLowerCase().trim();
-                const tituloSlug = slugify(t);
-
-                return (
-                  tituloNormalizado === termoBusca ||
-                  livroId === termoBusca ||
-                  tituloSlug === termoBusca
-                );
-              });
-            }
+              return (
+                tituloNormalizado === termoBusca ||
+                livroId === termoBusca ||
+                tituloSlug === termoBusca
+              );
+            });
           }
         }
 
@@ -299,6 +297,11 @@ function Livro() {
     criadoEm,
     atualizadoEm,
   } = livro;
+
+  const tituloTexto = obterTextoValido(titulo, livro.titulo, livro.title, livro.tituloDoLivro);
+  const generoTexto = obterTextoValido(genero_pt, livro.genero, livro.genre);
+  const videoUrl = video_url;
+  const anoPublicacaoExibicao = ano_publicacao || anoPublicacao || null;
 
   const capaImagem = resolverUrlCapa(capa_url || imagem_url || imagem || capas || foto || "");
   const ano = ano_publicacao || anoPublicacao || null;
