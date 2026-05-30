@@ -57,18 +57,12 @@ export default function Home() {
                     </div>
                 </section>
 
+                <section className={styles.cardsSection}>
                     <div className={styles.cards}>
-                        <Link to={`/livro/${livroPrincipal.slug || livroPrincipal.titulo?.toLowerCase().replace(/\s+/g, '-') || 'livro'}`} className={styles.explorarObra}>
-                            <h4>Explorar obra</h4>
-                            <p>
-                                Acompanhe a narrativa desde a vida no Trapiche até os destinos
-                                traçados pelo bando liderado por Pedro Bala.
-                            </p>
-                            <p>Ler Análise → </p>
-                        </Link>
-
-                    <div className={styles.cards}>
-                        <Link to="/livro" className={styles.explorarObra}>
+                        <Link
+                            to={`/livro/${livroPrincipal.slug || livroPrincipal.titulo?.toLowerCase().replace(/\s+/g, '-') || 'livro'}`}
+                            className={styles.explorarObra}
+                        >
                             <h4>Explorar obra</h4>
                             <p>
                                 Acompanhe a narrativa desde a vida no Trapiche até os destinos
