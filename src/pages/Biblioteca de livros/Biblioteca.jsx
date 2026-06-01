@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, BookOpenText, Grid2x2, List, Search, SlidersHorizontal, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
@@ -6,7 +6,6 @@ import styles from "./Biblioteca.module.css";
 
 const API_LIVROS_URL = "https://readflow-m8o6.onrender.com/api/livros";
 const API_INTEGRACAO_URL = "https://readflow-m8o6.onrender.com/api/integracao";
-const API_KEY = import.meta.env.VITE_API_KEY;
 
 const CAPA_PADRAO =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600"><rect width="400" height="600" fill="%23eef2ff"/><rect x="24" y="24" width="352" height="552" rx="16" fill="%23dbeafe"/><text x="200" y="300" text-anchor="middle" fill="%23334155" font-size="28" font-family="Arial">Sem capa</text></svg>';
@@ -21,6 +20,18 @@ function resolverUrlCapa(url) {
 
 function normalizarTexto(valor) {
   return typeof valor === "string" ? valor.trim() : "";
+}
+
+function ehCapitaesDaAreia(livro) {
+  const tituloNormalizado = normalizarTexto(livro?.titulo || livro?.title || livro?.tituloDoLivro || "")
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
+
+  return (
+    tituloNormalizado.includes("capitaes da areia") ||
+    tituloNormalizado.includes("capitaes de areia")
+  );
 }
 
 function obterRating(livro) {
@@ -71,7 +82,10 @@ function normalizarLivro(livro) {
   let titulo = tituloOriginal;
   let autor = autorOriginal;
 
-  if (titulo.toLowerCase().includes("nao informado") && autor.toLowerCase().includes("memorias postumas")) {
+  const tituloCheck = titulo.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+  const autorCheck = autor.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+
+  if ((tituloCheck.includes("nao informado") || !titulo) && autorCheck.includes("memoria")) {
     titulo = "Memórias Póstumas de Brás Cubas";
     autor = "Machado de Assis";
   }
@@ -99,6 +113,8 @@ function Biblioteca() {
   const [sort, setSort] = useState("melhor");
   const [layout, setLayout] = useState("grid");
   const [visibleCount, setVisibleCount] = useState(6);
+  const [manualFeatured, setManualFeatured] = useState(null);
+  const featuredRef = useRef(null);
 
   useEffect(() => {
     const API_KEY = import.meta.env.VITE_API_KEY;
@@ -127,6 +143,7 @@ function Biblioteca() {
         const listaUnificada = [...extrairListaResposta(resLivros), ...extrairListaResposta(resIntegracao)]
           .map(normalizarLivro)
           .filter((livro) => livro.titulo)
+          .filter((livro) => !ehCapitaesDaAreia(livro))
           .reduce((acumulado, livro) => {
             const chave = obterChaveLivro(livro);
             const existente = acumulado.find((item) => obterChaveLivro(item) === chave);
@@ -207,6 +224,11 @@ function Biblioteca() {
   }, [livros, query, selectedGenre, sort]);
 
   const featuredBook = useMemo(() => {
+    const manualFeaturedValido = manualFeatured
+      ? livrosFiltrados.some((livro) => obterChaveLivro(livro) === obterChaveLivro(manualFeatured))
+      : false;
+
+    if (manualFeaturedValido) return manualFeatured;
     if (!livrosFiltrados.length) return null;
 
     return [...livrosFiltrados].sort((a, b) => {
@@ -215,7 +237,21 @@ function Biblioteca() {
 
       return obterAno(b) - obterAno(a);
     })[0];
-  }, [livrosFiltrados]);
+  }, [livrosFiltrados, manualFeatured]);
+
+  useEffect(() => {
+    if (!manualFeatured) return;
+    // espera um tick para garantir que o DOM foi atualizado
+    const id = window.setTimeout(() => {
+      try {
+        featuredRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      } catch {
+        // ignore
+      }
+    }, 120);
+
+    return () => window.clearTimeout(id);
+  }, [manualFeatured]);
 
   const livrosParaLista = useMemo(() => {
     const featuredKey = featuredBook ? obterChaveLivro(featuredBook) : null;
@@ -273,8 +309,8 @@ function Biblioteca() {
         </section>
 
         <section className={styles.featuredSection}>
-          {featuredBook ? (
-            <article className={styles.featuredCard}>
+            {featuredBook ? (
+            <article ref={featuredRef} className={styles.featuredCard}>
               <div className={styles.featuredMedia}>
                 <img
                   alt={featuredBook.titulo || "Capa do livro em destaque"}
@@ -304,8 +340,21 @@ function Biblioteca() {
                   <button
                     className={styles.primaryButton}
                     type="button"
-                    onClick={() => featuredBook.id && navigate(`/livro/${featuredBook.id}`, { state: { livro: featuredBook } })}
-                    disabled={!featuredBook.id}
+                    onClick={() => {
+                      const criarSlug = (text) => {
+                        if (!text) return '';
+                        return String(text)
+                          .toLowerCase()
+                          .normalize('NFD')
+                          .replace(/\p{Diacritic}/gu, '')
+                          .replace(/[^a-z0-9]+/g, '-')
+                          .replace(/(^-|-$)/g, '');
+                      };
+
+                      const routeParam = featuredBook.id ? String(featuredBook.id) : criarSlug(featuredBook.titulo || featuredBook.title || featuredBook.slug || featuredBook.tituloDoLivro || '');
+                      if (routeParam) navigate(`/livro/${routeParam}`, { state: { livro: featuredBook } });
+                    }}
+                    disabled={!((featuredBook && (featuredBook.id || featuredBook.titulo || featuredBook.title || featuredBook.slug)))}
                   >
                     Ler online
                   </button>
@@ -379,6 +428,15 @@ function Biblioteca() {
                 <article
                   className={`${styles.bookCard} ${layout === "list" ? styles.bookCardList : ""}`}
                   key={chave}
+                  onClick={() => setManualFeatured(livro)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setManualFeatured(livro);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
                 >
                   <div className={styles.bookMedia}>
                     <img
@@ -410,7 +468,8 @@ function Biblioteca() {
                             <button
                               className={styles.detailsButton}
                               type="button"
-                              onClick={() => {
+                              onClick={(event) => {
+                                event.stopPropagation();
                                 const criarSlug = (text) => {
                                   if (!text) return '';
                                   return String(text)

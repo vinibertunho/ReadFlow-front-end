@@ -315,6 +315,37 @@
   line-height: 1.7;
 }
 
+.metaGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.875rem;
+}
+
+.metaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.95rem 1rem;
+  border-radius: 1rem;
+  background: #f8fafc;
+  border: 0.0625rem solid rgba(148, 163, 184, 0.16);
+}
+
+.metaLabel {
+  color: #4338ca;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.metaValue {
+  color: #334155;
+  line-height: 1.6;
+  font-size: 0.96rem;
+  font-weight: 600;
+}
+
 .status,
 .error {
   display: grid;
@@ -374,6 +405,9 @@
   .listSection {
     padding: 1rem;
     border-radius: 1rem;
+  }
+  .metaGrid {
+    grid-template-columns: 1fr;
   }
   .grid,
   .listSection {
