@@ -4,7 +4,7 @@ import Navbar from '../../components/Navbar/Navbar';
 import styles from './Home.module.css';
 import criancasCorrendo from '../../assets/criancas.jpg';
 import capa from '../../assets/capa.png';
-import { ExternalLink, Library } from 'lucide-react'; // Importado o Library aqui
+import { ExternalLink, Library } from 'lucide-react';
 
 export default function Home() {
     const [titulo] = useState('Capitães da Areia');
@@ -51,7 +51,6 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/* Seção 'destaques' agrupando a Apresentação e os Cards */}
                 <section className={styles.destaques}>
                     <div className={styles.apresentacao}>
                         <h3>Apresentação do Projeto</h3>
@@ -60,7 +59,7 @@ export default function Home() {
 
                     <div className={styles.cards}>
                         <Link
-                            to={`/livro/${livroPrincipal.slug || livroPrincipal.titulo?.toLowerCase().replace(/\s+/g, '-')} || 'livro'}`}
+                            to={`/livro/${livroPrincipal.slug || livroPrincipal.titulo?.toLowerCase().replace(/\s+/g, '-') || 'livro'}`}
                             className={styles.explorarObra}
                         >
                             <h4>Explorar obra</h4>
@@ -140,7 +139,6 @@ export default function Home() {
                                 </span>
                             </div>
                             
-                            {/* Troca dos espaços brancos por um ícone estilizado no CSS */}
                             <div className={styles.decoracaoIcone}>
                                 <Library size={180} strokeWidth={1} />
                             </div>
