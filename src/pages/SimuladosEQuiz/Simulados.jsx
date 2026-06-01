@@ -152,7 +152,9 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
                                         <button
                                             key={alt.id}
                                             onClick={() => selecionarAlternativa(alt.id)}
-                                            className={`${styles.alternativaBtn} ${selecionada ? styles.alternativaSelecionada : ''}`}>
+                                            className={`${styles.alternativaBtn} ${
+                                                selecionada ? styles.alternativaSelecionada : ''
+                                            }`}>
                                             <div className={styles.radioCircle}>
                                                 {selecionada && (
                                                     <div className={styles.radioInner} />
@@ -187,7 +189,6 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
                 </div>
             </div>
 
-            {/* Bloco Direito: Mapa de Questões (Sem a div extra atrapalhando) */}
             <div className={styles.mapaCard}>
                 <h3 className={styles.mapaTitulo}>Mapa de Questões</h3>
                 <div className={styles.mapaGrid}>
