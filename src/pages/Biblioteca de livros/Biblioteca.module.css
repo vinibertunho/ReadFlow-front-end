@@ -4,47 +4,68 @@
   padding: 2rem 1.5rem 4rem;
 }
 
+/* Alterado de Grid para Flex */
 .statusBox {
   min-height: 40vh;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   gap: 1rem;
   color: #0f172a;
   font-size: 1.05rem;
   font-weight: 600;
 }
 
+/* Alterado de Grid para Flex */
 .heroSection {
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(18rem, 1fr) auto;
-  gap: 1rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
   margin-bottom: 4rem;
 }
 
-.heroCopy h1 {
-  margin: 0.5rem 0 0;
-  font-size: clamp(2.2rem, 4vw, 4rem);
-  line-height: 1.04;
-  color: #0f1c2c;
-  letter-spacing: -0.04em;
+.heroCopy {
+  flex: 1 1 44rem;
 }
 
+/* UPGRADE VISUAL: Título mais imponente com efeito gradiente moderno */
+.heroCopy h1 {
+  margin: 0.75rem 0 0;
+  font-size: clamp(2.4rem, 5vw, 4.2rem);
+  line-height: 1.08;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #0f1c2c 20%, #1b263b 60%, #47607e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* UPGRADE VISUAL: Kicker transformado em uma tag minimalista elegante */
 .kicker {
   margin: 0;
   text-transform: uppercase;
-  letter-spacing: 0.22em;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #47607e;
+  letter-spacing: 0.2em;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #1e40af;
+  background: #eff6ff;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.5rem;
+  display: inline-block;
 }
 
+/* UPGRADE VISUAL: Ajuste na leitura e espaçamento do parágrafo */
 .heroText {
-  margin: 1rem 0 0;
+  margin: 1.25rem 0 0;
   max-width: 44rem;
-  color: #45474d;
-  font-size: 1.05rem;
-  line-height: 1.7;
+  color: #4b5563;
+  font-size: 1.1rem;
+  line-height: 1.75;
 }
 
 .searchShell {
@@ -113,9 +134,10 @@
   margin-bottom: 4rem;
 }
 
+/* Alterado de Grid para Flex */
 .featuredCard {
-  display: grid;
-  grid-template-columns: minmax(16rem, 0.9fr) minmax(0, 1.1fr);
+  display: flex;
+  flex-direction: row;
   overflow: hidden;
   border-radius: 1.25rem;
   border: 1px solid #c5c6cd;
@@ -124,6 +146,7 @@
 }
 
 .featuredMedia {
+  flex: 0 0 45%;
   min-height: 28rem;
   background: #dbe4f4;
 }
@@ -136,6 +159,7 @@
 }
 
 .featuredContent {
+  flex: 1 1 55%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -261,11 +285,13 @@
   background: #fff;
 }
 
+/* Alterado de inline-grid para inline-flex */
 .viewButton {
   width: 2.2rem;
   height: 2.2rem;
-  display: inline-grid;
-  place-items: center;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
   border-radius: 0.7rem;
   background: transparent;
   color: #75777d;
@@ -285,14 +311,25 @@
   font-weight: 700;
 }
 
+/* Alterado de Grid para Flexbox com cálculo de largura */
 .collectionGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1.2rem;
 }
 
+.collectionGrid > * {
+  flex: 0 0 calc((100% - (2 * 1.2rem)) / 3); /* Substitui as 3 colunas do Grid */
+  min-width: 0;
+}
+
+/* Modo lista simplesmente redefine a direção do flex */
 .listLayout {
-  grid-template-columns: 1fr;
+  flex-direction: column;
+}
+
+.listLayout > * {
+  flex: 1 1 100%;
 }
 
 .bookCard {
@@ -310,9 +347,18 @@
   box-shadow: 0 20px 38px rgba(15, 28, 44, 0.1);
 }
 
+/* Alterado de Grid para Flex */
 .bookCardList {
-  display: grid;
-  grid-template-columns: 10rem minmax(0, 1fr);
+  display: flex;
+  flex-direction: row;
+}
+
+.bookCardList .bookMedia {
+  flex: 0 0 10rem;
+}
+
+.bookCardList .bookContent {
+  flex: 1;
 }
 
 .bookMedia {
@@ -417,9 +463,12 @@
   color: #45474d;
 }
 
+/* Alterado de Grid para Flex */
 .emptyState {
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   min-height: 20rem;
 }
 
@@ -428,21 +477,26 @@
   text-align: center;
 }
 
+/* --- MEDIA QUERIES REFATORADOS PARA FLEX --- */
+
 @media (max-width: 1100px) {
   .heroSection {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .featuredCard {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 
   .featuredMedia {
+    flex: 1 1 auto;
     min-height: 20rem;
   }
 
-  .collectionGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Muda para 2 colunas no tablet */
+  .collectionGrid > * {
+    flex: 0 0 calc((100% - 1.2rem) / 2);
   }
 }
 
@@ -451,12 +505,13 @@
     padding: 1.25rem 1rem 3rem;
   }
 
-  .collectionGrid {
-    grid-template-columns: 1fr;
+  /* Muda para 1 coluna no celular */
+  .collectionGrid > * {
+    flex: 0 0 100%;
   }
 
   .bookCardList {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 
   .collectionTools {

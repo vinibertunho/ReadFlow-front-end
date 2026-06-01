@@ -282,14 +282,15 @@ function Biblioteca() {
     <>
       <Navbar />
       <main className={styles.pageShell}>
-        <section className={styles.heroSection}>
-          <div className={styles.heroCopy}>
-            <p className={styles.kicker}>Biblioteca Global</p>
-            <h1>Acervo literário com busca, filtros e catálogo vivo via API.</h1>
-            <p className={styles.heroText}>
-              Explore obras clássicas, descubra autores, navegue por gêneros e abra a análise de cada livro sem sair da biblioteca.
-            </p>
-          </div>
+  <section className={styles.heroSection}>
+    <div className={styles.heroCopy}>
+      <p className={styles.kicker}>Biblioteca Global</p>
+      <h1>Explore o acervo literário</h1>
+      <p className={styles.heroText}>
+        Explore obras clássicas, descubra autores, navegue por gêneros e abra a análise de cada livro sem sair da biblioteca.
+      </p>
+    </div>
+  
 
           <div className={styles.searchShell}>
             <Search className={styles.searchIcon} size={18} />
