@@ -16,7 +16,6 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/biblioteca" element={<Biblioteca />} />
         <Route path="/livro/:slug" element={<Livro />} />
-        {/* Rotas antigas redirecionadas para a estrutura nova */}
         <Route path="/guarani" element={<Navigate to="/livro/guarani" replace />} />
         <Route path="/quartos-despejo" element={<Navigate to="/livro/quartos-despejo" replace />} />
         <Route path="/memorias-cubas" element={<Navigate to="/livro/memorias-cubas" replace />} />
