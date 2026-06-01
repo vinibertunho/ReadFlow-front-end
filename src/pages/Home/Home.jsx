@@ -65,7 +65,6 @@ export default function Home() {
                     </div>
                 </section>
 
-                {/* Seção 'destaques' agrupando a Apresentação e os Cards */}
                 <section className={styles.destaques}>
                     <div className={styles.apresentacao}>
                         <h3>Apresentação do Projeto</h3>
@@ -154,7 +153,6 @@ export default function Home() {
                                 </span>
                             </div>
                             
-                            {/* Troca dos espaços brancos por um ícone estilizado no CSS */}
                             <div className={styles.decoracaoIcone}>
                                 <Library size={180} strokeWidth={1} />
                             </div>

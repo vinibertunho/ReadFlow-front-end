@@ -255,8 +255,6 @@
     text-transform: uppercase;
 }
 
-/* --- Seção Consertada do Cardzão da Biblioteca --- */
-
 .containerBibliotecaCard {
     padding: 0 4rem 6rem 4rem;
     max-width: 1200px;
@@ -324,24 +322,20 @@
     transform: scale(1.02);
 }
 
-/* Decoração com ícone do Lucide, sem requisições de API ou imagens */
 .decoracaoIcone {
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--purple-main);
-    opacity: 0.15; /* Deixa o ícone sutil como marca d'água */
+    opacity: 0.15;
     transition: transform 0.5s ease, opacity 0.5s ease;
     z-index: 1;
 }
 
-/* Efeito de rotação leve no ícone ao passar o mouse */
 .cardzaoBiblioteca:hover .decoracaoIcone {
     transform: scale(1.1) rotate(8deg);
     opacity: 0.25;
 }
-
-/* --- Responsividade --- */
 
 @media (max-width: 1024px) {
     .conteudoHeader {
@@ -390,7 +384,7 @@
     }
 
     .decoracaoIcone {
-        display: none; /* Some em telas pequenas para economizar espaço vertical */
+        display: none;
     }
 
     .conteudoCardzao h3 {
