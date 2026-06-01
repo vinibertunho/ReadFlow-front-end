@@ -6,10 +6,22 @@ import criancasCorrendo from '../../assets/criancas.jpg';
 import capa from '../../assets/capa.png';
 import { ExternalLink, Library } from 'lucide-react';
 
+const OBRA_DESTAQUE_SLUG = import.meta.env.VITE_OBRA_DESTAQUE_SLUG || 'capitaes-da-areia';
+const OBRA_DESTAQUE_TITULO = import.meta.env.VITE_OBRA_DESTAQUE_TITULO || 'Capitães da Areia';
+const OBRA_DESTAQUE_AUTOR = import.meta.env.VITE_OBRA_DESTAQUE_AUTOR || 'Jorge Amado';
+const OBRA_DESTAQUE_RESUMO =
+    import.meta.env.VITE_OBRA_DESTAQUE_RESUMO ||
+    'Acompanhe a vida dos meninos de rua que lutam pela sobrevivência nas ruas de Salvador.';
+
 export default function Home() {
-    const [titulo] = useState('Capitães da Areia');
+    const [titulo] = useState(OBRA_DESTAQUE_TITULO);
     const [livroPrincipal] = useState({
-        resumo: 'Acompanhe a vida dos meninos de rua que lutam pela sobrevivência nas ruas de Salvador.',
+        slug: OBRA_DESTAQUE_SLUG,
+        resumo: OBRA_DESTAQUE_RESUMO,
+    });
+    const [livro] = useState({
+        titulo: OBRA_DESTAQUE_TITULO,
+        autor: OBRA_DESTAQUE_AUTOR,
     });
 
     const obterClasseLink = (path) => {
@@ -35,10 +47,12 @@ export default function Home() {
                             <h4>Obra de Jorge Amado</h4>
                             <h1>{titulo}</h1>
                             <p>{livroPrincipal.resumo || 'resumo do livro aqui rs'}</p>
-                            
-                            <Link to="/livro" className={obterClasseLink('/livro')}>
-                                <button>Explorar Obra</button>
-                            </Link>
+                            <li>
+                                <Link to={`/livro/${livroPrincipal.slug || OBRA_DESTAQUE_SLUG}`} className={obterClasseLink(`/livro/${livroPrincipal.slug || OBRA_DESTAQUE_SLUG}`)}>
+                                    <button>Explorar Obra</button>
+                                </Link>
+                            </li>
+
                         </div>
 
                         <div className={styles.criancasCorrendo}>
@@ -59,7 +73,7 @@ export default function Home() {
 
                     <div className={styles.cards}>
                         <Link
-                            to={`/livro/${livroPrincipal.slug || livroPrincipal.titulo?.toLowerCase().replace(/\s+/g, '-') || 'livro'}`}
+                            to={`/livro/${livroPrincipal.slug || OBRA_DESTAQUE_SLUG}`}
                             className={styles.explorarObra}
                         >
                             <h4>Explorar obra</h4>

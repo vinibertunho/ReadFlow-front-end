@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import styles from "./Livro.module.css";
 
 const URL_API = "https://readflow-m8o6.onrender.com/api/livros";
-const API_INTEGRACAO_URL = "https://readflow-m8o6.onrender.com/api/integracao";
+const PERSONAGENS_API = "https://readflow-m8o6.onrender.com/api/personagens";
 const API_KEY = import.meta.env.VITE_API_KEY;
 
 const CAPA_PADRAO =
@@ -13,6 +13,7 @@ const ALIASES_LIVROS = {
   "o-guarani": ["o guarani", "guarani"],
   guarani: ["o guarani", "guarani"],
   "quartos-despejo": ["quartos de despejo", "quartos-despejo"],
+  "capitaes-da-areia": ["capitães da areia", "capitaes da areia", "capitães de areia"],
   "memorias-cubas": [
     "memórias póstumas de brás cubas",
     "memorias postumas de bras cubas",
@@ -62,13 +63,31 @@ function normalizarParagrafos(valor) {
   if (!valor) return [];
   if (Array.isArray(valor)) {
     return valor
-      .flatMap((item) => textoSeguro(item, "").split(/\n+/))
+      .flatMap((item) => obterTextoValido(item, "").split(/\n+/))
       .map((item) => item.trim())
       .filter(Boolean);
   }
+  if (typeof valor === "object") {
+    return Object.values(valor)
+      .flatMap((item) => normalizarParagrafos(item))
+      .filter(Boolean);
+  }
   if (typeof valor === "string") {
+    const texto = valor.trim();
+
+    if (!texto) return [];
+
+    if ((texto.startsWith("[") && texto.endsWith("]")) || (texto.startsWith("{") && texto.endsWith("}"))) {
+      try {
+        const parsed = JSON.parse(texto);
+        return normalizarParagrafos(parsed);
+      } catch {
+        // segue o fluxo padrão quando não for JSON válido
+      }
+    }
+
     return valor
-      .split(/\n+|\s*;\s*/)
+      .split(/\n+|\s*;\s*|\s*,\s*|\s*\|\s*/)
       .map((item) => item.trim())
       .filter(Boolean);
   }
@@ -95,6 +114,23 @@ function obterChavesBusca(routeId = "") {
   return Array.from(candidatos);
 }
 
+function extrairListaResposta(resposta) {
+  if (!resposta) return [];
+
+  const dadosBase = resposta.data ?? resposta;
+
+  if (Array.isArray(dadosBase)) return dadosBase;
+
+  if (dadosBase && typeof dadosBase === "object") {
+    if (Array.isArray(dadosBase.conteudo)) return dadosBase.conteudo;
+    if (Array.isArray(dadosBase.personagens)) return dadosBase.personagens;
+    if (Array.isArray(dadosBase.items)) return dadosBase.items;
+    if (Array.isArray(dadosBase.data)) return dadosBase.data;
+  }
+
+  return [];
+}
+
 function Livro() {
   const { id } = useParams();
   const location = useLocation();
@@ -106,6 +142,7 @@ function Livro() {
   const [livro, setLivro] = useState(location.state?.livro || null);
   const [carregando, setCarregando] = useState(!livro);
   const [erro, setErro] = useState(null);
+  const [personagens, setPersonagens] = useState([]);
 
   // Controlamos apenas o ID da aba ativa como estado recarregável
   const [activeTab, setActiveTab] = useState("");
@@ -114,36 +151,28 @@ function Livro() {
   useEffect(() => {
     if (livro) return;
 
-    // Se o livro já veio por state, não busca de novo
     async function fetchLivro() {
       try {
         setCarregando(true);
         setErro(null);
         const headersPadrao = {
           "Content-Type": "application/json",
-          "x-api-key": API_KEY,
-          Authorization: `Bearer ${API_KEY}`,
         };
+
+        if (API_KEY) {
+          headersPadrao["x-api-key"] = API_KEY;
+          headersPadrao.Authorization = `Bearer ${API_KEY}`;
+        }
 
         let dadosLivro = null;
 
-        // Tenta buscar no banco local por ID
         try {
-          const response = await fetch(`${URL_API}/${routeId}`, {
+          const resposta = await fetch(URL_API, {
             headers: headersPadrao,
           });
-          if (response.ok) {
-            dadosLivro = await response.json();
+          if (resposta.status === 401) {
+            throw new Error("A API exigiu autenticação. Defina VITE_API_KEY no .env para acessar os livros.");
           }
-        } catch {
-          console.log("Buscando rotas alternativas de integração...");
-        }
-
-        // Se não achar local, varre a API de integração
-        if (!dadosLivro) {
-          const resposta = await fetch(API_INTEGRACAO_URL, {
-            headers: headersPadrao,
-          });
           if (resposta.ok) {
             const resultadoJson = await resposta.json();
             const dadosBase = resultadoJson?.data || resultadoJson || [];
@@ -160,9 +189,7 @@ function Livro() {
             }
 
             const termosBusca = obterChavesBusca(routeId);
-
-            const termoBuscaRaw = decodeURIComponent(routeId).toLowerCase().trim();
-
+            const termoBuscaRaw = normalizarChave(decodeURIComponent(routeId));
             const slugify = (text) =>
               String(text || "")
                 .toLowerCase()
@@ -173,43 +200,45 @@ function Livro() {
 
             const termoBusca = termoBuscaRaw;
 
-            dadosLivro = listaUnificada.find((l) => {
+            const matchLivro = listaUnificada.find((l) => {
               let t = l?.titulo || l?.title || l?.tituloDoLivro || "";
-              let autorMapeado = l?.autor || l?.author || l?.autores || "";
+              const autorMapeado = l?.autor || l?.author || l?.autores || "";
 
-              if (
-                t.toLowerCase().includes("nao informado") &&
-                autorMapeado.toLowerCase().includes("memorias postumas")
-              ) {
+              if (normalizarChave(t).includes("nao informado") && normalizarChave(autorMapeado).includes("memorias postumas")) {
                 t = "Memórias Póstumas de Brás Cubas";
               }
 
-              if (!t && autorMapeado.toLowerCase().includes("memória")) {
+              if (!t && normalizarChave(autorMapeado).includes("memoria")) {
                 t = autorMapeado;
-                autorMapeado = "Machado de Assis";
               }
 
               const livroId = l?.id ? String(l.id).toLowerCase().trim() : "";
-              const tituloNormalizado = t.toLowerCase().trim();
+              const tituloNormalizado = normalizarChave(t);
               const tituloSlug = slugify(t);
+              const tituloSlugNormalizado = normalizarChave(tituloSlug);
+              const termosNormalizados = termosBusca.map(normalizarChave);
 
               return (
                 tituloNormalizado === termoBusca ||
+                tituloSlugNormalizado === termoBusca ||
                 livroId === termoBusca ||
-                tituloSlug === termoBusca
+                termosNormalizados.includes(tituloNormalizado) ||
+                termosNormalizados.includes(tituloSlugNormalizado)
               );
             });
+
+            if (matchLivro) {
+              dadosLivro = matchLivro;
+            }
           }
+        } catch {
+          console.log("Erro ao buscar catálogo principal.");
         }
 
         if (!dadosLivro) throw new Error("Livro não encontrado nos catálogos.");
 
         // Normaliza dados antes de guardar
-        if (
-          !dadosLivro.titulo &&
-          dadosLivro.autor &&
-          dadosLivro.autor.toLowerCase().includes("memória")
-        ) {
+        if (!dadosLivro.titulo && dadosLivro.autor && normalizarChave(dadosLivro.autor).includes("memoria")) {
           const autorOriginal = dadosLivro.autor;
           dadosLivro.titulo = autorOriginal;
           dadosLivro.autor = "Machado de Assis";
@@ -228,6 +257,64 @@ function Livro() {
       fetchLivro();
     }
   }, [routeId, livro]);
+
+  useEffect(() => {
+    if (normalizarChave(routeId) !== "capitaes-da-areia") {
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 6000);
+
+    async function fetchPersonagens() {
+      try {
+        const headersPadrao = {
+          "Content-Type": "application/json",
+        };
+
+        if (API_KEY) {
+          headersPadrao["x-api-key"] = API_KEY;
+          headersPadrao.Authorization = `Bearer ${API_KEY}`;
+        }
+
+        const resposta = await fetch(PERSONAGENS_API, {
+          headers: headersPadrao,
+          signal: controller.signal,
+        });
+
+        if (!resposta.ok) return;
+
+        const resultadoJson = await resposta.json();
+        const itens = extrairListaResposta(resultadoJson);
+
+        const nomes = itens
+          .flatMap((item) => {
+            if (typeof item === "string") return normalizarParagrafos(item);
+            if (typeof item === "object") {
+              const nome = extrairNomeObjeto(item);
+              return nome ? [nome] : [];
+            }
+            return [];
+          })
+          .filter(Boolean);
+
+        setPersonagens(Array.from(new Set(nomes)));
+      } catch (error) {
+        if (error?.name !== "AbortError") {
+          console.error("Erro ao buscar personagens:", error);
+        }
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    }
+
+    fetchPersonagens();
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [routeId]);
 
   if (carregando) {
     return (
@@ -263,7 +350,6 @@ function Livro() {
     capas,
     foto,
     genero_pt,
-    genero_en,
     sinopse,
     descricao_pt,
     descricao_en,
@@ -294,15 +380,11 @@ function Livro() {
     avaliacao,
     media_avaliacao,
     avaliacao_media,
-    criadoEm,
-    atualizadoEm,
   } = livro;
 
   const tituloTexto = obterTextoValido(titulo, livro.titulo, livro.title, livro.tituloDoLivro);
   const generoTexto = obterTextoValido(genero_pt, livro.genero, livro.genre);
   const videoUrl = video_url;
-  const anoPublicacaoExibicao = ano_publicacao || anoPublicacao || null;
-
   const capaImagem = resolverUrlCapa(capa_url || imagem_url || imagem || capas || foto || "");
   const ano = ano_publicacao || anoPublicacao || null;
   const rating = parseFloat(avaliacao || media_avaliacao || avaliacao_media || 0);
@@ -325,41 +407,32 @@ function Livro() {
 
   const hasFicha = Boolean(detalhesAutor || estilo || verossimilhanca || caracteristicas || conclusao || paginas || ano);
   const hasAnalise = Boolean(simbolismoTexto || engajamentoTexto || temasTexto);
-  const rawPersonagens = livro.personagens_pt || livro.personagens || livro.personagens_en || "";
-  let listaPersonagens = [];
-
-  if (Array.isArray(rawPersonagens)) {
-    listaPersonagens = rawPersonagens.flatMap((item) => {
-      if (typeof item === "string") return normalizarParagrafos(item);
-      if (typeof item === "object") {
-        const nm = extrairNomeObjeto(item);
-        return nm ? [nm] : [];
-      }
-      return [];
-    });
-  } else {
-    listaPersonagens = normalizarParagrafos(rawPersonagens);
-  }
-
   const autorDisplay = extrairNomeObjeto(autor) || extrairNomeObjeto(livro.author) || extrairNomeObjeto(livro.autores) || "";
-  const activeTabPadrao = (() => {
-    if (resumo) return "resumo";
-    if (listaPersonagens.length > 0) return "personagens";
-    if (contextoTexto) return "contexto";
-    if (hasFicha) return "ficha";
-    if (video_url) return "video";
-    if (hasAnalise) return "dados";
-    return "";
-  })();
+  const activeTabPadrao = "resumo";
   const abaAtiva = activeTab || activeTabPadrao;
 
-  const tabs = [];
-  if (resumo) tabs.push({ id: "resumo", label: "Resumo" });
-  if (listaPersonagens.length > 0) tabs.push({ id: "personagens", label: "Personagens" });
-  if (contextoTexto) tabs.push({ id: "contexto", label: "Contexto histórico" });
-  if (hasFicha) tabs.push({ id: "ficha", label: "Ficha técnica" });
-  if (video_url) tabs.push({ id: "video", label: "Vídeo" });
-  if (hasAnalise) tabs.push({ id: "dados", label: "Análise da obra" });
+  const routeNormalizado = normalizarChave(routeId);
+  const isCapitaesDaAreia =
+    routeNormalizado === "capitaes-da-areia" ||
+    normalizarChave(tituloTexto).includes("capitaes da areia") ||
+    normalizarChave(tituloTexto).includes("capitaes de areia");
+
+  const listaPersonagens = isCapitaesDaAreia ? personagens : [];
+
+  const tabs = [
+    { id: "resumo", label: "Resumo" },
+    { id: "contexto", label: "Contexto histórico" },
+    { id: "ficha", label: "Ficha técnica" },
+    { id: "dados", label: "Análise da obra" },
+  ];
+
+  if (isCapitaesDaAreia && listaPersonagens.length > 0) {
+    tabs.splice(1, 0, { id: "personagens", label: "Personagens" });
+  }
+
+  if (videoUrl) {
+    tabs.splice(3, 0, { id: "video", label: "Vídeo" });
+  }
 
   return (
     <div className={styles.page}>
@@ -470,7 +543,28 @@ function Livro() {
                 </section>
               )}
 
-              {abaAtiva === "personagens" && listaPersonagens.length > 0 && (
+              {abaAtiva === "resumo" && !resumo && (
+                <section className={styles.introCard}>
+                  <h2 className={styles.sectionTitle}>Resumo da obra</h2>
+                  <p className={styles.fieldValue}>Resumo indisponível no momento.</p>
+                </section>
+              )}
+
+              {abaAtiva === "contexto" && contextoTexto && (
+                <section className={styles.introCard}>
+                  <h2 className={styles.sectionTitle}>Contexto histórico</h2>
+                  <p className={styles.fieldValue}>{contextoTexto}</p>
+                </section>
+              )}
+
+              {abaAtiva === "contexto" && !contextoTexto && (
+                <section className={styles.introCard}>
+                  <h2 className={styles.sectionTitle}>Contexto histórico</h2>
+                  <p className={styles.fieldValue}>Contexto histórico indisponível no momento.</p>
+                </section>
+              )}
+
+              {abaAtiva === "personagens" && isCapitaesDaAreia && listaPersonagens.length > 0 && (
                 <section className={styles.introCard}>
                   <h2 className={styles.sectionTitle}>Personagens</h2>
                   <ul className={styles.list}>
@@ -481,10 +575,10 @@ function Livro() {
                 </section>
               )}
 
-              {abaAtiva === "contexto" && contextoTexto && (
+              {abaAtiva === "personagens" && isCapitaesDaAreia && listaPersonagens.length === 0 && (
                 <section className={styles.introCard}>
-                  <h2 className={styles.sectionTitle}>Contexto histórico</h2>
-                  <p className={styles.fieldValue}>{contextoTexto}</p>
+                  <h2 className={styles.sectionTitle}>Personagens</h2>
+                  <p className={styles.fieldValue}>Personagens indisponíveis no momento.</p>
                 </section>
               )}
 
@@ -522,10 +616,16 @@ function Livro() {
                       <p className={styles.fieldValue}>{conclusao}</p>
                     </article>
                   )}
+                  {!hasFicha && (
+                    <article className={styles.field}>
+                      <p className={styles.fieldLabel}>Ficha técnica</p>
+                      <p className={styles.fieldValue}>Dados técnicos indisponíveis no momento.</p>
+                    </article>
+                  )}
                 </section>
               )}
 
-              {abaAtiva === "video" && video_url && (
+              {abaAtiva === "video" && videoUrl && (
                 <section className={styles.introCard}>
                   <h2 className={styles.sectionTitle}>Conteúdo em vídeo</h2>
                   <a
@@ -536,6 +636,13 @@ function Livro() {
                   >
                     Abrir vídeo explicativo externo
                   </a>
+                </section>
+              )}
+
+              {abaAtiva === "video" && !videoUrl && (
+                <section className={styles.introCard}>
+                  <h2 className={styles.sectionTitle}>Conteúdo em vídeo</h2>
+                  <p className={styles.fieldValue}>Vídeo indisponível no momento.</p>
                 </section>
               )}
 
@@ -584,38 +691,53 @@ function Livro() {
                         </div>
                       </div>
                     )}
+
+                    {!hasAnalise && (
+                      <div className={styles.analysisCard}>
+                        <h3 className={styles.analysisCardTitle}>Análise da obra</h3>
+                        <div className={styles.analysisCardContent}>
+                          <p className={styles.fieldValue}>
+                            Análise indisponível no momento.
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className={styles.introCard}>
                     <h2 className={styles.sectionTitle}>
                       Metadados do Registro
                     </h2>
-                    <ul className={styles.list}>
+                    <div className={styles.metaGrid}>
                       {tituloTexto && (
-                        <li>
-                          <strong>Título original:</strong> {tituloTexto}
-                        </li>
+                        <div className={styles.metaItem}>
+                          <span className={styles.metaLabel}>Título original</span>
+                          <span className={styles.metaValue}>{tituloTexto}</span>
+                        </div>
                       )}
                       {autorDisplay && (
-                        <li>
-                          <strong>Autor:</strong> {autorDisplay}
-                        </li>
+                        <div className={styles.metaItem}>
+                          <span className={styles.metaLabel}>Autor</span>
+                          <span className={styles.metaValue}>{autorDisplay}</span>
+                        </div>
                       )}
                       {livro.criadoEm && (
-                        <li>
-                          <strong>Data de cadastro:</strong>{" "}
-                          {new Date(livro.criadoEm).toLocaleDateString("pt-BR")}
-                        </li>
+                        <div className={styles.metaItem}>
+                          <span className={styles.metaLabel}>Data de cadastro</span>
+                          <span className={styles.metaValue}>
+                            {new Date(livro.criadoEm).toLocaleDateString("pt-BR")}
+                          </span>
+                        </div>
                       )}
                       {livro.atualizadoEm && (
-                        <li>
-                          <strong>Última sincronização:</strong>{" "}
-                          {new Date(livro.atualizadoEm).toLocaleDateString(
-                            "pt-BR",
-                          )}
-                        </li>
+                        <div className={styles.metaItem}>
+                          <span className={styles.metaLabel}>Última sincronização</span>
+                          <span className={styles.metaValue}>
+                            {new Date(livro.atualizadoEm).toLocaleDateString("pt-BR")}
+                          </span>
+                        </div>
                       )}
-                    </ul>
+                    </div>
                   </div>
                 </section>
               )}
