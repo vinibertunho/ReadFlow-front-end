@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import Navbar from '../../components/Navbar/Navbar';
 import styles from './Simulados.module.css';
+import { useIdioma } from '../../context/IdiomaContext';
 
 const URL_API = 'https://readflow-m8o6.onrender.com/api/questoes';
 
-function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
+function ConteudoSimulado({ todasQuestoes, abaAtiva, ui }) {
     const [indiceAtual, setIndiceAtual] = useState(0);
     const [respostas, setRespostas] = useState({});
     const [simuladoConcluido, setSimuladoConcluido] = useState(false);
@@ -13,20 +14,13 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
     const questoesFiltradas = todasQuestoes.filter((q) => q.idioma === abaAtiva);
     const questaoAtual = questoesFiltradas[indiceAtual] || null;
 
-    const irParaAnterior = () => {
-        setIndiceAtual((prev) => Math.max(prev - 1, 0));
-    };
-
-    const irParaProxima = () => {
+    const irParaAnterior = () => setIndiceAtual((prev) => Math.max(prev - 1, 0));
+    const irParaProxima = () =>
         setIndiceAtual((prev) => Math.min(prev + 1, questoesFiltradas.length - 1));
-    };
 
     const selecionarAlternativa = (alternativaId) => {
         if (!questaoAtual) return;
-        setRespostas((prev) => ({
-            ...prev,
-            [questaoAtual.id]: alternativaId,
-        }));
+        setRespostas((prev) => ({ ...prev, [questaoAtual.id]: alternativaId }));
     };
 
     const finalizarSimulado = () => {
@@ -54,7 +48,7 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
     if (questoesFiltradas.length === 0) {
         return (
             <div className={styles.centralizado}>
-                Nenhuma questão carregada para o idioma: {abaAtiva}.
+                {ui.nenhumaQuestao} {abaAtiva}.
             </div>
         );
     }
@@ -64,23 +58,23 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
             <div
                 className={styles.centralizado}
                 style={{ flexDirection: 'column', padding: '20px' }}>
-                <h2>Simulado Concluído!</h2>
+                <h2>
+                    {ui.concluido} ({abaAtiva === 'PT' ? ui.portugues : ui.ingles})
+                </h2>
                 <p style={{ fontSize: '1.2rem' }}>
-                    Você acertou <strong>{pontuacao}</strong> de{' '}
-                    <strong>{questoesFiltradas.length}</strong> questões.
+                    {ui.acertou} <strong>{pontuacao}</strong> {ui.de}{' '}
+                    <strong>{questoesFiltradas.length}</strong> {ui.questoes}.
                 </p>
                 <div
                     className={styles.porcentagemResultado}
                     style={{ fontSize: '2rem', fontWeight: 'bold', margin: '15px 0' }}>
-                    {((pontuacao / questoesFiltradas.length) * 100).toFixed(0)}% de Aproveitamento
+                    {((pontuacao / questoesFiltradas.length) * 100).toFixed(0)}% {ui.aproveitamento}
                 </div>
 
-                <h3 style={{ marginTop: '30px', alignSelf: 'flex-start' }}>
-                    📋 Gabarito de Revisão:
-                </h3>
+                <h3 style={{ marginTop: '30px', alignSelf: 'flex-start' }}>📋 {ui.gabarito}</h3>
                 <div style={{ width: '100%', textAlign: 'left', marginTop: '10px' }}>
                     {questoesFiltradas.map((q, idx) => {
-                        const respUser = respostas[q.id] || 'Não respondida';
+                        const respUser = respostas[q.id] || ui.naoRespondida;
                         const acertoQuestao =
                             String(respUser).trim().toUpperCase() === q.respostaCorreta;
 
@@ -95,16 +89,19 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
                                     borderRadius: '6px',
                                 }}>
                                 <p>
-                                    <strong>Questão {idx + 1}:</strong> {q.enunciado}
+                                    <strong>
+                                        {ui.questao} {idx + 1}:
+                                    </strong>{' '}
+                                    {q.enunciado}
                                 </p>
                                 <p style={{ margin: '5px 0 0 0' }}>
-                                    Sua resposta:{' '}
+                                    👉 {ui.suaResposta}:{' '}
                                     <strong style={{ color: acertoQuestao ? 'green' : 'red' }}>
                                         {respUser}
                                     </strong>
                                 </p>
                                 <p style={{ margin: '2px 0 0 0' }}>
-                                    Gabarito oficial:{' '}
+                                    ✅ {ui.gabaritoOficial}:{' '}
                                     <strong style={{ color: 'green' }}>{q.respostaCorreta}</strong>
                                 </p>
                                 <p
@@ -114,7 +111,7 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
                                         fontSize: '0.9rem',
                                         color: '#555',
                                     }}>
-                                    Explicação: {q.comentario}
+                                    💡 {ui.explicacao}: {q.comentario}
                                 </p>
                             </div>
                         );
@@ -124,7 +121,7 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
                     onClick={reiniciarSimulado}
                     className={styles.btnProxima}
                     style={{ marginTop: '20px' }}>
-                    Refazer Simulado
+                    {ui.refazer}
                 </button>
             </div>
         );
@@ -132,14 +129,13 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
 
     return (
         <div className={styles.mainGrid}>
-            {/* Bloco Esquerdo: Questão */}
             <div className={styles.questaoCard}>
                 <div>
                     <span className={styles.contextoTxt}>
-                        Selecione o idioma desejado na barra de navegação para realizar as questões.
+                        {ui.selecioneIdioma} ({ui.secao} {abaAtiva})
                     </span>
                     <h2 className={styles.tituloQuestao}>
-                        Questão {indiceAtual + 1} de {questoesFiltradas.length}
+                        {ui.questao} {indiceAtual + 1} {ui.de} {questoesFiltradas.length}
                     </h2>
 
                     {questaoAtual && (
@@ -178,19 +174,21 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
                         onClick={irParaAnterior}
                         disabled={indiceAtual === 0}
                         className={styles.btnRevisar}>
-                        Questão Anterior
+                        {ui.anterior}
                     </button>
                     <button
                         onClick={irParaProxima}
                         disabled={indiceAtual === questoesFiltradas.length - 1}
                         className={styles.btnProxima}>
-                        Próxima Questão
+                        {ui.proxima}
                     </button>
                 </div>
             </div>
 
             <div className={styles.mapaCard}>
-                <h3 className={styles.mapaTitulo}>Mapa de Questões</h3>
+                <h3 className={styles.mapaTitulo}>
+                    {ui.mapaQuestoes} ({abaAtiva})
+                </h3>
                 <div className={styles.mapaGrid}>
                     {questoesFiltradas.map((q, index) => {
                         const respondida = respostas[q.id] !== undefined;
@@ -210,18 +208,52 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
                     })}
                 </div>
                 <button onClick={finalizarSimulado} className={styles.btnFinalizar}>
-                    Finalizar
+                    {ui.finalizar} {abaAtiva}
                 </button>
             </div>
         </div>
     );
 }
 
-function Simulados({ idiomaDoSite = 'PT' }) {
+function Simulados() {
     const [todasQuestoes, setTodasQuestoes] = useState([]);
     const [carregando, setCarregando] = useState(true);
     const [erro, setErro] = useState(null);
-    const abaAtiva = String(idiomaDoSite).toUpperCase();
+    const { idioma } = useIdioma();
+    const abaAtiva = idioma; // PT ou EN — sincronizado com o botão global
+
+    const ui = {
+        carregando:
+            idioma === 'PT' ? 'Carregando questões da API...' : 'Loading questions from API...',
+        nenhumaQuestao:
+            idioma === 'PT'
+                ? 'Nenhuma questão carregada para o idioma:'
+                : 'No questions loaded for language:',
+        concluido: idioma === 'PT' ? 'Simulado Concluído!' : 'Quiz Completed!',
+        portugues: idioma === 'PT' ? 'Português' : 'Portuguese',
+        ingles: idioma === 'PT' ? 'Inglês' : 'English',
+        acertou: idioma === 'PT' ? 'Você acertou' : 'You got',
+        de: idioma === 'PT' ? 'de' : 'out of',
+        questoes: idioma === 'PT' ? 'questões' : 'questions',
+        aproveitamento: idioma === 'PT' ? 'de Aproveitamento' : 'Score',
+        gabarito: idioma === 'PT' ? 'Gabarito de Revisão:' : 'Answer Key Review:',
+        naoRespondida: idioma === 'PT' ? 'Não respondida' : 'Not answered',
+        questao: idioma === 'PT' ? 'Questão' : 'Question',
+        suaResposta: idioma === 'PT' ? 'Sua resposta' : 'Your answer',
+        gabaritoOficial: idioma === 'PT' ? 'Gabarito oficial' : 'Official answer',
+        explicacao: idioma === 'PT' ? 'Explicação' : 'Explanation',
+        refazer: idioma === 'PT' ? 'Refazer Simulado' : 'Retake Quiz',
+        selecioneIdioma:
+            idioma === 'PT'
+                ? 'Selecione o idioma desejado na barra de navegação para realizar as questões.'
+                : 'Select the desired language in the navigation bar to answer the questions.',
+        secao: idioma === 'PT' ? 'Seção' : 'Section',
+        anterior: idioma === 'PT' ? 'Questão Anterior' : 'Previous Question',
+        proxima: idioma === 'PT' ? 'Próxima Questão' : 'Next Question',
+        mapaQuestoes: idioma === 'PT' ? 'Mapa de Questões' : 'Question Map',
+        finalizar: idioma === 'PT' ? 'Finalizar Seção' : 'Finish Section',
+        tituloHeader: idioma === 'PT' ? 'Clube do Livro' : 'Book Club',
+    };
 
     useEffect(() => {
         const carregarDadosDaApi = async () => {
@@ -321,17 +353,22 @@ function Simulados({ idiomaDoSite = 'PT' }) {
         carregarDadosDaApi();
     }, []);
 
-    if (carregando) return <div className={styles.centralizado}>Carregando questões da API...</div>;
+    if (carregando) return <div className={styles.centralizado}>{ui.carregando}</div>;
     if (erro) return <div className={`${styles.centralizado} text-red-500`}>⚠️ {erro}</div>;
 
     return (
         <div className={styles.container}>
             <Navbar />
             <header className={styles.header}>
-                <h1 className={styles.logo}>Clube do Livro</h1>
+                <h1 className={styles.logo}>{ui.tituloHeader}</h1>
             </header>
 
-            <ConteudoSimulado key={abaAtiva} todasQuestoes={todasQuestoes} abaAtiva={abaAtiva} />
+            <ConteudoSimulado
+                key={abaAtiva}
+                todasQuestoes={todasQuestoes}
+                abaAtiva={abaAtiva}
+                ui={ui}
+            />
         </div>
     );
 }
