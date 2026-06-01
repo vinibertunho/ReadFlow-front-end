@@ -64,7 +64,7 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
             <div
                 className={styles.centralizado}
                 style={{ flexDirection: 'column', padding: '20px' }}>
-                <h2>Simulado Concluído! ({abaAtiva === 'PT' ? 'Português' : 'Inglês'})</h2>
+                <h2>Simulado Concluído!</h2>
                 <p style={{ fontSize: '1.2rem' }}>
                     Você acertou <strong>{pontuacao}</strong> de{' '}
                     <strong>{questoesFiltradas.length}</strong> questões.
@@ -98,13 +98,13 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
                                     <strong>Questão {idx + 1}:</strong> {q.enunciado}
                                 </p>
                                 <p style={{ margin: '5px 0 0 0' }}>
-                                    👉 Sua resposta:{' '}
+                                    Sua resposta:{' '}
                                     <strong style={{ color: acertoQuestao ? 'green' : 'red' }}>
                                         {respUser}
                                     </strong>
                                 </p>
                                 <p style={{ margin: '2px 0 0 0' }}>
-                                    ✅ Gabarito oficial:{' '}
+                                    Gabarito oficial:{' '}
                                     <strong style={{ color: 'green' }}>{q.respostaCorreta}</strong>
                                 </p>
                                 <p
@@ -114,7 +114,7 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
                                         fontSize: '0.9rem',
                                         color: '#555',
                                     }}>
-                                    💡 Explicação: {q.comentario}
+                                    Explicação: {q.comentario}
                                 </p>
                             </div>
                         );
@@ -137,7 +137,6 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
                 <div>
                     <span className={styles.contextoTxt}>
                         Selecione o idioma desejado na barra de navegação para realizar as questões.
-                        (Seção {abaAtiva})
                     </span>
                     <h2 className={styles.tituloQuestao}>
                         Questão {indiceAtual + 1} de {questoesFiltradas.length}
@@ -190,7 +189,7 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
 
             {/* Bloco Direito: Mapa de Questões (Sem a div extra atrapalhando) */}
             <div className={styles.mapaCard}>
-                <h3 className={styles.mapaTitulo}>Mapa de Questões ({abaAtiva})</h3>
+                <h3 className={styles.mapaTitulo}>Mapa de Questões</h3>
                 <div className={styles.mapaGrid}>
                     {questoesFiltradas.map((q, index) => {
                         const respondida = respostas[q.id] !== undefined;
@@ -210,7 +209,7 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva }) {
                     })}
                 </div>
                 <button onClick={finalizarSimulado} className={styles.btnFinalizar}>
-                    Finalizar Seção {abaAtiva}
+                    Finalizar
                 </button>
             </div>
         </div>
