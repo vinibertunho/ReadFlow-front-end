@@ -47,11 +47,11 @@ export default function Home() {
                             <h4>Obra de Jorge Amado</h4>
                             <h1>{titulo}</h1>
                             <p>{livroPrincipal.resumo || 'resumo do livro aqui rs'}</p>
-                            <li>
-                                <Link to={`/livro/${livroPrincipal.slug || OBRA_DESTAQUE_SLUG}`} className={obterClasseLink(`/livro/${livroPrincipal.slug || OBRA_DESTAQUE_SLUG}`)}>
-                                    <button>Explorar Obra</button>
-                                </Link>
-                            </li>
+        
+                            <Link to={`/livro/${livroPrincipal.slug || OBRA_DESTAQUE_SLUG}`} className={obterClasseLink(`/livro/${livroPrincipal.slug || OBRA_DESTAQUE_SLUG}`)}>
+                            <button>Explorar Obra</button>
+                            </Link>
+                            
 
                         </div>
 
