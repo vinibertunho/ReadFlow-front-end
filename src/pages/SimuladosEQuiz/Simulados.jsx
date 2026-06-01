@@ -148,7 +148,9 @@ function ConteudoSimulado({ todasQuestoes, abaAtiva, ui }) {
                                         <button
                                             key={alt.id}
                                             onClick={() => selecionarAlternativa(alt.id)}
-                                            className={`${styles.alternativaBtn} ${selecionada ? styles.alternativaSelecionada : ''}`}>
+                                            className={`${styles.alternativaBtn} ${
+                                                selecionada ? styles.alternativaSelecionada : ''
+                                            }`}>
                                             <div className={styles.radioCircle}>
                                                 {selecionada && (
                                                     <div className={styles.radioInner} />
