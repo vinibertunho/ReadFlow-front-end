@@ -1,7 +1,33 @@
 import styles from './Footer.module.css';
 import { Link } from 'react-router-dom';
+import { useIdioma } from '../../context/IdiomaContext';
 
 function Footer() {
+    const { idioma } = useIdioma();
+    const en = idioma === 'EN';
+
+    const ui = {
+        tagline: en ? 'Your reading in a new flow.' : 'Sua leitura em um novo fluxo.',
+        navTitle: en ? 'Navigation' : 'Navegação',
+        home: en ? 'Home' : 'Home',
+        biblioteca: en ? 'Library' : 'Biblioteca',
+        explorar: en ? 'Explore Book' : 'Explorar Obra',
+        equipe: en ? 'Team' : 'Equipe',
+        vestibular: en ? 'Exam Prep' : 'Vestibular',
+        quiz: 'Quiz',
+        videoaulas: en ? 'Video Lessons' : 'Videoaulas',
+        curiosidades: en ? 'Fun Facts' : 'Curiosidades',
+        quemSomos: en ? 'About Us' : 'Quem Somos',
+        contato: en ? 'Contact' : 'Contato',
+        email: 'E-mail',
+        telefone: en ? 'Phone' : 'Telefone',
+        endereco: en ? 'Address' : 'Endereço',
+        sac: en ? 'Talk to Support' : 'Falar com o SAC',
+        copyright: en
+            ? '© 2026 ReadFlow. All rights reserved.'
+            : '© 2026 ReadFlow. Todos os direitos reservados.',
+    };
+
     return (
         <footer className={styles.footer}>
             <div className={styles.container}>
@@ -13,59 +39,59 @@ function Footer() {
                             className={styles.logo}
                         />
                     </a>
-                    <p>Sua leitura em um novo fluxo.</p>
+                    <p>{ui.tagline}</p>
                 </div>
 
                 <div className={styles.nav}>
-                    <h3>Navegação</h3>
+                    <h3>{ui.navTitle}</h3>
                     <ul>
                         <li>
-                            <Link to="/">Home</Link>
+                            <Link to="/">{ui.home}</Link>
                         </li>
                         <li>
-                            <Link to="/biblioteca">Biblioteca</Link>
+                            <Link to="/biblioteca">{ui.biblioteca}</Link>
                         </li>
                         <li>
-                            <Link to="/livro/capitaes-da-areia">Explorar Obra</Link>
+                            <Link to="/livro/capitaes-da-areia">{ui.explorar}</Link>
                         </li>
                         <li>
-                            <Link to="/equipe">Equipe</Link>
+                            <Link to="/equipe">{ui.equipe}</Link>
                         </li>
                         <li>
-                            <Link to="/vestibular">Vestibular</Link>
+                            <Link to="/vestibular">{ui.vestibular}</Link>
                         </li>
                         <li>
-                            <Link to="/simulados">Quiz</Link>
+                            <Link to="/simulados">{ui.quiz}</Link>
                         </li>
                         <li>
-                            <Link to="/videoaulas">Videoaulas</Link>
+                            <Link to="/videoaulas">{ui.videoaulas}</Link>
                         </li>
                         <li>
-                            <Link to="/curiosidades">Curiosidades</Link>
+                            <Link to="/curiosidades">{ui.curiosidades}</Link>
                         </li>
                         <hr className={styles.navDivider} />
                         <li>
-                            <Link to="/equipe">Quem Somos</Link>
+                            <Link to="/equipe">{ui.quemSomos}</Link>
                         </li>
                     </ul>
                 </div>
 
                 <div className={styles.contact}>
-                    <h3>Contato</h3>
+                    <h3>{ui.contato}</h3>
                     <p>
-                        E-mail:{' '}
-                        <a href="mailto:suporte@readflow.com.br" className={styles.contactLink}>
+                        {ui.email}:{' '}
+                        <a href="mailto:readflow@gmail.com" className={styles.contactLink}>
                             readflow@gmail.com
                         </a>
                     </p>
                     <p>
-                        Telefone:{' '}
+                        {ui.telefone}:{' '}
                         <a href="tel:1199999999" className={styles.contactLink}>
                             (11) 9999-9999
                         </a>
                     </p>
                     <p>
-                        Endereço:{' '}
+                        {ui.endereco}:{' '}
                         <a
                             href="https://maps.google.com/?q=Av.+Paulista,+1000+-+SP"
                             target="_blank"
@@ -75,7 +101,7 @@ function Footer() {
                         </a>
                     </p>
                     <a href="/suporte" className={styles.supportBtn}>
-                        Falar com o SAC
+                        {ui.sac}
                     </a>
                 </div>
             </div>
@@ -83,7 +109,7 @@ function Footer() {
             <hr className={styles.divider} />
 
             <div className={styles.copyright}>
-                <p>&copy; 2026 ReadFlow. Todos os direitos reservados.</p>
+                <p>{ui.copyright}</p>
             </div>
         </footer>
     );
