@@ -95,7 +95,6 @@
     box-sizing: border-box;
 }
 
-
 .imageCaption strong {
     font-size: 1rem;
     font-weight: 700;
@@ -283,7 +282,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2.5rem 0;
+    padding: 2.5rem 2rem;
     background-color: #e2e8f0;
     border-radius: 1.5rem;
     border: 1px solid #cbd5e1;
@@ -312,17 +311,19 @@
 }
 
 .timelineItem {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr 2.5rem 1fr;
     align-items: center;
     width: 100%;
     margin-top: 2rem;
+    gap: 2rem;
     position: relative;
 }
 
 .timelineLeft, .timelineRight {
-    width: 45%;
+    width: 100%;
     z-index: 2;
+
 }
 
 .timelineLeft {
@@ -336,6 +337,7 @@
 .timelineCenter {
     display: flex;
     justify-content: center;
+    align-items: center;
     position: relative;
 }
 
@@ -350,7 +352,7 @@
     justify-content: center;
     font-size: 0.6875rem;
     font-weight: bold;
-    box-shadow: 0 0 0 4px #ffffff;
+    box-shadow: 0 0 0 6px #ffffff;
 }
 
 .timelineCardContent {
