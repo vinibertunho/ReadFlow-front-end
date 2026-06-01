@@ -70,7 +70,7 @@
 }
 
 .textoHeader h4 {
-    color:#5423bd;
+    color: #5423bd;
     background-color: var(--details);
     padding: 2px 14px;
     border-radius: 20px;
@@ -97,7 +97,7 @@
     margin-bottom: 1.5rem;
 }
 
-.textoHeader button  {
+.textoHeader button {
     background-color: var(--purple-main);
     color: var(--bg-light);
     border: none;
@@ -205,24 +205,17 @@
 
 .cards p:nth-of-type(1) {
     color: var(--text-light);
-
     font-size: 15px;
-
     line-height: 1.6;
-
     margin: 0 0 24px 0;
-
     flex-grow: 1;
 }
 
 .cards p:last-child {
     color: var(--purple-main);
-
     font-weight: 600;
     font-size: 15px;
-
     margin: 0;
-
     display: flex;
     align-items: center;
 }
@@ -235,31 +228,21 @@
 
 .fraseBonitaAesthetic {
     width: 100%;
-
     background: var(--bg-light);
-
     padding: 70px 20px;
-
     margin-bottom: 5rem;
     margin-top: 3.5rem;
 }
 
 .fraseBonitaAesthetic h6 {
     max-width: 650px;
-
     margin: 0 auto 18px auto;
-
     text-align: center;
-
     font-size: 22px;
-
     font-style: italic;
     font-weight: 400;
-
     color: var(--text-dark);
-
     line-height: 1.8;
-
     font-family: 'Newsreader', serif;
 }
 
@@ -272,157 +255,116 @@
     text-transform: uppercase;
 }
 
-.bibliotecaRealOficial {
-    padding: 0 30px 90px 30px;
-    margin-top: -40px;
+/* --- Seção Consertada do Cardzão da Biblioteca --- */
+
+.containerBibliotecaCard {
+    padding: 0 4rem 6rem 4rem;
+    max-width: 1200px;
+    margin: -40px auto 0 auto;
 }
 
-.topBiblioteca {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 2.5rem;
-}
-
-.topBiblioteca h3 {
-    font-family: 'Newsreader', serif;
-
-    font-size: 1.7rem;
-
-    color: var(--text-dark);
-
-    margin-bottom: 12px;
-
-    font-weight: 700;
-}
-
-.topBiblioteca p {
-    color: var(--text-dark);
-    font-size: 17px;
-    font-weight: 300;
-}
-
-.verTodos {
-    text-decoration: none;
-
-    color: var(--purple-main);
-
-    font-size: 1.3rem;
-
-    transition: 0.2s;
-
-    margin-top: 14px;
-    font-weight: 700;
-
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.verTodos:hover {
-    opacity: 0.7;
-}
-
-.cardsLivro {
+.cardzaoBiblioteca {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 28px;
-}
-
-.cardLivro {
-    width: 100%;
+    grid-template-columns: 1.6fr 0.8fr;
+    background: linear-gradient(135deg, var(--card-bg) 0%, var(--details) 100%);
+    border: 1px solid rgba(123, 67, 245, 0.15);
+    border-radius: 24px;
+    padding: 3.5rem;
     text-decoration: none;
     color: inherit;
-}
-
-.capaLivroBiblioteca {
-    width: 100%;
-    height: 560px;
-
-    border-radius: 18px;
-
+    position: relative;
     overflow: hidden;
-
-    cursor: pointer;
-
-    transition: 0.35s ease;
-
-    background: #ddd;
-
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
 }
 
-.cardLivro:hover .capaLivroBiblioteca {
-    transform: translateY(-8px);
-
-    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
+.cardzaoBiblioteca:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 35px rgba(123, 67, 245, 0.15);
 }
 
-.capaLivroBiblioteca img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+.conteudoCardzao {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    z-index: 2;
 }
 
-.infoLivro {
-    margin-top: 14px;
+.conteudoCardzao h3 {
+    font-family: 'Newsreader', serif;
+    font-size: 2.2rem;
+    color: var(--text-dark);
+    margin: 0 0 1rem 0;
+    font-weight: 700;
 }
 
-.infoLivro h4 {
-    font-size: 1.2rem;
+.conteudoCardzao p {
+    color: var(--text-light);
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0 0 2rem 0;
+    max-width: 550px;
+}
 
-    margin-bottom: 4px;
-
+.botaoCardzao {
+    background-color: var(--purple-main);
+    color: var(--bg-light);
     font-weight: 600;
-
-    color: #111827;
+    font-size: 15px;
+    padding: 0.8rem 2rem;
+    border-radius: 12px;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-.infoLivro span {
-    color: #777;
-    font-size: 0.92rem;
+.cardzaoBiblioteca:hover .botaoCardzao {
+    background-color: #6935db;
+    transform: scale(1.02);
 }
 
-@media (max-width: 1200px) {
-
-    .cardsLivro {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
+/* Decoração com ícone do Lucide, sem requisições de API ou imagens */
+.decoracaoIcone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--purple-main);
+    opacity: 0.15; /* Deixa o ícone sutil como marca d'água */
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    z-index: 1;
 }
+
+/* Efeito de rotação leve no ícone ao passar o mouse */
+.cardzaoBiblioteca:hover .decoracaoIcone {
+    transform: scale(1.1) rotate(8deg);
+    opacity: 0.25;
+}
+
+/* --- Responsividade --- */
 
 @media (max-width: 1024px) {
-
     .conteudoHeader {
         grid-template-columns: 1fr;
-
         text-align: center;
-
         gap: 32px;
-
         padding: 40px 20px;
     }
 
     .capaLivro {
         order: 2;
-
         justify-content: center;
-
         margin-left: 0;
     }
 
     .textoHeader {
         order: 1;
-
         align-items: center;
     }
 
     .criancasCorrendo {
         order: 3;
-
         justify-content: center;
-
         margin-right: 0;
     }
 
@@ -435,27 +377,33 @@
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .bibliotecaRealOficial {
-        padding: 0 40px 70px 40px;
+    .containerBibliotecaCard {
+        padding: 0 2rem 4rem 2rem;
     }
-
 }
 
-@media (max-width: 700px) {
-
-    .cardsLivro {
+@media (max-width: 768px) {
+    .cardzaoBiblioteca {
         grid-template-columns: 1fr;
+        padding: 2.5rem;
+        gap: 1.5rem;
     }
 
-    .topBiblioteca {
-        flex-direction: column;
-        gap: 1rem;
+    .decoracaoIcone {
+        display: none; /* Some em telas pequenas para economizar espaço vertical */
     }
 
+    .conteudoCardzao h3 {
+        font-size: 1.8rem;
+    }
+    
+    .botaoCardzao {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 @media (max-width: 640px) {
-
     .textoHeader h1 {
         font-size: 35px;
     }
@@ -472,9 +420,4 @@
         font-size: 18px;
         line-height: 1.7;
     }
-
-    .topBiblioteca h3 {
-        font-size: 2.2rem;
-    }
-
 }

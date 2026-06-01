@@ -4,21 +4,17 @@ import Navbar from '../../components/Navbar/Navbar';
 import styles from './Home.module.css';
 import criancasCorrendo from '../../assets/criancas.jpg';
 import capa from '../../assets/capa.png';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Library } from 'lucide-react'; // Importado o Library aqui
 
 export default function Home() {
     const [titulo] = useState('Capitães da Areia');
     const [livroPrincipal] = useState({
         resumo: 'Acompanhe a vida dos meninos de rua que lutam pela sobrevivência nas ruas de Salvador.',
     });
-    const [livro] = useState({
-        titulo: 'Capitães da Areia',
-        autor: 'Jorge Amado',
-    });
 
     const obterClasseLink = (path) => {
-            return location.pathname === path ? `${styles.navLink} ${styles.active}` : styles.navLink;
-        };
+        return location.pathname === path ? `${styles.navLink} ${styles.active}` : styles.navLink;
+    };
 
     return (
         <>
@@ -39,12 +35,10 @@ export default function Home() {
                             <h4>Obra de Jorge Amado</h4>
                             <h1>{titulo}</h1>
                             <p>{livroPrincipal.resumo || 'resumo do livro aqui rs'}</p>
-                            <li>
-                                <Link to="/livro" className={obterClasseLink('/livro')}>
-                                    <button>Explorar Obra</button>
-                                </Link>
-                            </li>
-
+                            
+                            <Link to="/livro" className={obterClasseLink('/livro')}>
+                                <button>Explorar Obra</button>
+                            </Link>
                         </div>
 
                         <div className={styles.criancasCorrendo}>
@@ -57,10 +51,16 @@ export default function Home() {
                     </div>
                 </section>
 
-                <section className={styles.cardsSection}>
+                {/* Seção 'destaques' agrupando a Apresentação e os Cards */}
+                <section className={styles.destaques}>
+                    <div className={styles.apresentacao}>
+                        <h3>Apresentação do Projeto</h3>
+                        <p>Apresentação do projeto aqui (partedo povo do sesi)</p>
+                    </div>
+
                     <div className={styles.cards}>
                         <Link
-                            to={`/livro/${livroPrincipal.slug || livroPrincipal.titulo?.toLowerCase().replace(/\s+/g, '-') || 'livro'}`}
+                            to={`/livro/${livroPrincipal.slug || livroPrincipal.titulo?.toLowerCase().replace(/\s+/g, '-')} || 'livro'}`}
                             className={styles.explorarObra}
                         >
                             <h4>Explorar obra</h4>
@@ -68,7 +68,7 @@ export default function Home() {
                                 Acompanhe a narrativa desde a vida no Trapiche até os destinos
                                 traçados pelo bando liderado por Pedro Bala.
                             </p>
-                            <p>Ler Análise → </p>
+                            <p>Ler Análise &rarr; </p>
                         </Link>
 
                         <Link to="/equipe" className={styles.equipe}>
@@ -77,7 +77,7 @@ export default function Home() {
                                 Conheça os desenvolvedores e mentes criativas por trás deste projeto
                                 integrador.
                             </p>
-                            <p>Conhecer → </p>
+                            <p>Conhecer &rarr; </p>
                         </Link>
 
                         <Link to="/vestibular" className={styles.vestibulandos}>
@@ -86,7 +86,7 @@ export default function Home() {
                                 Encontre cronogramas, análises dos principais vestibulares e tudo o
                                 que você precisa para gabaritar a prova.
                             </p>
-                            <p>Estudar → </p>
+                            <p>Estudar &rarr; </p>
                         </Link>
 
                         <Link to="/simulados" className={styles.simulados}>
@@ -95,7 +95,7 @@ export default function Home() {
                                 Teste seus conhecimentos com questões exclusivas e prepare-se para o
                                 formato real dos exames.
                             </p>
-                            <p>Ver testes → </p>
+                            <p>Ver testes &rarr; </p>
                         </Link>
 
                         <Link to="/videoaulas" className={styles.videoaulas}>
@@ -104,7 +104,7 @@ export default function Home() {
                                 Assista a resumos em vídeo, análises de personagens e explicações
                                 detalhadas sobre o contexto histórico.
                             </p>
-                            <p>Ver Galeria → </p>
+                            <p>Ver Galeria &rarr; </p>
                         </Link>
 
                         <Link to="/curiosidades" className={styles.curiosidades}>
@@ -113,7 +113,7 @@ export default function Home() {
                                 Descubra segredos dos bastidores da obra, fatos sobre Jorge Amado e
                                 dicas valiosas de última hora para o seu estudo.
                             </p>
-                            <p>Explorar → </p>
+                            <p>Explorar &rarr; </p>
                         </Link>
                     </div>
                 </section>
@@ -124,34 +124,27 @@ export default function Home() {
                             "Eram os donos do trapiche e da cidade, pois a cidade de Salvador lhes
                             pertencia por direito, a eles que não tinham nada e tinham tudo."
                         </h6>
-
                         <p> — Jorge Amado, 1937 </p>
                     </div>
 
-                    <div className={styles.bibliotecaRealOficial}>
-                        <div className={styles.topBiblioteca}>
-                            <div>
+                    <div className={styles.containerBibliotecaCard}>
+                        <Link to="/biblioteca" className={styles.cardzaoBiblioteca}>
+                            <div className={styles.conteudoCardzao}>
                                 <h3>Biblioteca de Livros</h3>
-                                <p>Explore as obras analisadas por outras equipes do projeto.</p>
+                                <p>
+                                    O universo literário não para por aqui. Conheça e explore as análises 
+                                    completas de outras obras incríveis desenvolvidas pelas equipes do projeto.
+                                </p>
+                                <span className={styles.botaoCardzao}>
+                                    Acessar Acervo Completo <ExternalLink size={20} />
+                                </span>
                             </div>
-
-                            <Link to="/biblioteca" className={styles.verTodos}>
-                                Ver Todos <ExternalLink size={25} />
-                            </Link>
-                        </div>
-
-                        <div className={styles.cardsLivro}>
-                            <Link to="/biblioteca">
-                                <div className={styles.capaLivroBiblioteca}>
-                                    <img src={capa} alt={livro.titulo} />
-                                </div>
-
-                                <div className={styles.infoLivro}>
-                                    <h4>{livro.titulo}</h4>
-                                    <span>{livro.autor || 'Autor desconhecido'}</span>
-                                </div>
-                            </Link>
-                        </div>
+                            
+                            {/* Troca dos espaços brancos por um ícone estilizado no CSS */}
+                            <div className={styles.decoracaoIcone}>
+                                <Library size={180} strokeWidth={1} />
+                            </div>
+                        </Link>
                     </div>
                 </section>
             </main>
