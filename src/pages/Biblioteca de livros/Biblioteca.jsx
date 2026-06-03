@@ -3,7 +3,7 @@ import { BookOpenText, Search, LayoutGrid, LayoutList } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import styles from "./Biblioteca.module.css";
-import { useIdioma } from "../../context/IdiomaContext"; // ✅ importa o contexto
+import { useIdioma } from "../../context/IdiomaContext"; 
 
 const API_LIVROS_URL = "https://readflow-m8o6.onrender.com/api/livros";
 const API_INTEGRACAO_URL = "https://readflow-m8o6.onrender.com/api/integracao";
