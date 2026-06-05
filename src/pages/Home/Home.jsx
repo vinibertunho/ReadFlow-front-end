@@ -1,11 +1,64 @@
-import { useState, useMemo } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar';
 import styles from './Home.module.css';
 import criancasCorrendo from '../../assets/criancas.jpg';
 import capa from '../../assets/capa.png';
 import { ExternalLink, Library } from 'lucide-react';
 import { useIdioma } from '../../context/IdiomaContext';
+
+const API_SOBRE_PROJETO_URL = 'https://readflow-m8o6.onrender.com/api/sobre-projeto';
+const API_KEY = import.meta.env.VITE_API_KEY;
+const AUTH_HEADERS = {
+    'Content-Type': 'application/json',
+    ...(API_KEY ? { 'x-api-key': API_KEY, Authorization: `Bearer ${API_KEY}` } : {}),
+};
+
+// Extrai título e texto do /api/sobre-projeto tolerando diferentes formatos de resposta
+function extrairSobreProjeto(resposta, en) {
+    if (!resposta) return null;
+    let dado = resposta.data ?? resposta;
+    if (Array.isArray(dado)) dado = dado[0];
+    if (!dado || typeof dado !== 'object') return null;
+
+    const pick = (...chaves) => {
+        for (const c of chaves) {
+            const v = dado[c];
+            if (typeof v === 'string' && v.trim()) return v.trim();
+        }
+        return '';
+    };
+
+    const titulo = en
+        ? pick('titulo_en', 'title_en', 'title', 'titulo', 'nome')
+        : pick('titulo', 'titulo_pt', 'title', 'nome');
+    const texto = en
+        ? pick(
+              'descricao_en',
+              'description_en',
+              'conteudo_en',
+              'content_en',
+              'texto_en',
+              'descricao',
+              'description',
+              'conteudo',
+              'content',
+              'texto',
+          )
+        : pick(
+              'descricao_pt',
+              'descricao',
+              'description',
+              'conteudo',
+              'content',
+              'texto',
+              'descricao_en',
+              'description_en',
+          );
+
+    if (!titulo && !texto) return null;
+    return { titulo, texto };
+}
 
 const OBRA_DESTAQUE_SLUG = import.meta.env.VITE_OBRA_DESTAQUE_SLUG || 'capitaes-da-areia';
 const OBRA_DESTAQUE_TITULO = import.meta.env.VITE_OBRA_DESTAQUE_TITULO || 'Capitães da Areia';
@@ -17,20 +70,8 @@ const OBRA_DESTAQUE_RESUMO_EN =
     import.meta.env.VITE_OBRA_DESTAQUE_RESUMO_EN ||
     'Follow the lives of street children who fight for survival on the streets of Salvador.';
 
-export default function Home() {
-    const { idioma } = useIdioma();
-    const location = useLocation();
-
-    // Removido useState desnecessário - usando constante direta
-    const livroPrincipal = { slug: OBRA_DESTAQUE_SLUG };
-
-    const obterClasseLink = (path) => {
-        return location.pathname === path ? `${styles.navLink} ${styles.active}` : styles.navLink;
-    };
-
-    // Objeto traduzido memoizado para evitar recriação a cada render
-    const t = useMemo(() => {
-        return {
+function criarTextos(idioma) {
+    return {
             autorLabel: idioma === 'PT' ? 'Obra de Jorge Amado' : 'Work by Jorge Amado',
             titulo: OBRA_DESTAQUE_TITULO,
             resumo: idioma === 'PT' ? OBRA_DESTAQUE_RESUMO_PT : OBRA_DESTAQUE_RESUMO_EN,
@@ -97,7 +138,47 @@ export default function Home() {
                     : "The literary universe doesn't stop here. Discover and explore the complete analyses of other incredible works developed by the project teams.",
             bibliotecaBtn: idioma === 'PT' ? 'Acessar Acervo Completo' : 'Access Full Collection',
         };
+}
+
+export default function Home() {
+    const { idioma } = useIdioma();
+
+    const livroPrincipal = { slug: OBRA_DESTAQUE_SLUG };
+
+    // Textos traduzidos, atualizados via useEffect sempre que o idioma muda
+    const [t, setT] = useState(() => criarTextos(idioma));
+
+    useEffect(() => {
+        setT(criarTextos(idioma));
     }, [idioma]);
+
+    // Conteúdo do "Sobre o Projeto" vindo da API (com fallback no texto padrão)
+    const [sobreProjeto, setSobreProjeto] = useState(null);
+
+    useEffect(() => {
+        let ativo = true;
+        async function carregarSobreProjeto() {
+            try {
+                const res = await fetch(API_SOBRE_PROJETO_URL, { headers: AUTH_HEADERS });
+                if (!res.ok) return;
+                const json = await res.json();
+                if (ativo) setSobreProjeto(json);
+            } catch (e) {
+                console.warn('[Home] Erro ao buscar /api/sobre-projeto:', e.message);
+            }
+        }
+        carregarSobreProjeto();
+        return () => {
+            ativo = false;
+        };
+    }, []);
+
+    const sobre = extrairSobreProjeto(sobreProjeto, idioma !== 'PT');
+    const apresentacaoTitulo = sobre?.titulo || t.apresentacaoTitulo;
+    const apresentacaoParagrafos = (sobre?.texto || t.apresentacaoTexto)
+        .split(/\n+/)
+        .map((p) => p.trim())
+        .filter(Boolean);
 
     return (
         <>
@@ -120,7 +201,7 @@ export default function Home() {
                             <p>{t.resumo}</p>
                             <Link
                                 to={`/livro/${livroPrincipal.slug}`}
-                                className={`${obterClasseLink(`/livro/${livroPrincipal.slug}`)} ${styles.botaoExplorar}`}>
+                                className={styles.botaoExplorar}>
                                 {t.explorar}
                             </Link>
                         </div>
@@ -137,8 +218,10 @@ export default function Home() {
 
                 <section className={styles.destaques}>
                     <div className={styles.apresentacao}>
-                        <h3>{t.apresentacaoTitulo}</h3>
-                        <p>{t.apresentacaoTexto}</p>
+                        <h3>{apresentacaoTitulo}</h3>
+                        {apresentacaoParagrafos.map((paragrafo, i) => (
+                            <p key={i}>{paragrafo}</p>
+                        ))}
                     </div>
 
                     <div className={styles.cards}>
