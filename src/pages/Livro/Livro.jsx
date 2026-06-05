@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import Navbar from "../../components/Navbar/Navbar";
 import styles from "./Livro.module.css";
 import { useIdioma } from "../../context/IdiomaContext";
 
 const URL_API = "https://readflow-m8o6.onrender.com/api/livros";
+const API_INTEGRACAO_URL = "https://readflow-m8o6.onrender.com/api/integracao";
 const PERSONAGENS_API = "https://readflow-m8o6.onrender.com/api/personagens";
 const API_KEY = import.meta.env.VITE_API_KEY;
 
@@ -14,7 +16,11 @@ const ALIASES_LIVROS = {
   "o-guarani": ["o guarani", "guarani"],
   guarani: ["o guarani", "guarani"],
   "quartos-despejo": ["quartos de despejo", "quartos-despejo"],
-  "capitaes-da-areia": ["capitães da areia", "capitaes da areia", "capitães de areia"],
+  "capitaes-da-areia": [
+    "capitães da areia",
+    "capitaes da areia",
+    "capitães de areia",
+  ],
   "memorias-cubas": [
     "memórias póstumas de brás cubas",
     "memorias postumas de bras cubas",
@@ -40,7 +46,8 @@ function extrairNomeObjeto(valor) {
   if (!valor && valor !== 0) return "";
   if (typeof valor === "string") return valor.trim();
   if (typeof valor === "number") return String(valor);
-  if (Array.isArray(valor)) return valor.map(extrairNomeObjeto).filter(Boolean).join(", ");
+  if (Array.isArray(valor))
+    return valor.map(extrairNomeObjeto).filter(Boolean).join(", ");
   if (typeof valor === "object") {
     return (
       obterTextoValido(
@@ -53,7 +60,7 @@ function extrairNomeObjeto(valor) {
         valor.personagem,
         valor.personagemNome,
         valor.label,
-        valor.displayName
+        valor.displayName,
       ) || ""
     );
   }
@@ -76,7 +83,10 @@ function normalizarParagrafos(valor) {
   if (typeof valor === "string") {
     const texto = valor.trim();
     if (!texto) return [];
-    if ((texto.startsWith("[") && texto.endsWith("]")) || (texto.startsWith("{") && texto.endsWith("}"))) {
+    if (
+      (texto.startsWith("[") && texto.endsWith("]")) ||
+      (texto.startsWith("{") && texto.endsWith("}"))
+    ) {
       try {
         const parsed = JSON.parse(texto);
         return normalizarParagrafos(parsed);
@@ -138,53 +148,69 @@ function Livro() {
   const [personagens, setPersonagens] = useState([]);
   const [activeTab, setActiveTab] = useState("");
 
-  const en = idioma === 'EN';
+  const en = idioma === "EN";
 
   // Labels traduzidos
   const ui = {
-    voltar:          en ? '← Back to catalog'           : '← Voltar ao catálogo',
-    carregando:      en ? 'Loading book data... 📚'      : 'Carregando dados da obra... 📚',
-    indisponivel:    en ? 'Work unavailable at the moment.' : 'Obra indisponível no momento.',
-    assistirVideo:   en ? 'Watch video'                  : 'Assistir vídeo',
-    verCatalogo:     en ? 'View catalog'                 : 'Ver catálogo',
-    paginas:         en ? 'pages'                        : 'páginas',
-    autor:           en ? 'Author'                       : 'Autor',
-    semCapa:         en ? 'No cover'                     : 'Sem capa',
+    voltar: en ? "← Back to catalog" : "← Voltar ao catálogo",
+    carregando: en
+      ? "Loading book data... 📚"
+      : "Carregando dados da obra... 📚",
+    indisponivel: en
+      ? "Work unavailable at the moment."
+      : "Obra indisponível no momento.",
+    assistirVideo: en ? "Watch video" : "Assistir vídeo",
+    verCatalogo: en ? "View catalog" : "Ver catálogo",
+    paginas: en ? "pages" : "páginas",
+    autor: en ? "Author" : "Autor",
+    semCapa: en ? "No cover" : "Sem capa",
 
-    tabResumo:       en ? 'Summary'                      : 'Resumo',
-    tabPersonagens:  en ? 'Characters'                   : 'Personagens',
-    tabContexto:     en ? 'Historical Context'           : 'Contexto histórico',
-    tabFicha:        en ? 'Technical Sheet'              : 'Ficha técnica',
-    tabDados:        en ? 'Book Analysis'                : 'Análise da obra',
-    tabVideo:        en ? 'Video'                        : 'Vídeo',
+    tabResumo: en ? "Summary" : "Resumo",
+    tabPersonagens: en ? "Characters" : "Personagens",
+    tabContexto: en ? "Historical Context" : "Contexto histórico",
+    tabFicha: en ? "Technical Sheet" : "Ficha técnica",
+    tabDados: en ? "Book Analysis" : "Análise da obra",
+    tabVideo: en ? "Video" : "Vídeo",
 
-    resumoTitulo:    en ? 'Book Summary'                 : 'Resumo da obra',
-    resumoVazio:     en ? 'Summary unavailable at the moment.' : 'Resumo indisponível no momento.',
-    contextoTitulo:  en ? 'Historical Context'           : 'Contexto histórico',
-    contextoVazio:   en ? 'Historical context unavailable.' : 'Contexto histórico indisponível no momento.',
-    personagensTitulo: en ? 'Characters'                 : 'Personagens',
-    personagensVazio:  en ? 'Characters unavailable.'    : 'Personagens indisponíveis no momento.',
+    resumoTitulo: en ? "Book Summary" : "Resumo da obra",
+    resumoVazio: en
+      ? "Summary unavailable at the moment."
+      : "Resumo indisponível no momento.",
+    contextoTitulo: en ? "Historical Context" : "Contexto histórico",
+    contextoVazio: en
+      ? "Historical context unavailable."
+      : "Contexto histórico indisponível no momento.",
+    personagensTitulo: en ? "Characters" : "Personagens",
+    personagensVazio: en
+      ? "Characters unavailable."
+      : "Personagens indisponíveis no momento.",
 
-    sobreAutor:      en ? 'About the author'             : 'Sobre o autor',
-    estilo:          en ? 'Writing style'                : 'Estilo de escrita',
-    verossimilhanca: en ? 'Verisimilitude'               : 'Verossimilhança',
-    caracteristicas: en ? 'Literary characteristics'     : 'Características literárias',
-    conclusao:       en ? 'Conclusion'                   : 'Conclusão',
-    fichaVazia:      en ? 'Technical data unavailable.'  : 'Dados técnicos indisponíveis no momento.',
+    sobreAutor: en ? "About the author" : "Sobre o autor",
+    estilo: en ? "Writing style" : "Estilo de escrita",
+    verossimilhanca: en ? "Verisimilitude" : "Verossimilhança",
+    caracteristicas: en
+      ? "Literary characteristics"
+      : "Características literárias",
+    conclusao: en ? "Conclusion" : "Conclusão",
+    fichaVazia: en
+      ? "Technical data unavailable."
+      : "Dados técnicos indisponíveis no momento.",
 
-    simbolismo:      en ? 'Symbolism'                    : 'Simbolismo',
-    engajamento:     en ? 'Engagement'                   : 'Engajamento',
-    temas:           en ? 'Key themes'                   : 'Temas chave',
-    analiseVazia:    en ? 'Analysis unavailable.'        : 'Análise indisponível no momento.',
+    simbolismo: en ? "Symbolism" : "Simbolismo",
+    engajamento: en ? "Engagement" : "Engajamento",
+    temas: en ? "Key themes" : "Temas chave",
+    analiseVazia: en
+      ? "Analysis unavailable."
+      : "Análise indisponível no momento.",
 
-    metadados:       en ? 'Record Metadata'              : 'Metadados do Registro',
-    tituloOriginal:  en ? 'Original title'               : 'Título original',
-    dataCadastro:    en ? 'Registration date'            : 'Data de cadastro',
-    ultimaSync:      en ? 'Last sync'                    : 'Última sincronização',
+    metadados: en ? "Record Metadata" : "Metadados do Registro",
+    tituloOriginal: en ? "Original title" : "Título original",
+    dataCadastro: en ? "Registration date" : "Data de cadastro",
+    ultimaSync: en ? "Last sync" : "Última sincronização",
 
-    videoTitulo:     en ? 'Video content'                : 'Conteúdo em vídeo',
-    videoBtn:        en ? 'Open external video'          : 'Abrir vídeo explicativo externo',
-    videoVazio:      en ? 'Video unavailable.'           : 'Vídeo indisponível no momento.',
+    videoTitulo: en ? "Video content" : "Conteúdo em vídeo",
+    videoBtn: en ? "Open external video" : "Abrir vídeo explicativo externo",
+    videoVazio: en ? "Video unavailable." : "Vídeo indisponível no momento.",
   };
 
   useEffect(() => {
@@ -202,10 +228,34 @@ function Livro() {
 
         let dadosLivro = null;
 
+        const slugify = (text) =>
+          String(text || "")
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/\p{Diacritic}/gu, "")
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/(^-|-$)/g, "");
+
+        const termosBusca = obterChavesBusca(routeId);
+        const termoBusca = normalizarChave(decodeURIComponent(routeId));
+
+        console.log(
+          "[Livro] routeId:",
+          routeId,
+          "| termoBusca:",
+          termoBusca,
+          "| termos:",
+          termosBusca,
+        );
+
+        // 1) Tentar /api/livros
         try {
           const resposta = await fetch(URL_API, { headers: headersPadrao });
+          console.log("[Livro] /api/livros status:", resposta.status);
           if (resposta.status === 401) {
-            throw new Error("A API exigiu autenticação. Defina VITE_API_KEY no .env.");
+            throw new Error(
+              "A API exigiu autenticação. Defina VITE_API_KEY no .env.",
+            );
           }
           if (resposta.ok) {
             const resultadoJson = await resposta.json();
@@ -222,23 +272,19 @@ function Livro() {
               });
             }
 
-            const termosBusca = obterChavesBusca(routeId);
-            const termoBuscaRaw = normalizarChave(decodeURIComponent(routeId));
-            const slugify = (text) =>
-              String(text || "")
-                .toLowerCase()
-                .normalize("NFD")
-                .replace(/\p{Diacritic}/gu, "")
-                .replace(/[^a-z0-9]+/g, "-")
-                .replace(/(^-|-$)/g, "");
-
-            const termoBusca = termoBuscaRaw;
+            console.log(
+              "[Livro] /api/livros — total itens:",
+              listaUnificada.length,
+            );
 
             const matchLivro = listaUnificada.find((l) => {
               let t = l?.titulo || l?.title || l?.tituloDoLivro || "";
               const autorMapeado = l?.autor || l?.author || l?.autores || "";
 
-              if (normalizarChave(t).includes("nao informado") && normalizarChave(autorMapeado).includes("memorias postumas")) {
+              if (
+                normalizarChave(t).includes("nao informado") &&
+                normalizarChave(autorMapeado).includes("memorias postumas")
+              ) {
                 t = "Memórias Póstumas de Brás Cubas";
               }
               if (!t && normalizarChave(autorMapeado).includes("memoria")) {
@@ -262,13 +308,119 @@ function Livro() {
 
             if (matchLivro) dadosLivro = matchLivro;
           }
-        } catch {
-          console.log("Erro ao buscar catálogo principal.");
+        } catch (e) {
+          console.warn("[Livro] Erro ao buscar /api/livros:", e.message);
+        }
+
+        // 2) Fallback: /api/integracao
+        if (!dadosLivro) {
+          console.log(
+            "[Livro] Não encontrado em /api/livros — tentando /api/integracao...",
+          );
+          try {
+            const respostaInteg = await fetch(API_INTEGRACAO_URL, {
+              headers: headersPadrao,
+            });
+            console.log(
+              "[Livro] /api/integracao status:",
+              respostaInteg.status,
+            );
+            if (respostaInteg.ok) {
+              const resultadoInteg = await respostaInteg.json();
+              // A API pode retornar { data: [...] } ou diretamente [...]
+              const listaInteg = Array.isArray(resultadoInteg)
+                ? resultadoInteg
+                : Array.isArray(resultadoInteg?.data)
+                  ? resultadoInteg.data
+                  : [];
+
+              console.log(
+                "[Livro] /api/integracao — total itens:",
+                listaInteg.length,
+              );
+              console.log(
+                "[Livro] /api/integracao — amostra:",
+                JSON.stringify(listaInteg.slice(0, 2)),
+              );
+
+              for (const item of listaInteg) {
+                // statusApi pode não existir em todas as estruturas — tenta mesmo assim
+                if (
+                  !Array.isArray(item.conteudo) &&
+                  !item.titulo &&
+                  !item.title
+                )
+                  continue;
+
+                // Se tiver conteudo[], itera; senão trata o próprio item como livro
+                const candidatos = Array.isArray(item.conteudo)
+                  ? item.conteudo
+                  : [item];
+
+                for (const c of candidatos) {
+                  if (!c) continue;
+
+                  const autorRaw = c.autor;
+                  const autorStr = Array.isArray(autorRaw)
+                    ? autorRaw
+                        .map((a) => a.nome ?? a.name ?? String(a))
+                        .join(", ")
+                    : autorRaw || "";
+
+                  const candidato = {
+                    ...c,
+                    autor: autorStr,
+                    capa_url: c.capa_url || c.foto || "",
+                  };
+                  const t =
+                    candidato.titulo ||
+                    candidato.title ||
+                    candidato.tituloDoLivro ||
+                    "";
+                  const livroId = candidato.id
+                    ? String(candidato.id).toLowerCase().trim()
+                    : "";
+                  const tituloNorm = normalizarChave(t);
+                  const tituloSlug = slugify(t);
+                  const tituloSlugNorm = normalizarChave(tituloSlug);
+                  const termosNorm = termosBusca.map(normalizarChave);
+
+                  console.log(
+                    "[Livro] integracao candidato:",
+                    tituloNorm,
+                    "|",
+                    tituloSlugNorm,
+                    "| id:",
+                    livroId,
+                  );
+
+                  const match =
+                    tituloNorm === termoBusca ||
+                    tituloSlugNorm === termoBusca ||
+                    livroId === termoBusca ||
+                    termosNorm.includes(tituloNorm) ||
+                    termosNorm.includes(tituloSlugNorm);
+
+                  if (match) {
+                    dadosLivro = candidato;
+                    break;
+                  }
+                }
+                if (dadosLivro) break;
+              }
+            }
+          } catch (e) {
+            console.warn("[Livro] Erro ao buscar /api/integracao:", e.message);
+          }
         }
 
         if (!dadosLivro) throw new Error("Livro não encontrado nos catálogos.");
 
-        if (!dadosLivro.titulo && dadosLivro.autor && normalizarChave(dadosLivro.autor).includes("memoria")) {
+        if (
+          !dadosLivro.titulo &&
+          dadosLivro.autor &&
+          normalizarChave(dadosLivro.autor).includes("memoria")
+        ) {
           const autorOriginal = dadosLivro.autor;
           dadosLivro.titulo = autorOriginal;
           dadosLivro.autor = "Machado de Assis";
@@ -341,24 +493,30 @@ function Livro() {
 
   if (carregando) {
     return (
-      <div className={styles.page}>
-        <div className={styles.container}>
-          <p className={styles.status}>{ui.carregando}</p>
+      <>
+        <Navbar />
+        <div className={styles.page}>
+          <div className={styles.container}>
+            <p className={styles.status}>{ui.carregando}</p>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   if (erro || !livro) {
     return (
-      <div className={styles.page}>
-        <div className={styles.container}>
-          <p className={styles.error}>{erro || ui.indisponivel}</p>
-          <button onClick={() => navigate(-1)} className={styles.botaoRoxo}>
-            {ui.voltar}
-          </button>
+      <>
+        <Navbar />
+        <div className={styles.page}>
+          <div className={styles.container}>
+            <p className={styles.error}>{erro || ui.indisponivel}</p>
+            <button onClick={() => navigate(-1)} className={styles.botaoRoxo}>
+              {ui.voltar}
+            </button>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -404,7 +562,12 @@ function Livro() {
     avaliacao_media,
   } = livro;
 
-  const tituloTexto = obterTextoValido(titulo, livro.titulo, livro.title, livro.tituloDoLivro);
+  const tituloTexto = obterTextoValido(
+    titulo,
+    livro.titulo,
+    livro.title,
+    livro.tituloDoLivro,
+  );
 
   // Gênero por idioma
   const generoTexto = en
@@ -412,9 +575,13 @@ function Livro() {
     : obterTextoValido(genero_pt, livro.genero, livro.genre);
 
   const videoUrl = video_url;
-  const capaImagem = resolverUrlCapa(capa_url || imagem_url || imagem || capas || foto || "");
+  const capaImagem = resolverUrlCapa(
+    capa_url || imagem_url || imagem || capas || foto || "",
+  );
   const ano = ano_publicacao || anoPublicacao || null;
-  const rating = parseFloat(avaliacao || media_avaliacao || avaliacao_media || 0);
+  const rating = parseFloat(
+    avaliacao || media_avaliacao || avaliacao_media || 0,
+  );
 
   // Textos do banco em PT ou EN
   const resumo = en
@@ -422,8 +589,18 @@ function Livro() {
     : obterTextoValido(sinopse, descricao_pt, descricao_en);
 
   const contextoTexto = en
-    ? obterTextoValido(contexto_historico_en, contexto_en, contexto_historico_pt, contexto_pt)
-    : obterTextoValido(contexto_historico_pt, contexto_pt, contexto_historico_en, contexto_en);
+    ? obterTextoValido(
+        contexto_historico_en,
+        contexto_en,
+        contexto_historico_pt,
+        contexto_pt,
+      )
+    : obterTextoValido(
+        contexto_historico_pt,
+        contexto_pt,
+        contexto_historico_en,
+        contexto_en,
+      );
 
   const detalhesAutor = en
     ? obterTextoValido(detalhes_autor_en, detalhes_autor_pt)
@@ -438,8 +615,14 @@ function Livro() {
     : obterTextoValido(verossimilhanca_pt, verossimilhanca_en);
 
   const caracteristicas = en
-    ? obterTextoValido(caracteristicas_literarias_en, caracteristicas_literarias_pt)
-    : obterTextoValido(caracteristicas_literarias_pt, caracteristicas_literarias_en);
+    ? obterTextoValido(
+        caracteristicas_literarias_en,
+        caracteristicas_literarias_pt,
+      )
+    : obterTextoValido(
+        caracteristicas_literarias_pt,
+        caracteristicas_literarias_en,
+      );
 
   const conclusao = en
     ? obterTextoValido(conclusao_en, conclusao_pt)
@@ -461,9 +644,21 @@ function Livro() {
   const engajamentoLines = normalizarParagrafos(engajamentoTexto);
   const temasLines = normalizarParagrafos(temasTexto);
 
-  const hasFicha = Boolean(detalhesAutor || estilo || verossimilhanca || caracteristicas || conclusao || paginas || ano);
+  const hasFicha = Boolean(
+    detalhesAutor ||
+    estilo ||
+    verossimilhanca ||
+    caracteristicas ||
+    conclusao ||
+    paginas ||
+    ano,
+  );
   const hasAnalise = Boolean(simbolismoTexto || engajamentoTexto || temasTexto);
-  const autorDisplay = extrairNomeObjeto(autor) || extrairNomeObjeto(livro.author) || extrairNomeObjeto(livro.autores) || "";
+  const autorDisplay =
+    extrairNomeObjeto(autor) ||
+    extrairNomeObjeto(livro.author) ||
+    extrairNomeObjeto(livro.autores) ||
+    "";
   const activeTabPadrao = "resumo";
   const abaAtiva = activeTab || activeTabPadrao;
 
@@ -476,10 +671,10 @@ function Livro() {
   const listaPersonagens = isCapitaesDaAreia ? personagens : [];
 
   const tabs = [
-    { id: "resumo",    label: ui.tabResumo },
-    { id: "contexto",  label: ui.tabContexto },
-    { id: "ficha",     label: ui.tabFicha },
-    { id: "dados",     label: ui.tabDados },
+    { id: "resumo", label: ui.tabResumo },
+    { id: "contexto", label: ui.tabContexto },
+    { id: "ficha", label: ui.tabFicha },
+    { id: "dados", label: ui.tabDados },
   ];
 
   if (isCapitaesDaAreia && listaPersonagens.length > 0) {
@@ -490,11 +685,13 @@ function Livro() {
   }
 
   return (
-    <div className={styles.page}>
-      <div className={styles.container}>
-        <button onClick={() => navigate(-1)} className={styles.voltarBtn}>
-          {ui.voltar}
-        </button>
+    <>
+      <Navbar />
+      <div className={styles.page}>
+        <div className={styles.container}>
+          <button onClick={() => navigate(-1)} className={styles.voltarBtn}>
+            {ui.voltar}
+          </button>
 
         <section className={styles.hero}>
           <div className={styles.coverCard}>
@@ -521,7 +718,13 @@ function Livro() {
               <div className={styles.ratingRow}>
                 <div className={styles.ratingStars} aria-hidden>
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <svg key={i} viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+                    <svg
+                      key={i}
+                      viewBox="0 0 24 24"
+                      width="18"
+                      height="18"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
                       <path
                         d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.788 1.402 8.17L12 18.896l-7.336 3.872 1.402-8.17L.132 9.21l8.2-1.192z"
                         fill={i <= Math.round(rating) ? "#fbbf24" : "#e5e7eb"}
@@ -535,19 +738,33 @@ function Livro() {
 
             <div className={styles.metaInfo}>
               {anoPublicacao && <span>📅 {anoPublicacao}</span>}
-              {paginas && <span>📄 {paginas} {ui.paginas}</span>}
+              {paginas && (
+                <span>
+                  📄 {paginas} {ui.paginas}
+                </span>
+              )}
               {autorDisplay && (
-                <span>{ui.autor}: <strong>{autorDisplay}</strong></span>
+                <span>
+                  {ui.autor}: <strong>{autorDisplay}</strong>
+                </span>
               )}
             </div>
 
             <div className={styles.actions}>
               {videoUrl && (
-                <a className={styles.primaryButton} href={videoUrl} target="_blank" rel="noreferrer">
+                <a
+                  className={styles.primaryButton}
+                  href={videoUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   {ui.assistirVideo}
                 </a>
               )}
-              <button className={styles.secondaryButton} onClick={() => navigate("/biblioteca")}>
+              <button
+                className={styles.secondaryButton}
+                onClick={() => navigate("/biblioteca")}
+              >
                 {ui.verCatalogo}
               </button>
             </div>
@@ -556,7 +773,11 @@ function Livro() {
 
         {tabs.length > 0 && (
           <main className={styles.main}>
-            <div className={styles.tabsBar} role="tablist" aria-label="Seções do livro">
+            <div
+              className={styles.tabsBar}
+              role="tablist"
+              aria-label="Seções do livro"
+            >
               {tabs.map((t) => (
                 <button
                   key={t.id}
@@ -597,22 +818,30 @@ function Livro() {
                 </section>
               )}
 
-              {abaAtiva === "personagens" && isCapitaesDaAreia && listaPersonagens.length > 0 && (
-                <section className={styles.introCard}>
-                  <h2 className={styles.sectionTitle}>{ui.personagensTitulo}</h2>
-                  <ul className={styles.list}>
-                    {listaPersonagens.map((personagem, index) => (
-                      <li key={index}>{personagem}</li>
-                    ))}
-                  </ul>
-                </section>
-              )}
-              {abaAtiva === "personagens" && isCapitaesDaAreia && listaPersonagens.length === 0 && (
-                <section className={styles.introCard}>
-                  <h2 className={styles.sectionTitle}>{ui.personagensTitulo}</h2>
-                  <p className={styles.fieldValue}>{ui.personagensVazio}</p>
-                </section>
-              )}
+              {abaAtiva === "personagens" &&
+                isCapitaesDaAreia &&
+                listaPersonagens.length > 0 && (
+                  <section className={styles.introCard}>
+                    <h2 className={styles.sectionTitle}>
+                      {ui.personagensTitulo}
+                    </h2>
+                    <ul className={styles.list}>
+                      {listaPersonagens.map((personagem, index) => (
+                        <li key={index}>{personagem}</li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+              {abaAtiva === "personagens" &&
+                isCapitaesDaAreia &&
+                listaPersonagens.length === 0 && (
+                  <section className={styles.introCard}>
+                    <h2 className={styles.sectionTitle}>
+                      {ui.personagensTitulo}
+                    </h2>
+                    <p className={styles.fieldValue}>{ui.personagensVazio}</p>
+                  </section>
+                )}
 
               {abaAtiva === "ficha" && (
                 <section className={styles.grid}>
@@ -658,7 +887,12 @@ function Livro() {
               {abaAtiva === "video" && videoUrl && (
                 <section className={styles.introCard}>
                   <h2 className={styles.sectionTitle}>{ui.videoTitulo}</h2>
-                  <a href={videoUrl} target="_blank" rel="noreferrer" className={styles.primaryButton}>
+                  <a
+                    href={videoUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={styles.primaryButton}
+                  >
                     {ui.videoBtn}
                   </a>
                 </section>
@@ -675,20 +909,28 @@ function Livro() {
                   <div className={styles.analysisGrid}>
                     {simbolismoLines.length > 0 && (
                       <div className={styles.analysisCard}>
-                        <h3 className={styles.analysisCardTitle}>{ui.simbolismo}</h3>
+                        <h3 className={styles.analysisCardTitle}>
+                          {ui.simbolismo}
+                        </h3>
                         <div className={styles.analysisCardContent}>
                           {simbolismoLines.map((line, idx) => (
-                            <p key={idx} className={styles.fieldValue}>{line}</p>
+                            <p key={idx} className={styles.fieldValue}>
+                              {line}
+                            </p>
                           ))}
                         </div>
                       </div>
                     )}
                     {engajamentoLines.length > 0 && (
                       <div className={styles.analysisCard}>
-                        <h3 className={styles.analysisCardTitle}>{ui.engajamento}</h3>
+                        <h3 className={styles.analysisCardTitle}>
+                          {ui.engajamento}
+                        </h3>
                         <div className={styles.analysisCardContent}>
                           {engajamentoLines.map((line, idx) => (
-                            <p key={idx} className={styles.fieldValue}>{line}</p>
+                            <p key={idx} className={styles.fieldValue}>
+                              {line}
+                            </p>
                           ))}
                         </div>
                       </div>
@@ -698,14 +940,18 @@ function Livro() {
                         <h3 className={styles.analysisCardTitle}>{ui.temas}</h3>
                         <div className={styles.analysisCardContent}>
                           {temasLines.map((line, idx) => (
-                            <p key={idx} className={styles.fieldValue}>{line}</p>
+                            <p key={idx} className={styles.fieldValue}>
+                              {line}
+                            </p>
                           ))}
                         </div>
                       </div>
                     )}
                     {!hasAnalise && (
                       <div className={styles.analysisCard}>
-                        <h3 className={styles.analysisCardTitle}>{ui.tabDados}</h3>
+                        <h3 className={styles.analysisCardTitle}>
+                          {ui.tabDados}
+                        </h3>
                         <div className={styles.analysisCardContent}>
                           <p className={styles.fieldValue}>{ui.analiseVazia}</p>
                         </div>
@@ -718,29 +964,43 @@ function Livro() {
                     <div className={styles.metaGrid}>
                       {tituloTexto && (
                         <div className={styles.metaItem}>
-                          <span className={styles.metaLabel}>{ui.tituloOriginal}</span>
-                          <span className={styles.metaValue}>{tituloTexto}</span>
+                          <span className={styles.metaLabel}>
+                            {ui.tituloOriginal}
+                          </span>
+                          <span className={styles.metaValue}>
+                            {tituloTexto}
+                          </span>
                         </div>
                       )}
                       {autorDisplay && (
                         <div className={styles.metaItem}>
                           <span className={styles.metaLabel}>{ui.autor}</span>
-                          <span className={styles.metaValue}>{autorDisplay}</span>
+                          <span className={styles.metaValue}>
+                            {autorDisplay}
+                          </span>
                         </div>
                       )}
                       {livro.criadoEm && (
                         <div className={styles.metaItem}>
-                          <span className={styles.metaLabel}>{ui.dataCadastro}</span>
+                          <span className={styles.metaLabel}>
+                            {ui.dataCadastro}
+                          </span>
                           <span className={styles.metaValue}>
-                            {new Date(livro.criadoEm).toLocaleDateString(en ? "en-US" : "pt-BR")}
+                            {new Date(livro.criadoEm).toLocaleDateString(
+                              en ? "en-US" : "pt-BR",
+                            )}
                           </span>
                         </div>
                       )}
                       {livro.atualizadoEm && (
                         <div className={styles.metaItem}>
-                          <span className={styles.metaLabel}>{ui.ultimaSync}</span>
+                          <span className={styles.metaLabel}>
+                            {ui.ultimaSync}
+                          </span>
                           <span className={styles.metaValue}>
-                            {new Date(livro.atualizadoEm).toLocaleDateString(en ? "en-US" : "pt-BR")}
+                            {new Date(livro.atualizadoEm).toLocaleDateString(
+                              en ? "en-US" : "pt-BR",
+                            )}
                           </span>
                         </div>
                       )}
@@ -751,8 +1011,9 @@ function Livro() {
             </div>
           </main>
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

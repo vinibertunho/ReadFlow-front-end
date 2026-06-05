@@ -97,32 +97,30 @@
     margin-bottom: 1.5rem;
 }
 
-.textoHeader button {
+.botaoExplorar {
     background-color: var(--purple-main);
     color: var(--bg-light);
     border: none;
-    padding: 0.8rem 8rem;
+    padding: 0.9rem 2.5rem;
     border-radius: 10px;
     cursor: pointer;
     width: fit-content;
+    max-width: 100%;
+    text-align: center;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
     transition: 0.25s ease;
 }
 
-.textoHeader button p {
-    font-size: 15px;
-    font-weight: 300;
-    color: var(--bg-light);
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-.textoHeader button:hover {
+.botaoExplorar:hover {
     background-color: #6935db;
     transform: translateY(-4px) scale(1.02);
     box-shadow: 0 14px 30px rgba(123, 67, 245, 0.28);
 }
 
-.textoHeader button:active {
+.botaoExplorar:active {
     transform: scale(0.98);
 }
 
