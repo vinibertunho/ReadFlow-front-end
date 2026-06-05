@@ -3,7 +3,8 @@ import styles from './Equipe.module.css';
 import Navbar from '../../components/Navbar/Navbar.jsx';
 import { useIdioma } from '../../context/IdiomaContext.jsx';
 
-const API_URL = 'https://randomuser.me/api/?results=6&nat=br,pt,us';
+const URL_API = 'https://readflow-m8o6.onrender.com/api/equipes';
+
 
 function Equipe() {
     const [membros, setMembros] = useState([]);
@@ -12,13 +13,16 @@ function Equipe() {
     const { idioma } = useIdioma();
 
     useEffect(() => {
-        fetch(API_URL)
+        fetch(URL_API)
             .then((response) => {
                 if (!response.ok) throw new Error('Falha na requisição');
                 return response.json();
             })
             .then((dados) => {
-                setMembros(dados.results);
+                const resultado = Array.isArray(dados) ? dados[0] : dados;
+                const listaFinal = resultado?.integrantes || [];
+
+                setMembros(listaFinal);
                 setCarregando(false);
             })
             .catch((erro) => {
@@ -57,6 +61,7 @@ function Equipe() {
                 : 'Inclusão: Tornar-se uma ferramenta de apoio para alunos que não possuem acesso a cursinhos particulares de alto custo.',
 
             membrosTitle: en ? 'Team Members' : 'Membros da Equipe',
+            equipeNome: en ? 'ReadFlow Team' : 'Equipe ReadFlow',
         };
     }, [idioma]);
 
@@ -108,13 +113,26 @@ function Equipe() {
                     <div className={styles.grid}>
                         {membros.map((item, index) => (
                             <div key={index} className={styles.card}>
-                                <img src={item.picture.large} alt={`${item.name.first} ${item.name.last}`} />
+                                <img src={item.fotoUrl} alt={item.nome} />
                                 <div className={styles.info}>
                                     <h3>
-                                        {item.name.first} {item.name.last}
+                                        {item.nome ? item.nome.replace(/_/g, ' ') : 'Integrante'} 
                                     </h3>
-                                    <span>{idioma === 'EN' ? 'Developer' : 'Desenvolvedor(a)'}</span>
-                                    <p>YYYYYYYYYYYY</p>
+                                    <span>
+                                        {(() => {
+                                            const outrosMembros = item.nome?.toUpperCase();
+                                            if (outrosMembros.includes("CECILIA") ||
+                                             outrosMembros.includes("ELOISA")||
+                                             outrosMembros.includes('EDUARDO') ||
+                                             outrosMembros.includes('BRYAN') ||
+                                             outrosMembros.includes('GABRIEL')) {
+                                                return idioma === 'EN' ? 'Content Creator' : 'Conteudista';
+                                            }
+
+                                            return idioma === 'EN' ? 'Developer' : 'Desenvolvedor(a)';
+                                        })()}
+                                        </span>
+                                    <p>{ui.equipeNome}</p>
                                 </div>
                             </div>
                         ))}
