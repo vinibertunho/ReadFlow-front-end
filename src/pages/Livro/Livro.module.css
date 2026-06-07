@@ -1,5 +1,5 @@
 .page {
-  min-height: 100vh;
+  flex: 1;  
   background:
     radial-gradient(circle at top left, rgba(99, 102, 241, 0.14), transparent 28%),
     linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
@@ -295,7 +295,7 @@
   max-width: 100%;
   min-width: 300px;
   min-height: 200px;
-  max-height: 1500px;
+  max-height: 6500px;
 }
 
 .listSection {
