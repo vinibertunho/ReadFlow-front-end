@@ -14,7 +14,7 @@ const Videoaulas = () => {
                   id: 1,
                   titulo: 'Lesson 01: Introduction to the Generation of 30 and Jorge Amado',
                   duracao: '02:25',
-                  videoUrl: 'https://youtu.be/S0Rw-18rgpY',
+                  videoUrl: 'https://www.youtube.com/embed/BseVlYEbjXc',
                   startTime: 0,
                   descricao:
                       "In this introductory lesson, we explore the historical context of Bahia in 1930 and Jorge Amado's motivations for writing one of the most visceral works in Brazilian literature.",
@@ -23,7 +23,7 @@ const Videoaulas = () => {
                   id: 2,
                   titulo: 'Lesson 02: The Trapiche as Social Space and Determinism',
                   duracao: '04:40',
-                  videoUrl: 'https://youtu.be/pHWR1zf_y64',
+                  videoUrl: 'https://www.youtube.com/embed/qCyX_ZtgvxM',
                   startTime: 0,
                   descricao:
                       "We analyze how the Trapiche functions as a collective character and how the environment shapes the boys' destinies, applying concepts of social determinism.",
@@ -34,7 +34,7 @@ const Videoaulas = () => {
                   id: 1,
                   titulo: 'Aula 01: Introdução à Geração de 30 e Jorge Amado',
                   duracao: '00:33',
-                  videoUrl: 'https://youtube.com/shorts/CRwRxtUa3Mw?feature=share',
+                  videoUrl: 'https://www.youtube.com/embed/-oWlL5V1QlY',
                   startTime: 0,
                   descricao:
                       'Nesta aula introdutória, exploramos o contexto histórico da Bahia em 1930 e as motivações de Jorge Amado ao escrever uma das obras mais viscerais da literatura brasileira.',
@@ -43,7 +43,7 @@ const Videoaulas = () => {
                   id: 2,
                   titulo: 'Aula 02: O Trapiche como Espaço Social e Determinismo',
                   duracao: '02:18',
-                  videoUrl: 'https://youtube.com/shorts/X9UeY8RMY0I?feature=share',
+                  videoUrl: 'https://www.youtube.com/embed/b3ZGAymflDQ',
                   startTime: 0,
                   descricao:
                       'Analisamos como o Trapiche funciona como um personagem coletivo e de que forma o ambiente molda o destino dos meninos, aplicando conceitos de determinismo social.',
