@@ -13,8 +13,8 @@ const Videoaulas = () => {
               {
                   id: 1,
                   titulo: 'Lesson 01: Introduction to the Generation of 30 and Jorge Amado',
-                  duracao: '15:20',
-                  videoUrl: 'https://www.youtube.com/embed/rGWF3ZsZPYs',
+                  duracao: '02:25',
+                  videoUrl: 'https://youtu.be/S0Rw-18rgpY',
                   startTime: 0,
                   descricao:
                       "In this introductory lesson, we explore the historical context of Bahia in 1930 and Jorge Amado's motivations for writing one of the most visceral works in Brazilian literature.",
@@ -22,37 +22,19 @@ const Videoaulas = () => {
               {
                   id: 2,
                   titulo: 'Lesson 02: The Trapiche as Social Space and Determinism',
-                  duracao: '18:45',
-                  videoUrl: 'https://www.youtube.com/embed/kJQP7kiw5Fk',
+                  duracao: '04:40',
+                  videoUrl: 'https://youtu.be/pHWR1zf_y64',
                   startTime: 0,
                   descricao:
                       "We analyze how the Trapiche functions as a collective character and how the environment shapes the boys' destinies, applying concepts of social determinism.",
-              },
-              {
-                  id: 3,
-                  titulo: 'Lesson 03: Character Analysis: From Pedro Bala to Dora',
-                  duracao: '22:10',
-                  videoUrl: 'https://www.youtube.com/embed/Ys7-6_t7OEQ',
-                  startTime: 0,
-                  descricao:
-                      "A deep dive into the psychological construction of the Captains of the Sands' leaders and the impact of Dora's arrival in the group.",
-              },
-              {
-                  id: 4,
-                  titulo: 'Lesson 04: Language, Orality and Religious Syncretism',
-                  duracao: '14:35',
-                  videoUrl: 'https://www.youtube.com/embed/YVkUvmDQ3HY',
-                  startTime: 0,
-                  descricao:
-                      'How linguistic variation and African-based religions appear in the text as a form of cultural resistance and identity.',
               },
           ]
         : [
               {
                   id: 1,
                   titulo: 'Aula 01: Introdução à Geração de 30 e Jorge Amado',
-                  duracao: '15:20',
-                  videoUrl: 'https://www.youtube.com/embed/rGWF3ZsZPYs',
+                  duracao: '00:33',
+                  videoUrl: 'https://youtube.com/shorts/CRwRxtUa3Mw?feature=share',
                   startTime: 0,
                   descricao:
                       'Nesta aula introdutória, exploramos o contexto histórico da Bahia em 1930 e as motivações de Jorge Amado ao escrever uma das obras mais viscerais da literatura brasileira.',
@@ -60,29 +42,11 @@ const Videoaulas = () => {
               {
                   id: 2,
                   titulo: 'Aula 02: O Trapiche como Espaço Social e Determinismo',
-                  duracao: '18:45',
-                  videoUrl: 'https://www.youtube.com/embed/kJQP7kiw5Fk',
+                  duracao: '02:18',
+                  videoUrl: 'https://youtube.com/shorts/X9UeY8RMY0I?feature=share',
                   startTime: 0,
                   descricao:
                       'Analisamos como o Trapiche funciona como um personagem coletivo e de que forma o ambiente molda o destino dos meninos, aplicando conceitos de determinismo social.',
-              },
-              {
-                  id: 3,
-                  titulo: 'Aula 03: Análise dos Personagens: De Pedro Bala a Dora',
-                  duracao: '22:10',
-                  videoUrl: 'https://www.youtube.com/embed/Ys7-6_t7OEQ',
-                  startTime: 0,
-                  descricao:
-                      'Um mergulho na construção psicológica dos líderes dos Capitães da Areia e o impacto da chegada de Dora no grupo.',
-              },
-              {
-                  id: 4,
-                  titulo: 'Aula 04: Linguagem, Oralidade e Sincretismo Religioso',
-                  duracao: '14:35',
-                  videoUrl: 'https://www.youtube.com/embed/YVkUvmDQ3HY',
-                  startTime: 0,
-                  descricao:
-                      'Como a variação linguística e as religiões de matriz africana aparecem no texto como forma de resistência cultural e identidade.',
               },
           ];
 
