@@ -34,7 +34,7 @@ function obterRotaLivro(livro) {
   return slugify(livro?.titulo || livro?.title || "");
 }
 
-async function fetchWithTimeout(url, options = {}, timeout = 15000) {
+async function fetchWithTimeout(url, options = {}, timeout = 7000) {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
   try {
@@ -44,6 +44,16 @@ async function fetchWithTimeout(url, options = {}, timeout = 15000) {
   } catch (err) {
     clearTimeout(id);
     throw err;
+  }
+}
+
+// Tenta a requisição com timeout curto e, em caso de falha (ex.: cold start
+// do Render), refaz uma vez com um tempo um pouco maior antes de desistir.
+async function fetchComRetry(url, options = {}) {
+  try {
+    return await fetchWithTimeout(url, options, 7000);
+  } catch {
+    return await fetchWithTimeout(url, options, 10000);
   }
 }
 
@@ -72,12 +82,13 @@ function Biblioteca() {
         setCarregando(true);
         setErro("");
 
-        // Busca em paralelo com timeout tolerante ao Cold Start
+        // Busca em paralelo com timeout curto + retry para reduzir o tempo
+        // de carregamento sem falhar no Cold Start do servidor.
         const [resLivros, resInteg] = await Promise.all([
-          fetchWithTimeout(API_LIVROS_URL, { headers: AUTH_HEADERS }, 15000)
+          fetchComRetry(API_LIVROS_URL, { headers: AUTH_HEADERS })
             .then((r) => (r.ok ? r.json() : []))
             .catch(() => []),
-          fetchWithTimeout(API_INTEGRACAO_URL, { headers: AUTH_HEADERS }, 15000)
+          fetchComRetry(API_INTEGRACAO_URL, { headers: AUTH_HEADERS })
             .then((r) => (r.ok ? r.json() : []))
             .catch(() => []),
         ]);
