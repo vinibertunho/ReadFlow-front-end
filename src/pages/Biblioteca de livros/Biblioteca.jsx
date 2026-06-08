@@ -70,7 +70,6 @@ function Biblioteca() {
   const [sort, setSort] = useState("melhor");
   const [layout, setLayout] = useState("grid");
   const [visibleCount, setVisibleCount] = useState(6);
-  const [manualFeatured, setManualFeatured] = useState(null);
 
   useEffect(() => {
     setSelectedGenre(isPt ? "Todos" : "All");
@@ -184,11 +183,7 @@ function Biblioteca() {
       );
     });
 
-  const featuredBook =
-    manualFeatured &&
-    livrosFiltrados.some((l) => l.id_unico === manualFeatured.id_unico)
-      ? manualFeatured
-      : livrosFiltrados[0];
+  const featuredBook = livrosFiltrados[0];
 
   const livrosParaLista = livrosFiltrados
     .filter((l) => l.id_unico !== featuredBook?.id_unico)
@@ -343,7 +338,11 @@ function Biblioteca() {
               <article
                 key={l.id_unico}
                 className={`${styles.bookCard} ${layout === "list" ? styles.bookCardList : ""}`}
-                onClick={() => setManualFeatured(l)}
+                onClick={() =>
+                  navigate(`/livro/${obterRotaLivro(l)}`, {
+                    state: { livro: l },
+                  })
+                }
               >
                 <img
                   className={styles.bookImage}
@@ -351,12 +350,12 @@ function Biblioteca() {
                   alt="Capa"
                 />
                 <div className={styles.bookContent}>
-                  <span>
+                  <span className={styles.authorLabel}>
                     {l.autor ||
                       (isPt ? "Autor não informado" : "Unknown Author")}
                   </span>
                   <h4>{isPt ? l.titulo : l.title_en}</h4>
-                  <p>
+                  <p className={styles.bookSummary}>
                     {isPt
                       ? l.sinopse || "Sem sinopse."
                       : l.sinopse_en || l.sinopse || "No synopsis."}

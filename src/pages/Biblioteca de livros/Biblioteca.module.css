@@ -203,9 +203,7 @@
   font-size: 0.95rem;
   line-height: 1.65;
   font-style: italic;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+  display: -webkit-box;  -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
@@ -318,16 +316,19 @@
 }
 
 .collectionGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 1.2rem;
 }
 
 .listLayout {
-  grid-template-columns: 1fr;
+  flex-direction: column;
 }
 
 .bookCard {
+  flex: 1 1 calc(33.333% - 0.8rem);
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   border: 0.0625rem solid #c5c6cd;
   border-radius: 1rem;
@@ -369,13 +370,15 @@
 
 .bookImage {
   width: 100%;
-  aspect-ratio: 2 / 3;
+  height: 16rem;
+  flex-shrink: 0;
   object-fit: cover;
   object-position: center;
   display: block;
 }
 
 .bookContent {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
@@ -395,6 +398,10 @@
   color: #0f1c2c;
   font-size: 1.05rem;
   line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .bookSummary {
@@ -572,8 +579,8 @@
     object-position: center 15%;
   }
 
-  .collectionGrid {
-    grid-template-columns: repeat(2, 1fr);
+  .bookCard {
+    flex: 1 1 calc(50% - 0.6rem);
   }
 }
 
@@ -586,8 +593,8 @@
     height: 14rem;
   }
 
-  .collectionGrid {
-    grid-template-columns: repeat(2, 1fr);
+  .bookCard {
+    flex: 1 1 calc(50% - 0.6rem);
   }
 
   .collectionTools {
@@ -611,8 +618,8 @@
 }
 
 @media (max-width: 30rem) {
-  .collectionGrid {
-    grid-template-columns: 1fr;
+  .bookCard {
+    flex: 1 1 100%;
   }
 
   .bookCardList {
