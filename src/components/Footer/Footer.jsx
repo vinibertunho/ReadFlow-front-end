@@ -2,6 +2,7 @@ import styles from './Footer.module.css';
 import { Link } from 'react-router-dom';
 import { useIdioma } from '../../context/IdiomaContext';
 
+
 function Footer() {
     const { idioma } = useIdioma();
     const en = idioma === 'EN';
@@ -34,7 +35,7 @@ function Footer() {
                 <div className={styles.brand}>
                     <a href="/">
                         <img
-                            src="../../../public/image/logo-do-readflow.png"
+                           src="/image/logo-do-readflow.png"
                             alt="Logo ReadFlow"
                             className={styles.logo}
                         />
