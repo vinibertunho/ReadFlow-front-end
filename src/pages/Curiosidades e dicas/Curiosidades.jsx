@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import styles from './Curiosidades.module.css';
 import Navbar from '../../components/Navbar/Navbar';
 import cidadeImg from '../../assets/cidade.png';
-import fotoImg from '../../assets/foto.jpg';
+import fotoImg from '../../assets/foto3.jpeg';
 import downloadImg from '../../assets/download.jpg';
 import { useIdioma } from '../../context/IdiomaContext';
 
@@ -27,7 +27,7 @@ export default function Curiosidades() {
             });
     }, []);
 
-    const ui = {
+     const ui = {
         carregando: en ? 'Loading Facts & Tips...' : 'Carregando Curiosidades e dicas...',
         semDados: en ? 'No data found.' : 'Nenhum dado encontrado.',
         subtitulo: en ? 'Literary Exploration' : 'Exploração Literária',
@@ -35,6 +35,11 @@ export default function Curiosidades() {
         textoDefault: en
             ? 'Loading contextual information:'
             : 'Carregando informações contextuais:',
+
+        livrosQueimadosTitle: en ? 'Books Burned by the Dictatorship' : 'Livros Queimados pela Ditadura',
+        livrosQueimadosText: en 
+            ? 'During Getúlio Vargas\' government, in the Estado Novo, the book was considered a communist threat. It is reported that around 808 copies of Captains of the Sands were seized and burned in a public square in Salvador shortly after its release.' 
+            : 'Durante o governo de Getúlio Vargas, no Estado Novo, o livro foi considerado uma ameaça comunista. Consta que cerca de 808 exemplares de Capitães da Areia foram apreendidos e queimados em praça pública em Salvador logo após o lançamento.',
 
         cenarioReal: en ? 'Real Setting' : 'Cenário Real',
         cenarioSub: en ? 'Salvador, 1930s' : 'Salvador, Anos 30',
@@ -48,6 +53,10 @@ export default function Curiosidades() {
             ? "Around 808 copies of the book were publicly burned in Salvador's main square by local authorities."
             : 'Cerca de 808 exemplares do livro foram queimados em praça pública em Salvador pelas autoridades locais.',
 
+        criticasSistemaTitle: en ? 'Severe Criticism of the System' : 'Críticas Severas ao Sistema',
+        criticasSistemaText: en 
+            ? 'In addition to exposing hunger and abandonment, Jorge Amado used the work to make harsh criticisms of the reformatories of the time (where minors suffered gruesome tortures) and the hypocrisy of bourgeois society and the clergy.' 
+            : 'Além de expor a fome e o abandono, Jorge Amado usou a obra para fazer duras críticas aos reformatórios da época (onde os menores sofriam torturas medonhas) e à hipocrisia da sociedade burguesa e do clero.',
         bahiaTitle: en ? 'Bahia in 1930' : 'A Bahia de 1930',
         bullet1: en ? 'Precarious urbanization' : 'Urbanização precária',
         bullet2: en ? 'Decline of cacao farming' : 'Decadência do cacau',
@@ -102,11 +111,14 @@ export default function Curiosidades() {
         return <h2 className={styles.loading}>{ui.semDados}</h2>;
     }
 
-    const data = (Array.isArray(dados) ? dados[0] : dados) || {};
+    const listaCuriosidades = Array.isArray(dados) ? dados : [dados];
+    const data = listaCuriosidades[0] || {};
 
-    // Usa campo em EN se disponível, senão PT
     const titulo = en ? data.titulo_en || data.titulo : data.titulo;
     const texto = en ? data.texto_en || data.texto : data.texto;
+
+    const dadosCriticas = listaCuriosidades.find(c => c.titulo && c.titulo.includes("Críticas")) || {};
+    const textoFatoHistorico = en ? dadosCriticas.texto_en || dadosCriticas.texto : dadosCriticas.texto;
 
     return (
         <>
@@ -114,7 +126,7 @@ export default function Curiosidades() {
             <div className={styles.container}>
                 <section className={styles.sectionTwoColumns}>
                     <div className={styles.heroTextContainer}>
-                        <span className={styles.sectionSubtitle}>{ui.subtitulo}</span>
+                        <h4 className={styles.sectionSubtitle}>{ui.subtitulo}</h4>
                         <h2 className={styles.sectionTitle}>{titulo || ui.tituloDefault}</h2>
                         <p className={styles.bodyText}>{texto || ui.textoDefault}</p>
                     </div>
@@ -123,7 +135,7 @@ export default function Curiosidades() {
                         <img src={cidadeImg} alt={ui.cenarioReal} className={styles.heroImage} />
                         <div className={styles.imageCaption}>
                             <strong>{ui.cenarioReal}</strong>
-                            <span>{ui.cenarioSub}</span>
+                            <h4>{ui.cenarioSub}</h4>
                         </div>
                     </div>
                 </section>
@@ -132,13 +144,15 @@ export default function Curiosidades() {
                     <section className={styles.cardCensure}>
                         <div className={styles.cardText}>
                             <div className={styles.cardTitleContainer}>
-                                <span className={styles.cardIcon}>📖</span>
-                                <h3 className={styles.cardTitle}>{ui.impactoTitle}</h3>
+                                <h4 className={styles.cardIcon}>📖</h4>
+                                <h3 className={styles.cardTitle}>{ui.livrosQueimadosTitle}</h3>
                             </div>
-                            <p className={styles.bodyText}>{ui.impactoText}</p>
+                            <p className={styles.bodyText}>{ui.livrosQueimadosText}</p>
                             <div className={styles.alertBox}>
-                                <span className={styles.alertTitle}>{ui.fatoHistorico}</span>
-                                <p className={styles.alertText}>{ui.fatoText}</p>
+                                <h4 className={styles.alertTitle}>
+                                    {ui.livrosQueimadosTitle}
+                                </h4>
+                                <p className={styles.alertText}>{ui.criticasSistemaText}</p>
                             </div>
                         </div>
 
@@ -149,7 +163,7 @@ export default function Curiosidades() {
 
                     <section className={styles.darkCard}>
                         <div className={styles.cardTitleContainer}>
-                            <span className={styles.cardIconWhite}>⚓</span>
+                            <h4 className={styles.cardIconWhite}>⚓</h4>
                             <h3 className={styles.darkCardTitle}>{ui.bahiaTitle}</h3>
                         </div>
                         <ul className={styles.bulletList}>
@@ -166,8 +180,8 @@ export default function Curiosidades() {
 
                     <div className={styles.timelineItem}>
                         <div className={styles.timelineCardTransparentLeft}>
-                            <h4 className={styles.timelineTitleText}>{ui.ano1912Title}</h4>
-                            <p className={styles.timelineBody}>{ui.ano1912Text}</p>
+                            <h4 className={styles.timelineTitleText}>{ui.ano1912Right}</h4>
+                            <p className={styles.timelineBody}>{ui.ano1912Desc}</p>
                         </div>
                         <div className={styles.timelineCenter}>
                             <div className={styles.timelineBadge}>1912</div>
@@ -217,10 +231,10 @@ export default function Curiosidades() {
                         <h2 className={styles.religiosidadeTitle}>{ui.religiosidadeTitle}</h2>
                         <p className={styles.religiosidadeBodyText}>{ui.religiosidadeText}</p>
                         <div className={styles.tagContainer}>
-                            <span className={styles.tag}>{ui.tag1}</span>
-                            <span className={styles.tag}>{ui.tag2}</span>
-                            <span className={styles.tag}>{ui.tag3}</span>
-                            <span className={styles.tag}>{ui.tag4}</span>
+                            <h4 className={styles.tag}>{ui.tag1}</h4>
+                            <h4 className={styles.tag}>{ui.tag2}</h4>
+                            <h4 className={styles.tag}>{ui.tag3}</h4>
+                            <h4 className={styles.tag}>{ui.tag4}</h4>
                         </div>
                     </div>
                     <div className={styles.religiosidadeImageContainer}>
