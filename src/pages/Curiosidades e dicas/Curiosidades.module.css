@@ -17,8 +17,17 @@
     padding: 2rem;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
 }
 
+.textContent {
+    font-size: 0.875rem;
+    line-height: 1.8;
+    color: #64748b;
+    margin: 0;
+    text-align: justify;
+    text-align-last: left;
+}
 .sectionTwoColumns {
     display: flex;
     gap: 2rem;
@@ -41,6 +50,7 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    max-width: 80rem;
 }
 
 .sectionSubtitle {
@@ -55,15 +65,18 @@
     font-size: 1.75rem;
     font-weight: 800;
     color: #1e293b;
-    line-height: 1.3;
+    line-height: 1.2;
     margin: 0 0 1rem 0;
 }
 
 .bodyText {
     font-size: 0.875rem;
     color: #64748b;
-    line-height: 1.6;
-    margin: 0;
+    line-height: 2;
+    width: 100%;
+    text-align: left;
+    text-align-last: left;
+    display: block;
 }
 
 .heroImageWrapper {
@@ -107,6 +120,7 @@
 .cardGrid {
     display: flex;
     gap: 1.5rem;
+    align-items: flex-start;
     max-width: 100%;
     min-width: 300px;
     min-height: 250px;
@@ -115,13 +129,12 @@
 
 .cardCensure{
     background-color: white;
-    border-radius: 1rem;
     display: flex;
     gap: 1.5rem;
+    padding: 1.25rem;
     align-items: stretch;
-    overflow: hidden;
     width: 100%;
-
+    border-radius: 1rem;
 }
 
 .cardCensure > * {
@@ -149,18 +162,27 @@
 .cardText {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
     justify-content: flex-start;
     border-radius: 0.75rem;
     background-color: #ffffff;
     padding: 1.5rem;
+    gap: 1rem;
     width: 100%;
 }
 
+.cardText p {
+    width: 100%;
+    text-align: justify !important;
+    text-align-last: justify !important;
+    text-justify: inter-word !important;
+    display: block !important;
+    margin: 0 0 1.25rem 0 !important;
+
+}
 .cardTitleContainer {
     display: flex;
     align-items: center;
-    gap: 0.625rem;
+    gap: 0.75rem;
     margin-bottom: 0.5rem;
 }
 
@@ -170,7 +192,7 @@
 
 .cardTitle {
     font-size: 1.125rem;
-    font-weight: 700;
+    font-weight: 600;
     color: #1e293b;
     margin: 0;
 }
@@ -183,14 +205,14 @@
 
 }
 .alertTitle {
-    font-size: 0.6875rem;
+    font-size: 0.875rem;
     font-weight: 800;
     color: #1e40af;
     display: block;
     margin-bottom: 0.25rem;
 }
 .alertText {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     color: #1e40af;
     margin: 0;
     line-height: 1.4;
@@ -213,10 +235,10 @@
 }
 
 .darkCard {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     color: #f8fafc;
     background-color: #334155;
-    padding: 1.5625rem;
+    padding: 2.5rem 2rem;
     border-radius: 0.75rem;
     display: flex;
     flex-direction: column;
@@ -228,6 +250,8 @@
 .cardIconWhite {
     font-size: 1.25rem;
     color: #ffffff;
+    margin: 0;
+    display: inline-block;
 }
 
 .darkCardTitle {
@@ -235,6 +259,10 @@
     font-weight: 700;
     color: #ffffff;
     margin: 0;
+    
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 }
 
 .bulletList {
@@ -243,11 +271,11 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 1.5rem;
 }
 
 .bulletItem {
-    font-size: 0.8125rem;
+    font-size: 0.975rem;
     color: #e2e8f0;
     display: flex;
     align-items: center;
@@ -301,7 +329,7 @@
 }
 
 .timelineItem {
-    display: flex;
+    display: grid;
     grid-template-columns: 1fr 2.5rem 1fr;
     align-items: center;
     width: 100%;
@@ -312,14 +340,7 @@
 
 .timelineLeft, .timelineRight {
     width: 100%;
-}
-
-.timelineLeft {
-    text-align: right;
-}
-
-.timelineRight {
-    text-align: left;
+    text-align: inherit;
 }
 
 .timelineCenter {
@@ -349,6 +370,12 @@
     border-radius: 0.5rem;
     padding: 1.25rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: left;
+    gap: 0.5rem;
 }
 
 .timelineCardContentLeft {
@@ -356,6 +383,7 @@
     border: 1px solid #cbd5e1;
     border-radius: 0.5rem;
     padding: 1.25rem;
+    
 }
 
 .timelineCardTransparentLeft {
@@ -384,21 +412,23 @@
     padding: 1.25rem;
     box-sizing: border-box;
     width: 100%;
-    text-align: right;
+    text-align: left;
 }
 
 .timelineTitleText {
-    font-size: 0.875rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: #1e293b;
-    margin: 0 0 0.5rem 0;
+    margin: 0;
 }
 
 .timelineBody {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     color: #64748b;
-    line-height: 1.5;
+    line-height: 1.8;
     margin: 0;
+    width: 100%;
+    display: block;
 }
 
 .academyTag {
@@ -413,36 +443,63 @@
     background-color: #ebf3ff;
     border-radius: 1.5rem;
     display: flex;
-    overflow: hidden;
-    gap: 2.5rem;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.25rem;
+    flex-direction: column !important;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .religiosidadeTextContent {
-    padding: 2rem 1.5rem;
+    flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
-
+    gap: 1rem;
+    max-width: 32rem;
+    width: 100% !important;
 }
 
 .religiosidadeTitle {
     font-size: 1.5rem;
     font-weight: 800;
     color: #1e293b;
-    margin: 0;
+    margin: 0 0 0.5rem 0;
+    width: 100%;
+    text-align: justify;
 }
 
 .religiosidadeBodyText {
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     color: #475569;
-    line-height: 1.6;
-    margin: 0;
+    line-height: 1.8;
+    margin-top: 1.5rem;
+    width: 100%;
+    text-align: left;
+    text-align-last: justify;
+}
+
+.religiosidadeImageContainer {
+    flex: 0.8;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.religiosidadeImage {
+    width: 100%;
+    max-width: 25rem;
+    height: auto;
+    object-fit: cover;
+    display: flex;
+    border-radius: 0.75rem;
 }
 
 .tagContainer {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
+    margin-top: 1.5rem;
 }
 
 .tag {
@@ -455,26 +512,34 @@
     border: 1px;
 }
 
-.religiosidadeImageContainer {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: flex-end;
-    grid-column: 2;
-    padding: 1.5rem 1.5rem 1.5rem 0;
-    box-sizing: border-box;
-}
-
-.religiosidadeImage {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: flex;
-    border-radius: 0.75rem;
-}
 /* ==========================================================================
    RESPONSIVIDADE SUPER ENXUTA
    ========================================================================== */
+@media (min-width: 48rem) {
+    .religiosidadeSection {
+        flex-direction: row !important; /* Coloca um do lado do outro no PC */
+        align-items: center;            /* Alinha verticalmente no centro */
+        gap: 2.5rem;                    /* Aumenta o espaço horizontal entre colunas */
+        padding: 2.5rem;
+    }
+    
+    .religiosidadeTextContent {
+        width: 60% !important;          /* No PC, o texto volta a usar 60% */
+    }
+    
+    .religiosidadeImageContainer {
+        width: 40% !important;          /* No PC, a imagem volta a usar 40% */
+        justify-content: flex-start;
+    }
+    
+    .religiosidadeImage {
+        max-width: 100%;               /* Permite que a foto preencha seus 40% sem restrições */
+    }
+    
+    .religiosidadeBodyText {
+        text-align: justify !important; /* No PC, o justificado fica perfeito e retilíneo */
+    }
+}
 
 /* Mobile */
 @media (max-width: 575.98px) {
@@ -522,4 +587,64 @@
 /* Extra Large Devices */
 @media (min-width: 1200px) {
     .container { max-width: 70rem; gap: 2.5rem; }
+}
+
+@media (max-width: 768px) {
+    /* Cria o efeito da linha vertical passando pelo lado esquerdo no mobile */
+    .timelineSection {
+        position: relative;
+    }
+    
+    .timelineSection::after {
+        content: '';
+        position: absolute;
+        left: 2rem;
+        top: 6rem;
+        bottom: 2rem;
+        width: 2px;
+        background-color: #cbd5e1;
+        z-index: 1;
+    }
+
+    /* Quebra o Grid de 3 colunas para empilhar em uma coluna só */
+    .timelineItem {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding-left: 3.5rem; /* Espaço para a linha e os badges */
+        gap: 1rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Força os textos e caixas a ocuparem 100% da largura útil */
+    .timelineLeft, 
+    .timelineRight {
+        width: 100% !important;
+        text-align: left !important;
+    }
+
+    /* Move os badges (anos) para ficarem alinhados sobre a linha à esquerda */
+    .timelineCenter {
+        position: absolute;
+        left: 2rem;
+        transform: translateX(-50%);
+        top: 0.5rem;
+        z-index: 2;
+    }
+
+    .timelineBadge {
+        width: 2.2rem;
+        height: 2.2rem;
+        font-size: 0.625rem;
+    }
+
+    /* Ajusta os paddings dos cards para não esmagar o texto em telas pequenas */
+    .timelineCardContent,
+    .timelineCardContentLeft,
+    .timelineCardTransparentLeft,
+    .timelineCardTransparentRight {
+        padding: 1rem !important;
+        width: 100% !important;
+    }
 }
