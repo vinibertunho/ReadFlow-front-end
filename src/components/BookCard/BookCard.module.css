@@ -13,10 +13,9 @@
 
 .media {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem; 
+  overflow: hidden;
+  height: 200px;
+  flex-shrink: 0;
 }
 
 .badge {
@@ -34,12 +33,10 @@
 
 .foto {
   width: 100%;
-  max-width: 100%;
-  height: auto;
-  max-height: 220px; /* limita a altura da imagem */
+  height: 100%;
   object-fit: cover;
+  object-position: center top;
   display: block;
-  border-radius: 0.625rem;
 }
 
 .info {
@@ -96,9 +93,6 @@
 }
 
 @media (max-width: 767.98px) {
-  .foto {
-    max-height: 180px;
-  }
   .info {
     padding: 0.75rem;
   }
@@ -108,27 +102,18 @@
 }
 
 @media (min-width: 768px) and (max-width: 991.98px) {
-  .foto {
-    max-height: 200px;
-  }
   .titulo {
     font-size: 1.05rem;
   }
 }
 
 @media (min-width: 992px) and (max-width: 1199.98px) {
-  .foto {
-    max-height: 220px;
-  }
   .titulo {
     font-size: 1.1rem;
   }
 }
 
 @media (min-width: 1200px) {
-  .foto {
-    max-height: 240px;
-  }
   .info {
     padding: 1rem;
   }
